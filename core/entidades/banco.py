@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Banco:
-    id: int
     nombre: str
+    id: int | None = None
     descripcion: str | None = None
 
     def _actualizar_nombre_banco(self, nuevo_nombre: str):

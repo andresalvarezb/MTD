@@ -4,13 +4,12 @@ from datetime import datetime
 
 @dataclass
 class CuentaBancaria:
-    id: int
     numero_cuenta: str
     numero_certificado: str
     estado: str
     id_usuario: int
     id_banco: int
-    fecha_creacion: datetime
+    id: int | None = None
     tipo_de_cuenta: str | None = None
     fecha_actualizacion: datetime | None = None
     observaciones: str | None = None

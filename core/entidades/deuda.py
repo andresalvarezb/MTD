@@ -1,18 +1,18 @@
-from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
+from datetime import datetime
+from dataclasses import dataclass
 
 
 @dataclass
-class DeudaUsuario:
-    id: int
-    id_area: int
+class Deuda:
     id_usuario: int
     estado: str
     saldo: Decimal
     valor_total: Decimal
     fecha_creacion: datetime
     fecha_actualizacion: datetime | None
+    id_area: int | None = None
+    id: int | None = None
 
     def actualizar_saldo(self, descuento: Decimal):
         if descuento < 0:
