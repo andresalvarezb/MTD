@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
 from .descuento import Descuento
+from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
 
 
 @dataclass
@@ -64,3 +65,35 @@ class CuentaPorPagar:
         descuento_total = Decimal(sum(descuento.valor for descuento in descuentos))
         self.total_descuentos = descuento_total
         self.total_a_pagar = self.valor_cuenta_cobro - descuento_total
+
+    @classmethod
+    def from_orm(cls, orm_obj: CuentaPorPagarORM) -> "CuentaPorPagar":
+        return cls(
+            id_historial_laboral=orm_obj.id_historial_laboral,
+            id_cuenta_bancaria=orm_obj.id_cuenta_bancaria,
+            claveCPP=orm_obj.claveCPP,
+            fecha_prestacion_servicio=orm_obj.fecha_prestacion_servicio,
+            fecha_radicacion_contable=orm_obj.fecha_radicacion_contable,
+            estado_aprobacion_cuenta_usuario=orm_obj.estado_aprobacion_cuenta_usuario,
+            estado_cuenta_por_pagar=orm_obj.estado_cuenta_por_pagar,
+            valor_cuenta_cobro=orm_obj.valor_cuenta_cobro, # type: ignore
+            estado_de_pago=orm_obj.estado_de_pago,
+            id=orm_obj.id,
+            total_descuentos=orm_obj.total_descuentos, # type: ignore
+            total_a_pagar=orm_obj.total_a_pagar, # type: ignore
+            fecha_actualizacion=orm_obj.fecha_actualizacion,
+            fecha_aprobacion_rut=orm_obj.fecha_aprobacion_rut,
+            fecha_creacion=orm_obj.fecha_creacion,
+            fecha_aprobacion_cuenta_usuario=orm_obj.fecha_aprobacion_cuenta_usuario,
+            fecha_programacion_pago=orm_obj.fecha_programacion_pago,
+            fecha_reprogramacion=orm_obj.fecha_reprogramacion,
+            fecha_pago=orm_obj.fecha_pago,
+            estado_reprogramacion_pago=orm_obj.estado_reprogramacion_pago,
+            rut=orm_obj.rut,
+            dse=orm_obj.dse,
+            causal_rechazo=orm_obj.causal_rechazo,
+            creado_por=orm_obj.creado_por,
+            lider_paciente_asignado=orm_obj.lider_paciente_asignado,
+            eps_paciente_asignado=orm_obj.eps_paciente_asignado,
+            tipo_de_cuenta=orm_obj.tipo_de_cuenta,
+        )

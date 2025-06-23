@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
+from fastapi.responses import JSONResponse
 from core.servicios.etlHistorico import procesar_historico
 from core.servicios.crearUsuario import CrearUsuario
 from core.servicios.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
@@ -35,6 +36,11 @@ from core.servicios.crearDescuento import CrearDescuento
 from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
+from core.servicios.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
+from core.servicios.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
+from core.entidades.cuentaPorPagar import CuentaPorPagar
+from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
+from app.api.esquemas.respuestaEndpoint import WrapperRespuesta
 
 
 router = APIRouter()
@@ -263,9 +269,24 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
         }
     return {"message": "Historial cargado correctamente", "data": registros_exitosos}
 
-    # repo_municipio = RepositorioMunicipioSqlAlchemy(db)
-    # municipio_service = CrearMunicipio(repo_municipio)
 
-    # repositorio = RepositorioUsuarioSqlAlchemy(db)
-    # crear_usuario_service = CrearUsuario(repositorio)
-    # crear_usuario_service.ejecutar(data)
+@router.get("/", response_model=list[CuentaPorPagarResponseSchema])
+def obtener_cuentas(db: Session = Depends(get_db)):
+    try:
+        repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
+        caso_de_uso = ObtenerCuentasPorPagar(repo_cuentasPorPagar)
+        cuentas = caso_de_uso.ejecutar()
+        cuentas_response = [CuentaPorPagarResponseSchema.model_validate(cuenta) for cuenta in cuentas]
+        return cuentas_response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+@router.get('/{id_cuenta_por_pagar}', response_model=CuentaPorPagarResponseSchema)
+def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db)):
+    try:
+        repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
+        caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
+        cuenta = caso_de_uso.ejecutar(id_cuenta_por_pagar)
+        return CuentaPorPagarResponseSchema.model_validate(cuenta)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

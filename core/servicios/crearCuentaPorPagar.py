@@ -1,11 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
-from core.interfaces.repositorioCuentaPorPagar import RepositorioCuentaPorPagar
+from core.interfaces.repositorioCuentaPorPagar import CrearCuentaPorPagarProtocol
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 
 class CrearCuentaPorPagar:
-    def __init__(self, repositorio: RepositorioCuentaPorPagar):
+    def __init__(self, repositorio: CrearCuentaPorPagarProtocol):
         self.repositorio = repositorio
 
     def ejecutar(self, datos: dict) -> CuentaPorPagar:
