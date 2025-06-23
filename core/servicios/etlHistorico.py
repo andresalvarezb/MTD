@@ -108,11 +108,14 @@ def columnas_invalidas(row: pd.Series, tipos: dict) -> list:
     return errores
 
 
-def procesar_archivo(file: UploadFile) -> dict:
+def procesar_historico(file: UploadFile) -> dict:
     df = leer_archivo(file)
 
     if df.empty:
         raise HTTPException(status_code=400, detail="El archivo está vacío")
+
+    df["NO.CUENTA BANCARIA"] = df["NO.CUENTA BANCARIA"].astype("object")
+    df["NÚMERO DE DOCUMENTO CERTIFICADO BANCARIO"] = df["NÚMERO DE DOCUMENTO CERTIFICADO BANCARIO"].astype("object")
 
     df = df.dropna(subset=["DOCUMENTO"])  # Elimina filas completamente vacías
 
@@ -160,4 +163,4 @@ def procesar_archivo(file: UploadFile) -> dict:
     df["ESTADO_DE_PAGO"] = df["ESTADO_DE_PAGO"].fillna("SIN VALOR")
     df["ESTADO_DE_REPROGRAMACION"] = df["ESTADO_DE_REPROGRAMACION"].fillna("SIN VALOR")
 
-    return df.head(50).to_dict(orient="index")
+    return df.head(10).to_dict(orient="index")

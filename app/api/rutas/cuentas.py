@@ -211,7 +211,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                         "id_usuario": usuario.id,
                         "id_deuda": None,
                         "valor": descuento["valor"],
-                        "fecha_creacion": None,
+                        "fecha_creacion": registro["FECHA_RADICACION_CONTABLE"],
                         "tipo_de_descuento": descuento["tipo_descuento"],
                         "descripcion": descuento["descripcion"],
                         "fecha_actualizacion": None,
