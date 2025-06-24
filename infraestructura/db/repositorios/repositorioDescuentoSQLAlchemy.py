@@ -1,10 +1,14 @@
 from sqlalchemy.orm import Session
 from core.entidades.descuento import Descuento
 from infraestructura.db.modelos.descuento import DescuentosPorPagarORM
-from core.interfaces.repositorioDescuento import RepositorioDescuento
+from core.interfaces.repositorioDescuento import (
+    CrearDescuentoProtocol,
+    ObtenerDescuentosProtocol,
+    ObtenerDescuentoProtocol,
+)
 
 
-class RepositorioDescuentoSqlAlchemy(RepositorioDescuento):
+class RepositorioDescuentoSqlAlchemy(CrearDescuentoProtocol, ObtenerDescuentosProtocol, ObtenerDescuentoProtocol):
     def __init__(self, db: Session) -> None:
         self.db = db
 
@@ -40,3 +44,11 @@ class RepositorioDescuentoSqlAlchemy(RepositorioDescuento):
             return existe
         else:
             return None
+
+    def obtener_descuentos(self) -> list[Descuento]:
+        registros_orm = self.db.query(DescuentosPorPagarORM).all()
+        return [Descuento.from_orm(orm_obj) for orm_obj in registros_orm]
+
+    def obtener_descuento(self, id_descuento: int) -> Descuento:
+        registro_orm = self.db.query(DescuentosPorPagarORM).filter_by(id=id_descuento).first()
+        return Descuento.from_orm(registro_orm)

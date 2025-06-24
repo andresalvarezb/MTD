@@ -27,7 +27,9 @@ class RepositorioDeudaSqlAlchemy(RepositorioDeuda):
         return deuda
 
     def obtener(self, deuda: Deuda):
-        existe = self.db.query(DeudaORM).filter_by(id_usuario=deuda.id_usuario, fecha_creacion=deuda.fecha_creacion).first()
+        existe = (
+            self.db.query(DeudaORM).filter_by(id_usuario=deuda.id_usuario, fecha_creacion=deuda.fecha_creacion).first()
+        )
         if existe:
             return existe
         else:

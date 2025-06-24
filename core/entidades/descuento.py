@@ -34,3 +34,17 @@ class Descuento:
     def actualizar_tipo_de_descuento(self, nuevo_tipo: str):
         self.tipo_de_descuento = nuevo_tipo.capitalize()
         self.fecha_actualizacion = datetime.now()
+
+    @classmethod
+    def from_orm(cls, orm_obj):
+        return cls(
+            id=orm_obj.id,
+            id_cuenta_por_pagar=orm_obj.id_cuenta_por_pagar,
+            id_usuario=orm_obj.id_usuario,
+            valor=orm_obj.valor,
+            fecha_creacion=orm_obj.fecha_creacion,
+            tipo_de_descuento=orm_obj.tipo_de_descuento,
+            id_deuda=orm_obj.id_deuda,
+            descripcion=orm_obj.descripcion,
+            fecha_actualizacion=orm_obj.fecha_actualizacion,
+        )

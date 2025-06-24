@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 from decimal import Decimal
 
+
 class CuentaPorPagarResponseSchema(BaseModel):
     id: int | None
     id_historial_laboral: int

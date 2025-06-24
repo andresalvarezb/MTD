@@ -1,46 +1,41 @@
 import logging
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
-from fastapi.responses import JSONResponse
-from core.servicios.etlHistorico import procesar_historico
-from core.servicios.crearUsuario import CrearUsuario
-from core.servicios.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
-
-from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
-from infraestructura.db.index import get_db
 from sqlalchemy.orm import Session
+from infraestructura.db.index import get_db
+from core.servicios.crearCargo import CrearCargo
+from core.servicios.crearBanco import CrearBanco
+from core.servicios.crearUsuario import CrearUsuario
+from core.servicios.crearDescuento import CrearDescuento
+from core.servicios.etlHistorico import procesar_historico
+from core.servicios.crearCuentaBancaria import CrearCuentaBancaria
+from core.servicios.crearCuentaPorPagar import CrearCuentaPorPagar
+from core.servicios.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
+from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
+from core.servicios.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
+from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
+from core.servicios.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
+from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
+from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
+from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
+from core.servicios.crearMunicipio import CrearDepartamento, CrearMunicipio
+from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
+    RepositorioHistorialLaboralUsuarioSqlAlchemy,
+)
 from infraestructura.db.repositorios.repositorioMunicipioSqlAlchemy import (
     RepositorioMunicipioSqlAlchemy,
     RepositorioDepartamentoSqlAlchemy,
 )
-from core.servicios.crearMunicipio import CrearDepartamento, CrearMunicipio
-from core.servicios.crearCargo import CrearCargo
-from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
 
-# from core.interfaces.repositorioHistorialLaboralUsuario import RepositorioHistorialLaboralUsuario
-from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
-    RepositorioHistorialLaboralUsuarioSqlAlchemy,
-)
-from core.entidades.banco import Banco
-from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
-from core.servicios.crearBanco import CrearBanco
-from core.servicios.crearCuentaBancaria import CrearCuentaBancaria
+
 from infraestructura.db.repositorios.repositorioCuentaBancariaSqlAlchemy import (
     RepositorioCuentaBancariaSqlAlchemy,
 )
 from infraestructura.db.repositorios.repositorioCuentaPorPagarSqlAlchemy import (
     RepositorioCuentaPorPagarSqlAlchemy,
 )
-from core.servicios.crearCuentaPorPagar import CrearCuentaPorPagar
-from core.servicios.crearDescuento import CrearDescuento
 from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
-from core.servicios.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
-from core.servicios.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
-from core.entidades.cuentaPorPagar import CuentaPorPagar
-from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
-from app.api.esquemas.respuestaEndpoint import WrapperRespuesta
 
 
 router = APIRouter()
@@ -281,7 +276,8 @@ def obtener_cuentas(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
-@router.get('/{id_cuenta_por_pagar}', response_model=CuentaPorPagarResponseSchema)
+
+@router.get("/{id_cuenta_por_pagar}", response_model=CuentaPorPagarResponseSchema)
 def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)

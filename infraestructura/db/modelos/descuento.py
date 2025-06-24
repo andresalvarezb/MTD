@@ -12,8 +12,6 @@ if TYPE_CHECKING:
     from .deuda import DeudaORM
 
 
-
-
 class DescuentosPorPagarORM(Base):
     __tablename__ = "descuentos_por_pagar"
 
@@ -31,4 +29,3 @@ class DescuentosPorPagarORM(Base):
     cuenta_por_pagar: Mapped["CuentaPorPagarORM"] = relationship(back_populates="descuentos")
     usuario: Mapped["UsuarioORM"] = relationship(back_populates="descuentos")
     deuda: Mapped["DeudaORM"] = relationship(back_populates="descuentos")
-

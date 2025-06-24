@@ -1,15 +1,17 @@
 from sqlalchemy.orm import Session
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
-from core.interfaces.repositorioCuentaPorPagar import CrearCuentaPorPagarProtocol, ObtenerCuentaPorPagarProtocol, ObtenerCuentasPorPagarProtocol
+from core.interfaces.repositorioCuentaPorPagar import (
+    CrearCuentaPorPagarProtocol,
+    ObtenerCuentaPorPagarProtocol,
+    ObtenerCuentasPorPagarProtocol,
+)
 from fastapi import HTTPException
 
 
-
-
-
-
-class RepositorioCuentaPorPagarSqlAlchemy(CrearCuentaPorPagarProtocol, ObtenerCuentaPorPagarProtocol, ObtenerCuentasPorPagarProtocol):
+class RepositorioCuentaPorPagarSqlAlchemy(
+    CrearCuentaPorPagarProtocol, ObtenerCuentaPorPagarProtocol, ObtenerCuentasPorPagarProtocol
+):
     def __init__(self, db: Session):
         self.db = db
 

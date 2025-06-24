@@ -1,9 +1,9 @@
 from core.entidades.descuento import Descuento
-from core.interfaces.repositorioDescuento import RepositorioDescuento
+from core.interfaces.repositorioDescuento import CrearDescuentoProtocol
 
 
 class CrearDescuento:
-    def __init__(self, repositorio: RepositorioDescuento):
+    def __init__(self, repositorio: CrearDescuentoProtocol):
         self.repositorio = repositorio
 
     def ejecutar(self, datos: dict) -> Descuento:

@@ -76,11 +76,11 @@ class CuentaPorPagar:
             fecha_radicacion_contable=orm_obj.fecha_radicacion_contable,
             estado_aprobacion_cuenta_usuario=orm_obj.estado_aprobacion_cuenta_usuario,
             estado_cuenta_por_pagar=orm_obj.estado_cuenta_por_pagar,
-            valor_cuenta_cobro=orm_obj.valor_cuenta_cobro, # type: ignore
+            valor_cuenta_cobro=orm_obj.valor_cuenta_cobro,  # type: ignore
             estado_de_pago=orm_obj.estado_de_pago,
             id=orm_obj.id,
-            total_descuentos=orm_obj.total_descuentos, # type: ignore
-            total_a_pagar=orm_obj.total_a_pagar, # type: ignore
+            total_descuentos=orm_obj.total_descuentos,  # type: ignore
+            total_a_pagar=orm_obj.total_a_pagar,  # type: ignore
             fecha_actualizacion=orm_obj.fecha_actualizacion,
             fecha_aprobacion_rut=orm_obj.fecha_aprobacion_rut,
             fecha_creacion=orm_obj.fecha_creacion,
