@@ -1,9 +1,9 @@
 from core.entidades.usuario import Usuario
-from core.interfaces.repositorioUsuario import RepositorioUsuario
+from core.interfaces.repositorioUsuario import CrearUsuarioProtocol
 
 
 class CrearUsuario:
-    def __init__(self, repositorio: RepositorioUsuario):
+    def __init__(self, repositorio: CrearUsuarioProtocol):
         self.repositorio = repositorio
 
     def ejecutar(self, datos: dict) -> Usuario:
