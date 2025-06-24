@@ -1,9 +1,9 @@
 from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
-from core.interfaces.repositorioHistorialLaboralUsuario import RepositorioHistorialLaboralUsuario
+from core.interfaces.repositorioHistorialLaboralUsuario import CrearHistorialLaboralUsuarioProtocol
 
 
 class CrearHistorialLaboralUsuario:
-    def __init__(self, repositorio: RepositorioHistorialLaboralUsuario):
+    def __init__(self, repositorio: CrearHistorialLaboralUsuarioProtocol):
         self.repositorio = repositorio
 
     def ejecutar(self, datos: dict) -> HistorialLaboralUsuario:
