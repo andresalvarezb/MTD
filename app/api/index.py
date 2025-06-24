@@ -11,7 +11,7 @@ router = APIRouter()
 router.include_router(cuentas, prefix="/cuentas", tags=["Cuentas por pagar"])
 router.include_router(descuentos, prefix="/descuentos", tags=["Descuentos"])
 router.include_router(usuarios, prefix="/usuarios", tags=["Usuarios"])
-router.include_router(seguridadSocial, prefix="/seguridadSocial", tags=["Seguridad Social"])
+router.include_router(seguridadSocial, prefix="/seguridad-social", tags=["Seguridad Social"])
 
 
 
