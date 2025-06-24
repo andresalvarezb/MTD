@@ -5,7 +5,7 @@ from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import Reposit
 from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
     RepositorioHistorialLaboralUsuarioSqlAlchemy,
 )
-from core.servicios.actualizarSeguridadSocial import ActualizarSeguridadSocial
+from core.servicios.historialLaboral.actualizarSeguridadSocial import ActualizarSeguridadSocial
 from app.api.esquemas.seguridadSocial import ActualizacionSeguridadSocialSchema
 
 router = APIRouter()

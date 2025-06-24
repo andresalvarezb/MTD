@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
 from fastapi import APIRouter, HTTPException, Depends
-from core.servicios.obtenerDescuento import ObtenerDescuento
-from core.servicios.obtenerDescuentos import ObtenerDescuentos
+from core.servicios.descuentos.obtenerDescuento import ObtenerDescuento
+from core.servicios.descuentos.obtenerDescuentos import ObtenerDescuentos
 from app.api.esquemas.descuento import DescuentoResponseSchema
 from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import RepositorioDescuentoSqlAlchemy
 

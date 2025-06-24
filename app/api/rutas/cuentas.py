@@ -2,22 +2,22 @@ import logging
 import pandas as pd
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
-from core.servicios.crearCargo import CrearCargo
-from core.servicios.crearBanco import CrearBanco
-from core.servicios.crearUsuario import CrearUsuario
-from core.servicios.crearDescuento import CrearDescuento
+from core.servicios.usuarios.crearCargo import CrearCargo
+from core.servicios.cuentasBancarias.crearBanco import CrearBanco
+from core.servicios.usuarios.crearUsuario import CrearUsuario
+from core.servicios.descuentos.crearDescuento import CrearDescuento
 from core.servicios.etlHistorico import procesar_historico
-from core.servicios.crearCuentaBancaria import CrearCuentaBancaria
-from core.servicios.crearCuentaPorPagar import CrearCuentaPorPagar
-from core.servicios.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
+from core.servicios.cuentasBancarias.crearCuentaBancaria import CrearCuentaBancaria
+from core.servicios.cuentasPorPagar.crearCuentaPorPagar import CrearCuentaPorPagar
+from core.servicios.cuentasPorPagar.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
 from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
-from core.servicios.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
+from core.servicios.cuentasPorPagar.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
 from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
-from core.servicios.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
+from core.servicios.historialLaboral.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
 from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
 from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
-from core.servicios.crearMunicipio import CrearDepartamento, CrearMunicipio
+from core.servicios.usuarios.crearMunicipio import CrearDepartamento, CrearMunicipio
 from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
     RepositorioHistorialLaboralUsuarioSqlAlchemy,
 )

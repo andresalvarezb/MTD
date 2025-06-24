@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from core.entidades.usuario import Usuario
 from infraestructura.db.index import get_db
 from fastapi import APIRouter, HTTPException, Depends
-from core.servicios.obtenerUsuario import ObtenerUsuario
-from core.servicios.obtenerUsuarios import ObtenerUsuarios
+from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
+from core.servicios.usuarios.obtenerUsuarios import ObtenerUsuarios
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
 
 
