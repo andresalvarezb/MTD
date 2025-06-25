@@ -1,15 +1,12 @@
 import uvicorn
 from fastapi import FastAPI
-from app.api.index import router as api_router
+from app.api.index import app
 from infraestructura.db.index import Base, engine
 
 # 👇 Importa dinámicamente todos los modelos definidos
 import infraestructura.db.modelos.municipio
 import infraestructura.db.modelos.areaMTD
 import infraestructura.db.modelos.deuda
-
-app = FastAPI(title="API Cuentas Medicas", description="", version="0.1.0")
-app.include_router(api_router, prefix="/api")
 
 
 @app.get("/")
