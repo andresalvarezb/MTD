@@ -1,7 +1,7 @@
 from core.entidades.deuda import Deuda
-from typing import Protocol, runtime_checkable
+from typing import Protocol
 
 
-@runtime_checkable
-class RepositorioDeuda(Protocol):
-    def guardar(self, deuda: Deuda) -> Deuda: ...
+class CrearDeudaProtocol(Protocol):
+    def crear(self, deuda: Deuda) -> Deuda: ...
+

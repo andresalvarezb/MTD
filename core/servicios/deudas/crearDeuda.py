@@ -1,22 +1,49 @@
 from core.entidades.deuda import Deuda
-from core.interfaces.repositorioDeuda import RepositorioDeuda
+from core.interfaces.repositorioDeuda import CrearDeudaProtocol
+from core.servicios.deudas.dtos import CrearDeudaDTO
+from core.interfaces.repositorioUsuario import ObtenerUsuarioPorDocumentoProtocol
+from decimal import Decimal
+from core.interfaces.repositorioAreaMTD import ObtenerAreaPorNombreProtocol
 
 
-class Creardeuda:
-    def __init__(self, repositorio: RepositorioDeuda):
-        self.repositorio = repositorio
+class CrearDeuda:
+    def __init__(
+        self,
+        repo_deuda: CrearDeudaProtocol,
+        obtener_usuario_repo: ObtenerUsuarioPorDocumentoProtocol,
+        obtener_area_repo: ObtenerAreaPorNombreProtocol,
+    ):
+        self.repo_deuda = repo_deuda
+        self.repo_usuario = obtener_usuario_repo
+        self.repo_area = obtener_area_repo
 
-    def ejecutar(self, datos: dict) -> Deuda:
+    def ejecutar(self, datos: CrearDeudaDTO) -> Deuda:
+        usuario = self.repo_usuario.obtener_por_documento(datos.documento)
+
+        if not usuario:
+            raise ValueError(f"Usuario {datos.documento} no encontrado. No se puede asignar deuda")
+
+        # ! Revisar el bug que genera esta linea. se agrega este parche pero es un comportamiento inesperado
+        if usuario.id is None:
+            raise KeyError(f"El usuario no esta agregado a un en la base de datos.")
+
+        if datos.monto <= 0:
+            raise ValueError("El monto de la deuda debe ser mayor a cero")
+
+        area = self.repo_area.obtener_por_nombre(datos.area)
+        if not area:
+            raise ValueError(f"Area {datos.area} no encontrada. No se puede asignar deuda")
+
         deuda = Deuda(
-            id_usuario=datos["id_usuario"],
-            estado=datos["estado"],
-            saldo=datos["saldo"],
-            valor_total=datos["valor_total"],
-            fecha_creacion=datos["fecha_creacion"],
-            fecha_actualizacion=datos["fecha_actualizacion"],
-            id_area=datos["id_area"],
+            id_usuario=usuario.id,
+            estado="PENDIENTE",
+            saldo=datos.monto,
+            valor_total=datos.monto,
+            fecha_creacion=datos.fecha_creacion,
+            descripcion=datos.descripcion,
+            id_area=area.id,
         )
 
-        deuda = self.repositorio.guardar(deuda)
+        deuda = self.repo_deuda.crear(deuda)
 
         return deuda

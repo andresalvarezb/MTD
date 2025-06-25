@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from core.entidades.deuda import Deuda
 from infraestructura.db.modelos.deuda import DeudaORM
-from core.interfaces.repositorioDeuda import RepositorioDeuda
+from core.interfaces.repositorioDeuda import CrearDeudaProtocol
 
 
-class RepositorioDeudaSqlAlchemy(RepositorioDeuda):
+class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol):
     def __init__(self, db: Session):
         self.db = db
 
-    def guardar(self, deuda: Deuda) -> Deuda:
+    def crear(self, deuda: Deuda) -> Deuda:
         """Implementación para guardar un Deuda en la base de datos"""
 
         # verificar existencia

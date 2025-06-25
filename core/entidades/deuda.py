@@ -10,9 +10,11 @@ class Deuda:
     saldo: Decimal
     valor_total: Decimal
     fecha_creacion: datetime
-    fecha_actualizacion: datetime | None
+    fecha_actualizacion: datetime | None = None
     id_area: int | None = None
     id: int | None = None
+    descripcion: str | None = None
+
 
     def actualizar_saldo(self, descuento: Decimal):
         if descuento < 0:
