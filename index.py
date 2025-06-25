@@ -5,6 +5,7 @@ from infraestructura.db.index import Base, engine
 
 # 👇 Importa dinámicamente todos los modelos definidos
 import infraestructura.db.modelos.municipio
+import infraestructura.db.modelos.areaMTD
 import infraestructura.db.modelos.deuda
 
 app = FastAPI(title="API Cuentas Medicas", description="", version="0.1.0")

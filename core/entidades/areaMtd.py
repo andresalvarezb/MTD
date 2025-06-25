@@ -5,10 +5,13 @@ from dataclasses import dataclass
 class AreaMTD:
     id: int
     nombre: str
-    descripcion: str | None = None
 
     def _actualizar_nombre_area(self, nuevo_nombre: str):
         self.nombre = nuevo_nombre.capitalize()
 
-    def _actualizar_descripcion_area(self, nueva_descripcion: str):
-        self.descripcion = nueva_descripcion.capitalize()
+    @classmethod
+    def from_orm(cls, orm_object):
+        return cls(
+            id=orm_object.id,
+            nombre=orm_object.nombre
+        )
