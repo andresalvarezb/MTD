@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from core.entidades.deuda import Deuda
 from infraestructura.db.modelos.deuda import DeudaORM
-from core.interfaces.repositorioDeuda import CrearDeudaProtocol
+from core.interfaces.repositorioDeuda import CrearDeudaProtocol, ObtenerDeudasProtocol
 
 
-class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol):
+class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol, ObtenerDeudasProtocol):
     def __init__(self, db: Session):
         self.db = db
 
@@ -34,3 +34,7 @@ class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol):
             return existe
         else:
             return None
+
+    def obtener_todas(self) -> list[Deuda]:
+        deudas = self.db.query(DeudaORM).all()
+        return [Deuda.from_orm(deuda) for deuda in deudas]
