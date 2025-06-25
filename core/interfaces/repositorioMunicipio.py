@@ -1,12 +1,20 @@
 from typing import Protocol, runtime_checkable
 from core.entidades.municipio import Municipio, Departamento
 
+# * MUNICIPIO
 
-@runtime_checkable
-class RepositorioMunicipio(Protocol):
-    def guardar(self, municipio: Municipio) -> Municipio: ...
+class CrearMunicipioProtocol(Protocol):
+    def crear(self, municipio: Municipio) -> Municipio: ...
+
+class ObtenerMunicipioPorNombreProtocol(Protocol):
+    def obtener_por_nombre(self, municipio: Municipio) -> Municipio | None: ...
 
 
-@runtime_checkable
-class RepositorioDepartamento(Protocol):
-    def guardar(self, departamento: Departamento) -> Departamento: ...
+
+# * DEPARTAMENTO
+class CrearDepartamentoProtocol(Protocol):
+    def crear(self, departamento: Departamento) -> Departamento: ...
+
+
+class ObtenerDepartamentoPorNombreProtocol(Protocol):
+    def obtener_por_nombre(self, departamento: Departamento) -> Departamento | None: ...

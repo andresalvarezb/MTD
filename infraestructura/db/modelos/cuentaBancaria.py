@@ -19,7 +19,7 @@ class CuentaBancariaORM(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     numero_cuenta: Mapped[str] = mapped_column(String(45), nullable=False, unique=True, index=True)
     numero_certificado: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    estado: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    estado: Mapped[str] = mapped_column(String(255), nullable=True)
     id_usuario: Mapped[int] = mapped_column(
         ForeignKey("usuario.id", ondelete="RESTRICT", onupdate="CASCADE"), nullable=False, index=True
     )

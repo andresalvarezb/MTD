@@ -7,6 +7,9 @@ from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchem
 )
 from core.servicios.historialLaboral.actualizarSeguridadSocial import ActualizarSeguridadSocial
 from app.api.esquemas.seguridadSocial import ActualizacionSeguridadSocialSchema
+from core.servicios.historialLaboral.dtos import ActualizarSeguridadSocialDTO
+
+
 
 router = APIRouter()
 
@@ -24,7 +27,7 @@ def actualizar_seguridad_social(data: ActualizacionSeguridadSocialSchema, db: Se
             actualizar_ss_usuario_repo=repo_usuario,
             actualizar_ss_hlu_repo=repo_historialLaboralUsuario,
         )
-        usuario, historial_laboral = caso_de_uso.ejecutar(data)
+        usuario, historial_laboral = caso_de_uso.ejecutar(ActualizarSeguridadSocialDTO(**data.model_dump()))
         db.commit()
 
         return {

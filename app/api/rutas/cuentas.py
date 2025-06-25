@@ -1,5 +1,6 @@
 import logging
 import pandas as pd
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
 from core.servicios.usuarios.crearCargo import CrearCargo
@@ -37,6 +38,11 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
 
+from core.servicios.usuarios.dtos import CrearDepartamentoDTO, CrearMunicipioDTO, CrearCargoDTO, CrearUsuarioDTO
+from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO
+from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
+from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
+from core.servicios.descuentos.dtos import CrearDescuentoDTO
 
 router = APIRouter()
 
@@ -50,117 +56,152 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
         try:
             # crear la ubciacion del profesional (Municipio, departamento)
             repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
-            departamento_service = CrearDepartamento(repo_departamento)
-            departamento = departamento_service.ejecutar({"departamento": registro["DEPARTAMENTO"]})
+            departamento_service = CrearDepartamento(repo_crear=repo_departamento, repo_obtener=repo_departamento)
+            departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
+            # ! Validar esta exepción
+            if departamento.id is None:
+                raise Exception("Departamento no encontrado")
+
+            # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
-            municipio_service = CrearMunicipio(repo_municipio)
+            municipio_service = CrearMunicipio(repo_crear=repo_municipio, repo_obtener=repo_municipio)
             municipio = municipio_service.ejecutar(
-                {"municipio": registro["MUNICIPIO"], "id_departamento": departamento.id}
+                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], id_departamento=departamento.id)
             )
 
             # crear cargo
             repo_cargo = RepositorioCargoSqlAlchemy(db)
-            cargo_service = CrearCargo(repo_cargo)
-            cargo = cargo_service.ejecutar({"cargo": registro["CARGO"]})
+            cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
+            cargo = cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
+
+            # ! Validar esta exepción
+            if cargo.id is None:
+                raise Exception("Cargo no encontrado")
+
+            # ! Validar esta exepción
+            if municipio.id is None:
+                raise Exception("Municipio no encontrado")
 
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
-            usuario_service = CrearUsuario(repo_usuario)
+            usuario_service = CrearUsuario(repo_crear=repo_usuario, repo_obtener=repo_usuario)
             usuario = usuario_service.ejecutar(
-                {
-                    "documento": registro["DOCUMENTO"],
-                    "nombre": registro["NOMBRE"],
-                    "estado": registro["ESTADO_USUARIO"],  # ? agregrar enum
-                    "id_municipio": municipio.id,
-                    "contrato": registro["TIPO_DE_CONTRATO"],
-                    "id_cargo": cargo.id,
-                    "correo": registro["CORREO"],
-                    "telefono": registro["TELEFONO_USUARIO"],
-                    "seguridad_social": registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
-                    "fecha_aprobacion_seguridad_social": registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
-                    "fecha_ultima_contratacion": None,
-                }
+                CrearUsuarioDTO(
+                    documento=registro["DOCUMENTO"],
+                    nombre=registro["NOMBRE"],
+                    estado=registro["ESTADO_USUARIO"],  # ? agregrar enum
+                    id_municipio=municipio.id,
+                    contrato=registro["TIPO_DE_CONTRATO"],
+                    id_cargo=cargo.id,
+                    correo=registro["CORREO"],
+                    telefono=registro["TELEFONO_USUARIO"],
+                    seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
+                    fecha_aprobacion_seguridad_social=registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
+                    fecha_ultima_contratacion=registro["FECHA_CONTRATACION"],
+                )
             )
+
+            # ! Validar esta exepción
+            if usuario.id is None:
+                raise Exception("usuario no encontrado")
 
             # Crear registro del estado del usuario en el historial laboral
             repo_historialLaboralUsuario = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)
-            historialLaboralUsuario_service = CrearHistorialLaboralUsuario(repo_historialLaboralUsuario)
+            historialLaboralUsuario_service = CrearHistorialLaboralUsuario(
+                repo_crear=repo_historialLaboralUsuario, repo_obtener=repo_historialLaboralUsuario
+            )
             historialLaboralUsuario = historialLaboralUsuario_service.ejecutar(
-                {
-                    "id_usuario": usuario.id,
-                    "id_municipio": municipio.id,
-                    "contrato": registro["TIPO_DE_CONTRATO"],  # ? agregrar enum
-                    "id_cargo": cargo.id,
-                    "fecha_contratacion": registro["FECHA_CONTRATACION"],
-                    "claveHLU": (
+                CrearHistorialLaboralUsuarioDTO(
+                    id_municipio=municipio.id,
+                    contrato=registro["TIPO_DE_CONTRATO"],
+                    id_cargo=cargo.id,
+                    claveHLU=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
-                    "seguridad_social": registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
-                    "fecha_aprobacion_seguridad_social": registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
-                    "fecha_fin_contratacion": None,
-                    "fecha_ultima_contratacion": None,
-                }
+                    id_usuario=usuario.id,
+                    fecha_contratacion=registro["FECHA_CONTRATACION"],
+                    seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
+                    fecha_aprobacion_seguridad_social=registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
+                    fecha_ultima_contratacion=registro["FECHA_CONTRATACION"],
+                    fecha_fin_contratacion=None,
+                )
             )
 
             # Crear cuenta bancaria
             repo_banco = RepositorioBancoSqlAlchemy(db)
-            banco_service = CrearBanco(repo_banco)
-            banco = banco_service.ejecutar({"banco": registro["BANCO"]})
+            banco_service = CrearBanco(repo_crear=repo_banco, repo_obtener=repo_banco)
+            banco = banco_service.ejecutar(CrearBancoDTO(nombre=registro["BANCO"]))
+
+            # ! Validar esta exepción
+            if banco.id is None:
+                raise Exception("banco no encontrado")
 
             repo_cuentaBancaria = RepositorioCuentaBancariaSqlAlchemy(db)
-            cuentaBancaria_service = CrearCuentaBancaria(repo_cuentaBancaria)
-            cuenta_bancaria = cuentaBancaria_service.ejecutar(
-                {
-                    "numero_cuenta": registro["NUM_CUENTA_BANCARIA"],
-                    "numero_certificado": registro["NUM_CERTIFICADO_BANCARIO"],
-                    "estado": "",  # ? agregrar enum
-                    "id_usuario": usuario.id,
-                    "id_banco": banco.id,
-                    "tipo_de_cuenta": "",  # ? agregrar enum
-                    "fecha_actualizacion": None,
-                    "observaciones": None,
-                }
+            cuentaBancaria_service = CrearCuentaBancaria(
+                repo_crear=repo_cuentaBancaria, repo_obtener=repo_cuentaBancaria
             )
+            cuenta_bancaria = cuentaBancaria_service.ejecutar(
+                CrearCuentaBancariaDTO(
+                    numero_cuenta=registro["NUM_CUENTA_BANCARIA"],
+                    numero_certificado=registro["NUM_CERTIFICADO_BANCARIO"],
+                    estado="INACTIVA",  # ? agregrar enum
+                    id_usuario=usuario.id,
+                    id_banco=banco.id,
+                    tipo_de_cuenta=None,  # ? agregrar enum
+                    fecha_actualizacion=None,
+                    observaciones=None,
+                )
+            )
+
+            # ! Validar esta exepción
+            if historialLaboralUsuario.id is None:
+                raise Exception("historialLaboralUsuario no encontrado")
+
+            # ! Validar esta exepción
+            if cuenta_bancaria.id is None:
+                raise Exception("cuenta_bancaria no encontrado")
 
             # Creacion de la cuenta por pagar
             repo_cuentaPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-            cuentaPorPagar_service = CrearCuentaPorPagar(repo_cuentaPorPagar)
+            cuentaPorPagar_service = CrearCuentaPorPagar(
+                repo_crear=repo_cuentaPorPagar, repo_obtener=repo_cuentaPorPagar
+            )
             cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
-                {
-                    "id_historial_laboral": historialLaboralUsuario.id,
-                    "id_cuenta_bancaria": cuenta_bancaria.id,
-                    "claveCPP": (
+                CrearCuentaPorPagarDTO(
+                    id_historial_laboral=historialLaboralUsuario.id,
+                    id_cuenta_bancaria=cuenta_bancaria.id,
+                    claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
-                    "fecha_prestacion_servicio": registro["FECHA_PRESTACION_SERVICIO"],
-                    "fecha_radicacion_contable": registro["FECHA_RADICACION_CONTABLE"],
-                    "estado_de_pago": registro["ESTADO_DE_PAGO"],
-                    "estado_aprobacion_cuenta_usuario": registro["ESTADO_APROBACION_CUENTA_DE_COBRO"],
-                    "estado_cuenta_por_pagar": registro["ESTADO_REQUISITOS_PARA_PAGO"],
-                    "valor_cuenta_cobro": registro["VALOR_CUENTA_DE_COBRO"],
-                    "total_descuentos": 0.0,
-                    "total_a_pagar": registro["TOTAL_A_PAGAR"],
-                    "fecha_actualizacion": None,
-                    "fecha_aprobacion_rut": registro["FECHA_APROBACION_RUT"],
-                    "fecha_creacion": None,
-                    "fecha_aprobacion_cuenta_usuario": registro["FECHA_APROBACION_CUENTA_DE_COBRO"],
-                    "fecha_programacion_pago": registro["FECHA_PROGRAMACION_PAGO"],
-                    "fecha_reprogramacion": registro["FECHA_REPROGRAMACION_PAGO"],
-                    "fecha_pago": registro["FECHA_PAGO"],
-                    "estado_reprogramacion_pago": registro["ESTADO_DE_REPROGRAMACION"],
-                    "rut": registro["RUT"] == "SI",
-                    "dse": registro["DSE"],
-                    "causal_rechazo": registro["CAUSAL_DE_RECHAZO"],
-                    "creado_por": "",
-                    "lider_paciente_asignado": registro["LIDER_ASIGNADO_PACIENTE"],
-                    "eps_paciente_asignado": registro["EPS_PACIENTE_ASIGNADO"],
-                    "tipo_de_cuenta": None,
-                }
+                    fecha_prestacion_servicio=registro["FECHA_PRESTACION_SERVICIO"],
+                    fecha_radicacion_contable=registro["FECHA_RADICACION_CONTABLE"],
+                    estado_aprobacion_cuenta_usuario=registro["ESTADO_APROBACION_CUENTA_DE_COBRO"],
+                    estado_cuenta_por_pagar=registro["ESTADO_REQUISITOS_PARA_PAGO"],
+                    valor_cuenta_cobro=registro["VALOR_CUENTA_DE_COBRO"],
+                    estado_de_pago=registro["ESTADO_DE_PAGO"],
+                    total_descuentos=Decimal(0.0),
+                    total_a_pagar=registro["TOTAL_A_PAGAR"],
+                    fecha_actualizacion=None,
+                    fecha_aprobacion_rut=registro["FECHA_APROBACION_RUT"],
+                    fecha_creacion=None,
+                    fecha_aprobacion_cuenta_usuario=registro["FECHA_APROBACION_CUENTA_DE_COBRO"],
+                    fecha_programacion_pago=registro["FECHA_PROGRAMACION_PAGO"],
+                    fecha_reprogramacion=registro["FECHA_REPROGRAMACION_PAGO"],
+                    fecha_pago=registro["FECHA_PAGO"],
+                    estado_reprogramacion_pago=registro["ESTADO_DE_REPROGRAMACION"],
+                    rut=registro["RUT"] == "SI",
+                    dse=registro["DSE"],
+                    causal_rechazo=registro["CAUSAL_DE_RECHAZO"],
+                    creado_por=None,  # ? agregrar enum
+                    lider_paciente_asignado=registro["LIDER_ASIGNADO_PACIENTE"],
+                    eps_paciente_asignado=registro["EPS_PACIENTE_ASIGNADO"],
+                    tipo_de_cuenta=None,
+                )
             )
 
             # Creacion de los descuentos
@@ -199,24 +240,28 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 },
             ]
 
+            # ! Validar esta exepción
+            if cuenta_por_pagar.id is None:
+                raise Exception("cuenta_por_pagar no encontrado")
+            
             descuentos_creados = []
             for descuento in descuentos_predefinidos:
                 if descuento["valor"] == 0.0:
                     continue
 
                 repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
-                descuentos_service = CrearDescuento(repo_descuentos)
+                descuentos_service = CrearDescuento(repo_obtener=repo_descuentos, repo_crear=repo_descuentos)
                 descuento_nuevo = descuentos_service.ejecutar(
-                    {
-                        "id_cuenta_por_pagar": cuenta_por_pagar.id,
-                        "id_usuario": usuario.id,
-                        "id_deuda": None,
-                        "valor": descuento["valor"],
-                        "fecha_creacion": registro["FECHA_RADICACION_CONTABLE"],
-                        "tipo_de_descuento": descuento["tipo_descuento"],
-                        "descripcion": descuento["descripcion"],
-                        "fecha_actualizacion": None,
-                    }
+                    CrearDescuentoDTO(
+                        id_cuenta_por_pagar=cuenta_por_pagar.id,
+                        id_usuario=usuario.id,
+                        id_deuda=None,
+                        valor=descuento["valor"],
+                        fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],
+                        tipo_de_descuento=descuento["tipo_descuento"],
+                        descripcion=descuento["descripcion"],
+                        fecha_actualizacion=None,
+                    )
                 )
                 descuentos_creados.append(descuento_nuevo)
 

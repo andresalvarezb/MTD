@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
+from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
+
 
 
 @dataclass
 class CuentaBancaria:
     numero_cuenta: str
-    numero_certificado: str
+    numero_certificado: str | None
     estado: str
     id_usuario: int
     id_banco: int
@@ -50,3 +52,18 @@ class CuentaBancaria:
 
         # Siempre se actualiza la fecha
         self.fecha_actualizacion = datetime.now()
+
+    @classmethod
+    def from_orm(cls, orm_obj: CuentaBancariaORM) -> "CuentaBancaria":
+        return cls(
+            numero_cuenta=orm_obj.numero_cuenta,
+            numero_certificado=orm_obj.numero_certificado,
+            estado=orm_obj.estado,
+            id_usuario=orm_obj.id_usuario,
+            id_banco=orm_obj.id_banco,
+            id=orm_obj.id,
+            tipo_de_cuenta=orm_obj.tipo_de_cuenta,
+            fecha_actualizacion=orm_obj.fecha_actualizacion,
+            observaciones=orm_obj.observaciones,
+
+        )

@@ -3,7 +3,7 @@ from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 
 class CrearCuentaPorPagarProtocol(Protocol):
-    def guardar(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar: ...
+    def crear(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar: ...
 
 
 class ObtenerCuentasPorPagarProtocol(Protocol):
@@ -12,3 +12,6 @@ class ObtenerCuentasPorPagarProtocol(Protocol):
 
 class ObtenerCuentaPorPagarProtocol(Protocol):
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar: ...
+
+class ObtenerCuentaPorPagarPorClaveProtocol(Protocol):
+    def obtener_por_clave(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar | None: ...

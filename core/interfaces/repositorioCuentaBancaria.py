@@ -2,6 +2,9 @@ from typing import Protocol, runtime_checkable
 from core.entidades.cuentaBancaria import CuentaBancaria
 
 
-@runtime_checkable
-class RepositorioCuentaBancaria(Protocol):
-    def guardar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria: ...
+class CrearCuentaBancariaProtocol(Protocol):
+    def crear(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria: ...
+
+
+class ObtenerCuentaBancariaProtocol(Protocol):
+    def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria | None: ...

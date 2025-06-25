@@ -1,12 +1,21 @@
 from core.entidades.cargo import Cargo
-from core.interfaces.repositorioCargo import RepositorioCargo
+from core.servicios.usuarios.dtos import CrearCargoDTO
+from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoProtocol
 
 
 class CrearCargo:
-    def __init__(self, repositorio: RepositorioCargo):
-        self.repositorio = repositorio
+    def __init__(self, repo_crear: CrearCargoProtocol, repo_obtener: ObtenerCargoProtocol):
+        self.repo_crear = repo_crear
+        self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: dict) -> Cargo:
-        cargo = Cargo(nombre=datos["cargo"])
-        cargo = self.repositorio.guardar(cargo)
-        return cargo
+    def ejecutar(self, datos: CrearCargoDTO) -> Cargo:
+        # obtener cargo
+        cargo = Cargo(nombre=datos.nombre)
+        cargo_existente = self.repo_obtener.obtener_por_nombre(cargo)
+
+        if cargo_existente:
+            return cargo_existente
+
+        # Crear cargo
+        cargo_nuevo = self.repo_crear.crear(cargo)
+        return cargo_nuevo

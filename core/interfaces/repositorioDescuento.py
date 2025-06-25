@@ -4,7 +4,7 @@ from core.entidades.descuento import Descuento
 
 @runtime_checkable
 class CrearDescuentoProtocol(Protocol):
-    def guardar(self, descuento: Descuento) -> Descuento: ...
+    def crear(self, descuento: Descuento) -> Descuento: ...
 
 
 @runtime_checkable
@@ -13,5 +13,9 @@ class ObtenerDescuentosProtocol(Protocol):
 
 
 @runtime_checkable
+class ObtenerDescuentoPorIdProtocol(Protocol):
+    def obtener_descuento_por_id(self, id_descuento: int) -> Descuento | None: ...
+
+
 class ObtenerDescuentoProtocol(Protocol):
-    def obtener_descuento(self, id_descuento: int) -> Descuento: ...
+    def obtener_descuento(self, descuento: Descuento) -> Descuento | None: ...

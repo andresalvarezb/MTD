@@ -1,32 +1,46 @@
 from sqlalchemy.orm import Session
 from core.entidades.usuario import Usuario
 from infraestructura.db.modelos.usuario import UsuarioORM
-from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorIdProtocol, ObtenerUsuarioPorDocumentoProtocol, ObtenerUsuariosProtocol
+from core.interfaces.repositorioUsuario import (
+    CrearUsuarioProtocol,
+    ObtenerUsuarioPorIdProtocol,
+    ObtenerUsuarioPorDocumentoProtocol,
+    ObtenerUsuariosProtocol,
+)
 
 
-class RepositorioUsuarioSqlAlchemy(CrearUsuarioProtocol, ObtenerUsuarioPorIdProtocol, ObtenerUsuarioPorDocumentoProtocol, ObtenerUsuariosProtocol):
+class RepositorioUsuarioSqlAlchemy(
+    CrearUsuarioProtocol, ObtenerUsuarioPorIdProtocol, ObtenerUsuarioPorDocumentoProtocol, ObtenerUsuariosProtocol
+):
     def __init__(self, db: Session):
         self.db = db
 
-    def guardar(self, usuario: Usuario) -> Usuario:
-        """Implementación para guardar un usuario en la base de datos"""
+    # def guardar(self, usuario: Usuario) -> Usuario:
+    #     """Implementación para guardar un usuario en la base de datos"""
 
-        # verificar existencia
-        registro_orm = self.db.query(UsuarioORM).filter_by(documento=usuario.documento).first()
-        if registro_orm:
-            usuario.id = registro_orm.id
-            return usuario
+    #     # verificar existencia
+    #     registro_orm = self.db.query(UsuarioORM).filter_by(documento=usuario.documento).first()
+    #     if registro_orm:
+    #         usuario.id = registro_orm.id
+    #         return usuario
 
-        # creacion
-        nuevo_usuario = UsuarioORM(**usuario.__dict__)
-        self.db.add(nuevo_usuario)
+    #     # creacion
+    #     nuevo_usuario = UsuarioORM(**usuario.__dict__)
+    #     self.db.add(nuevo_usuario)
+    #     self.db.flush()
+    #     self.db.refresh(nuevo_usuario)
+
+    #     usuario.id = nuevo_usuario.id
+    #     return usuario
+    def crear(self, usuario: Usuario) -> Usuario:
+        usuario_nuevo = UsuarioORM(**usuario.__dict__)
+        self.db.add(usuario_nuevo)
         self.db.flush()
-        self.db.refresh(nuevo_usuario)
-
-        usuario.id = nuevo_usuario.id
+        self.db.refresh(usuario_nuevo)
+        usuario.id = usuario_nuevo.id
         return usuario
 
-    def obtener_por_documento(self, documento_usuario: str):
+    def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
         registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento_usuario).first()
         if registro_orm:
             return Usuario.from_orm(registro_orm)
@@ -45,7 +59,7 @@ class RepositorioUsuarioSqlAlchemy(CrearUsuarioProtocol, ObtenerUsuarioPorIdProt
             raise ValueError("Usuario no encontrado")
         registro_orm.seguridad_social = usuario.seguridad_social
         return Usuario.from_orm(registro_orm)
-    
+
     def obtener_todos(self) -> list[Usuario]:
         registros_orm = self.db.query(UsuarioORM).all()
         return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]

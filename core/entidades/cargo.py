@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from infraestructura.db.modelos.cargo import CargoORM
 
 
 @dataclass
@@ -11,3 +12,10 @@ class Cargo:
 
     def _actualizar_nombre_cargo(self, nuevo_nombre: str):
         self.nombre = nuevo_nombre.capitalize()
+
+    @classmethod
+    def from_orm(cls, orm_object: CargoORM) -> "Cargo":
+        return cls(
+            id=orm_object.id,
+            nombre=orm_object.nombre,
+        )

@@ -1,6 +1,8 @@
 from core.interfaces.repositorioUsuario import ObtenerUsuarioPorDocumentoProtocol, ActulizarSeguridadSocialUsuarioProtocol
 from app.api.esquemas.seguridadSocial import ActualizacionSeguridadSocialSchema
 from core.interfaces.repositorioHistorialLaboralUsuario import ObtenerHistorialLaboralPorIdProtocol, ActulizarSeguridadSocialHistorialLaboralProtocol
+from core.servicios.historialLaboral.dtos import ActualizarSeguridadSocialDTO
+
 
 
 class ActualizarSeguridadSocial:
@@ -17,8 +19,10 @@ class ActualizarSeguridadSocial:
         self.actualizar_ss_hlu_repo = actualizar_ss_hlu_repo
 
 
-    def ejecutar(self, data: ActualizacionSeguridadSocialSchema):
+    def ejecutar(self, data: ActualizarSeguridadSocialDTO):
         # obtener registros en base al id
+
+
         usuario = self.obtener_usuario_repo.obtener_por_documento(data.documento_usuario)
         if not usuario:
             raise ValueError(f"Usuario {data.documento_usuario} no encontrado")

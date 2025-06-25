@@ -3,7 +3,7 @@ from typing import Protocol, runtime_checkable
 
 
 class CrearUsuarioProtocol(Protocol):
-    def guardar(self, usuario: Usuario) -> Usuario: ...
+    def crear(self, usuario: Usuario) -> Usuario: ...
 
 
 class ObtenerUsuarioPorIdProtocol(Protocol):
