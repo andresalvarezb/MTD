@@ -36,7 +36,7 @@ class ObtenerCuentasPorPagar:
 
 
 
-    def ejecutar(self):
+    def ejecutar(self) -> list[CuentaPorPagarCompletoResponseSchema]:
         resultado = []
         cuentas = self.repo_cuenta_por_pagar.obtener_cuentas_por_pagar()
 

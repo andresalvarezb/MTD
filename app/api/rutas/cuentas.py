@@ -44,6 +44,8 @@ from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
 from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
+from app.api.esquemas.cuentaPorPagar import CuentaPorPagarCompletoResponseSchema
+
 
 router = APIRouter()
 
@@ -353,7 +355,7 @@ def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
-@router.get("/")
+@router.get("/", response_model=list[CuentaPorPagarCompletoResponseSchema])
 def obtener_cuentas(db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
@@ -371,7 +373,6 @@ def obtener_cuentas(db: Session = Depends(get_db)):
             repo_departamento=repo_departamento,
         )
         cuentas = caso_de_uso.ejecutar()
-        # cuentas_response = [CuentaPorPagarResponseSchema.model_validate(cuenta) for cuenta in cuentas]
         return cuentas
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
