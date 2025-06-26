@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from core.entidades.cuentaBancaria import CuentaBancaria
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
-from core.interfaces.repositorioCuentaBancaria import CrearCuentaBancariaProtocol,ObtenerCuentaBancariaProtocol
+from core.interfaces.repositorioCuentaBancaria import CrearCuentaBancariaProtocol,ObtenerCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol
 
 
-class RepositorioCuentaBancariaSqlAlchemy(ObtenerCuentaBancariaProtocol, CrearCuentaBancariaProtocol):
+class RepositorioCuentaBancariaSqlAlchemy(ObtenerCuentaBancariaProtocol, CrearCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol):
     def __init__(self, db: Session):
         self.db = db
 
@@ -36,6 +36,13 @@ class RepositorioCuentaBancariaSqlAlchemy(ObtenerCuentaBancariaProtocol, CrearCu
 
     def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria):
         registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()
+        if registro_orm:
+            return CuentaBancaria.from_orm(registro_orm)
+        else:
+            return None
+
+    def obtener_por_id(self, id_cuenta_bancaria: int):
+        registro_orm = self.db.query(CuentaBancariaORM).filter_by(id=id_cuenta_bancaria).first()
         if registro_orm:
             return CuentaBancaria.from_orm(registro_orm)
         else:

@@ -8,3 +8,7 @@ class CrearCuentaBancariaProtocol(Protocol):
 
 class ObtenerCuentaBancariaProtocol(Protocol):
     def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria | None: ...
+
+
+class ObtenerCuentaBancariaPorIdProtocol(Protocol):
+    def obtener_por_id(self, id_cuenta_bancaria: int) -> CuentaBancaria | None: ...

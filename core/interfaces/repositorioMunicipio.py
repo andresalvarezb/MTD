@@ -9,6 +9,8 @@ class CrearMunicipioProtocol(Protocol):
 class ObtenerMunicipioPorNombreProtocol(Protocol):
     def obtener_por_nombre(self, municipio: Municipio) -> Municipio | None: ...
 
+class ObtenerMunicipioPorIdProtocol(Protocol):
+    def obtener_por_id(self, id_municipio: int) -> Municipio | None: ...
 
 
 # * DEPARTAMENTO
@@ -18,3 +20,6 @@ class CrearDepartamentoProtocol(Protocol):
 
 class ObtenerDepartamentoPorNombreProtocol(Protocol):
     def obtener_por_nombre(self, departamento: Departamento) -> Departamento | None: ...
+
+class ObtenerDepartamentoPorIdProtocol(Protocol):
+    def obtener_por_id(self, id_departamento: int) -> Departamento | None: ...
