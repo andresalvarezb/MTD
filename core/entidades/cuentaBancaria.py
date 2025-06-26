@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
+from core.entidades.banco import Banco
+from core.entidades.usuario import Usuario
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
-
 
 
 @dataclass
@@ -9,8 +10,8 @@ class CuentaBancaria:
     numero_cuenta: str
     numero_certificado: str | None
     estado: str
-    id_usuario: int
-    id_banco: int
+    usuario: Usuario
+    banco: Banco
     id: int | None = None
     tipo_de_cuenta: str | None = None
     fecha_actualizacion: datetime | None = None
@@ -56,14 +57,13 @@ class CuentaBancaria:
     @classmethod
     def from_orm(cls, orm_obj: CuentaBancariaORM) -> "CuentaBancaria":
         return cls(
+            id=orm_obj.id,
+            usuario=Usuario.from_orm(orm_obj.usuario),
+            banco=Banco.from_orm(orm_obj.banco),
             numero_cuenta=orm_obj.numero_cuenta,
             numero_certificado=orm_obj.numero_certificado,
             estado=orm_obj.estado,
-            id_usuario=orm_obj.id_usuario,
-            id_banco=orm_obj.id_banco,
-            id=orm_obj.id,
             tipo_de_cuenta=orm_obj.tipo_de_cuenta,
             fecha_actualizacion=orm_obj.fecha_actualizacion,
             observaciones=orm_obj.observaciones,
-
         )

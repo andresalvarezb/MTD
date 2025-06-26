@@ -10,9 +10,9 @@ class CrearCuentaPorPagar:
 
     def ejecutar(self, datos: CrearCuentaPorPagarDTO) -> CuentaPorPagar:
         cuenta = CuentaPorPagar(
-            id_historial_laboral=datos.id_historial_laboral,
-            id_cuenta_bancaria=datos.id_cuenta_bancaria,
             claveCPP=datos.claveCPP,
+            historial_laboral=datos.historial_laboral,
+            cuenta_bancaria=datos.cuenta_bancaria,
             fecha_prestacion_servicio=datos.fecha_prestacion_servicio,
             fecha_radicacion_contable=datos.fecha_radicacion_contable,
             estado_aprobacion_cuenta_usuario=datos.estado_aprobacion_cuenta_usuario,
@@ -35,7 +35,6 @@ class CrearCuentaPorPagar:
             creado_por=datos.creado_por,
             lider_paciente_asignado=datos.lider_paciente_asignado,
             eps_paciente_asignado=datos.eps_paciente_asignado,
-            tipo_de_cuenta=datos.tipo_de_cuenta,
         )
 
         cuenta_existente = self.repo_obtener.obtener_por_clave(cuenta)

@@ -15,30 +15,26 @@ class RepositorioUsuarioSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
-    # def guardar(self, usuario: Usuario) -> Usuario:
-    #     """Implementación para guardar un usuario en la base de datos"""
 
-    #     # verificar existencia
-    #     registro_orm = self.db.query(UsuarioORM).filter_by(documento=usuario.documento).first()
-    #     if registro_orm:
-    #         usuario.id = registro_orm.id
-    #         return usuario
-
-    #     # creacion
-    #     nuevo_usuario = UsuarioORM(**usuario.__dict__)
-    #     self.db.add(nuevo_usuario)
-    #     self.db.flush()
-    #     self.db.refresh(nuevo_usuario)
-
-    #     usuario.id = nuevo_usuario.id
-    #     return usuario
     def crear(self, usuario: Usuario) -> Usuario:
-        usuario_nuevo = UsuarioORM(**usuario.__dict__)
+        usuario_nuevo = UsuarioORM(
+            documento=usuario.documento,
+            nombre=usuario.nombre,
+            estado=usuario.estado,
+            id_municipio=usuario.municipio.id,
+            contrato=usuario.contrato,
+            id_cargo=usuario.cargo.id,
+            correo=usuario.correo,
+            telefono=usuario.telefono,
+            seguridad_social=usuario.seguridad_social,
+            fecha_aprobacion_seguridad_social=usuario.fecha_aprobacion_seguridad_social,
+            fecha_ultima_contratacion=usuario.fecha_ultima_contratacion,
+        )
         self.db.add(usuario_nuevo)
         self.db.flush()
         self.db.refresh(usuario_nuevo)
-        usuario.id = usuario_nuevo.id
-        return usuario
+        return usuario.from_orm(usuario_nuevo)
+
 
     def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
         registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento_usuario).first()

@@ -6,16 +6,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .usuario import UsuarioORM
+    from .departamento import DepartamentoORM
+    from .historialLaboralUsuario import HistorialLaboralORM
 
 
-class DepartamentoORM(Base):
-    __tablename__ = "departamento"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    nombre: Mapped[str] = mapped_column(String(45), nullable=False, unique=True, index=True)
-
-    # Relaciones N:1
-    municipios: Mapped[list["MunicipioORM"]] = relationship(back_populates="departamento")
 
 
 class MunicipioORM(Base):
@@ -31,3 +25,5 @@ class MunicipioORM(Base):
     # Relaciones 1:N
     departamento: Mapped["DepartamentoORM"] = relationship(back_populates="municipios")
     usuarios: Mapped[list["UsuarioORM"]] = relationship(back_populates="municipio")
+    historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="municipio")
+    

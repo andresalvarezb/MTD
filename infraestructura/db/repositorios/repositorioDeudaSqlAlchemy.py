@@ -18,7 +18,16 @@ class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol, ObtenerDeudasProtocol):
             return deuda
 
         # creacion
-        nuevo_deuda = DeudaORM(**deuda.__dict__)
+        nuevo_deuda = DeudaORM(
+            id_usuario=deuda.id_usuario,
+            estado=deuda.estado,
+            saldo=deuda.saldo,
+            valor_total=deuda.valor_total,
+            fecha_creacion=deuda.fecha_creacion,
+            fecha_actualizacion=deuda.fecha_actualizacion,
+            descripcion=deuda.descripcion,
+            id_area=deuda.id_area,
+        )
         self.db.add(nuevo_deuda)
         self.db.flush()
         self.db.refresh(nuevo_deuda)

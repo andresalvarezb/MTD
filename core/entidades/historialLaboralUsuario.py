@@ -1,16 +1,18 @@
 from datetime import datetime
 from dataclasses import dataclass
-
+from core.entidades.cargo import Cargo
+from core.entidades.usuario import Usuario
+from core.entidades.municipio import Municipio
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
 
 
 @dataclass
 class HistorialLaboralUsuario:
-    id_municipio: int
+    usuario: Usuario
     contrato: str
-    id_cargo: int
+    cargo: Cargo
     claveHLU: str
-    id_usuario: int
+    municipio: Municipio
     id: int | None = None
     fecha_contratacion: datetime | None = None
     seguridad_social: bool | None = None
@@ -29,13 +31,13 @@ class HistorialLaboralUsuario:
     @classmethod
     def from_orm(cls, orm_obj: HistorialLaboralORM) -> "HistorialLaboralUsuario":
         return cls(
-            id_municipio=orm_obj.id_municipio,
+            id=orm_obj.id,
+            municipio=Municipio.from_orm(orm_obj.municipio),
             contrato=orm_obj.contrato,
-            id_cargo=orm_obj.id_cargo,
+            cargo=Cargo.from_orm(orm_obj.cargo),
             fecha_contratacion=orm_obj.fecha_contratacion,
             claveHLU=orm_obj.claveHLU,
-            id_usuario=orm_obj.id_usuario,
-            id=orm_obj.id,
+            usuario=Usuario.from_orm(orm_obj.usuario),
             seguridad_social=orm_obj.seguridad_social,
             fecha_aprobacion_seguridad_social=orm_obj.fecha_aprobacion_seguridad_social,
             fecha_ultima_contratacion=orm_obj.fecha_ultima_contratacion,

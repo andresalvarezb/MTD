@@ -1,7 +1,6 @@
 from core.entidades.cuentaBancaria import CuentaBancaria
-from core.interfaces.repositorioCuentaBancaria import CrearCuentaBancariaProtocol,ObtenerCuentaBancariaProtocol
+from core.interfaces.repositorioCuentaBancaria import CrearCuentaBancariaProtocol, ObtenerCuentaBancariaProtocol
 from core.servicios.cuentasBancarias.dtos import CrearCuentaBancariaDTO
-
 
 
 class CrearCuentaBancaria:
@@ -9,14 +8,13 @@ class CrearCuentaBancaria:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-
     def ejecutar(self, datos: CrearCuentaBancariaDTO) -> CuentaBancaria:
         cuenta_bancaria = CuentaBancaria(
+            usuario=datos.usuario,
+            banco=datos.banco,
             numero_cuenta=datos.numero_cuenta,
             numero_certificado=datos.numero_certificado,
             estado=datos.estado,
-            id_usuario=datos.id_usuario,
-            id_banco=datos.id_banco,
             tipo_de_cuenta=datos.tipo_de_cuenta,
             fecha_actualizacion=datos.fecha_actualizacion,
             observaciones=datos.observaciones,

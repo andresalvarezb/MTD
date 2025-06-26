@@ -1,15 +1,18 @@
-from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
+from datetime import datetime
+from dataclasses import dataclass
+from core.entidades.deuda import Deuda
+from core.entidades.usuario import Usuario
+from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 
 
 
 @dataclass
 class CrearDescuentoDTO:
-    id_cuenta_por_pagar: int
-    id_usuario: int
-    id_deuda: int | None
+    cuenta_por_pagar: CuentaPorPagar
+    usuario: Usuario
+    deuda: Deuda | None
     valor: Decimal
     fecha_creacion: datetime
     tipo_de_descuento: str

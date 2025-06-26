@@ -1,38 +1,34 @@
 from sqlalchemy.orm import Session
 from core.entidades.cuentaBancaria import CuentaBancaria
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
-from core.interfaces.repositorioCuentaBancaria import CrearCuentaBancariaProtocol,ObtenerCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol
+from core.interfaces.repositorioCuentaBancaria import (
+    CrearCuentaBancariaProtocol,
+    ObtenerCuentaBancariaProtocol,
+    ObtenerCuentaBancariaPorIdProtocol,
+)
 
 
-class RepositorioCuentaBancariaSqlAlchemy(ObtenerCuentaBancariaProtocol, CrearCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol):
+class RepositorioCuentaBancariaSqlAlchemy(
+    ObtenerCuentaBancariaProtocol, CrearCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol
+):
     def __init__(self, db: Session):
         self.db = db
 
-    # def guardar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
-    #     """Implementación para guardar un CuentaBancaria en la base de datos"""
-
-    #     # verificar existencia
-    #     existe = self.obtener(cuenta_bancaria)
-    #     if existe:
-    #         cuenta_bancaria.id = existe.id
-    #         return cuenta_bancaria
-
-    #     # creacion
-    #     nueva_cuenta_bancaria = CuentaBancariaORM(**cuenta_bancaria.__dict__)
-    #     self.db.add(nueva_cuenta_bancaria)
-    #     self.db.flush()
-    #     self.db.refresh(nueva_cuenta_bancaria)
-
-    #     cuenta_bancaria.id = nueva_cuenta_bancaria.id
-    #     return cuenta_bancaria
-
     def crear(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
-        nueva_cuenta = CuentaBancariaORM(**cuenta_bancaria.__dict__)
+        nueva_cuenta = CuentaBancariaORM(
+            id_usuario=cuenta_bancaria.usuario.id,
+            id_banco=cuenta_bancaria.banco.id,
+            estado=cuenta_bancaria.estado,
+            numero_cuenta=cuenta_bancaria.numero_cuenta,
+            numero_certificado=cuenta_bancaria.numero_certificado,
+            tipo_de_cuenta=cuenta_bancaria.tipo_de_cuenta,
+            fecha_actualizacion=cuenta_bancaria.fecha_actualizacion,
+            observaciones=cuenta_bancaria.observaciones,
+        )
         self.db.add(nueva_cuenta)
         self.db.flush()
         self.db.refresh(nueva_cuenta)
-        cuenta_bancaria.id = nueva_cuenta.id
-        return cuenta_bancaria
+        return cuenta_bancaria.from_orm(nueva_cuenta)
 
     def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria):
         registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()

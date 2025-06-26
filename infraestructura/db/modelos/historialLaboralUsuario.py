@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .cargo import CargoORM
     from .usuario import UsuarioORM
+    from .municipio import MunicipioORM
     from .cuentaPorPagar import CuentaPorPagarORM
 
 
@@ -37,3 +38,5 @@ class HistorialLaboralORM(Base):
     usuario: Mapped["UsuarioORM"] = relationship(back_populates="historial_laboral")
     cargo: Mapped["CargoORM"] = relationship(back_populates="historial_laboral")
     cuentas_por_pagar: Mapped[list["CuentaPorPagarORM"]] = relationship(back_populates="historial_laboral")
+    municipio: Mapped["MunicipioORM"] = relationship(back_populates="historial_laboral")
+

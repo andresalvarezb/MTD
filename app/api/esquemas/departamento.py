@@ -1,10 +1,8 @@
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, Field
 
 
 class DepartamentoResponseSchema(BaseModel):
-    id: int
-    nombre: str
-
+    id: int = Field(..., description="Identificador único del departamento")
+    nombre: str = Field(..., description="Nombre del departamento")
 
     model_config = {"from_attributes": True}

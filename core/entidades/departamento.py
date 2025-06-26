@@ -1,20 +1,16 @@
 from dataclasses import dataclass
-from infraestructura.db.modelos.cargo import CargoORM
-
+from infraestructura.db.modelos.departamento import DepartamentoORM
 
 @dataclass
-class Cargo:
+class Departamento:
     nombre: str
     id: int | None = None
 
     def __post_init__(self):
         self.nombre = self.nombre.upper()
 
-    def _actualizar_nombre_cargo(self, nuevo_nombre: str):
-        self.nombre = nuevo_nombre.upper()
-
     @classmethod
-    def from_orm(cls, orm_object: CargoORM) -> "Cargo":
+    def from_orm(cls, orm_object: DepartamentoORM) -> "Departamento":
         return cls(
             id=orm_object.id,
             nombre=orm_object.nombre,

@@ -1,10 +1,10 @@
 from core.entidades.cargo import Cargo
 from core.servicios.usuarios.dtos import CrearCargoDTO
-from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoProtocol
+from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
 
 
 class CrearCargo:
-    def __init__(self, repo_crear: CrearCargoProtocol, repo_obtener: ObtenerCargoProtocol):
+    def __init__(self, repo_crear: CrearCargoProtocol, repo_obtener: ObtenerCargoPorNombreProtocol):
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 

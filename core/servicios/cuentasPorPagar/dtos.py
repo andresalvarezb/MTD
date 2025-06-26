@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
+from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
+from core.entidades.cuentaBancaria import CuentaBancaria
 
 
 @dataclass
 class CrearCuentaPorPagarDTO:
-    id_historial_laboral: int
-    id_cuenta_bancaria: int
     claveCPP: str
+    historial_laboral: HistorialLaboralUsuario
+    cuenta_bancaria: CuentaBancaria
     fecha_prestacion_servicio: datetime
     fecha_radicacion_contable: datetime
     estado_aprobacion_cuenta_usuario: str
@@ -30,4 +32,3 @@ class CrearCuentaPorPagarDTO:
     creado_por: str | None
     lider_paciente_asignado: str | None
     eps_paciente_asignado: str | None
-    tipo_de_cuenta: str | None

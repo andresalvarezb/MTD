@@ -1,30 +1,20 @@
 from sqlalchemy.orm import Session
 from core.entidades.cargo import Cargo
 from infraestructura.db.modelos.cargo import CargoORM
-from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoProtocol
+from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
 
 
-class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoProtocol):
+class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoPorNombreProtocol):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    # def guardar(self, cargo: Cargo) -> Cargo:
-    #     """Implementación para guardar el Cargo en la base de datos"""
+    def crear(self, cargo: Cargo) -> Cargo:
+        cargo_nuevo = CargoORM(nombre=cargo.nombre)
+        self.db.add(cargo_nuevo)
+        self.db.flush()
+        self.db.refresh(cargo_nuevo)
+        return cargo.from_orm(cargo_nuevo)
 
-    #     # verificar existencia
-    #     existe = self.obtener(cargo)
-    #     if existe:
-    #         cargo.id = existe.id
-    #         return cargo
-
-    #     # creacion
-    #     nuevo_cargo = CargoORM(nombre=cargo.nombre)
-    #     self.db.add(nuevo_cargo)
-    #     self.db.flush()
-    #     self.db.refresh(nuevo_cargo)
-
-    #     cargo.id = nuevo_cargo.id
-    #     return cargo
 
     def obtener_por_nombre(self, cargo: Cargo) -> Cargo | None:
         registro_orm = self.db.query(CargoORM).filter_by(nombre=cargo.nombre).first()
@@ -32,11 +22,3 @@ class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoProtocol):
             return Cargo.from_orm(registro_orm)
         else:
             return None
-
-    def crear(self, cargo: Cargo) -> Cargo:
-        cargo_nuevo = CargoORM(nombre=cargo.nombre)
-        self.db.add(cargo_nuevo)
-        self.db.flush()
-        self.db.refresh(cargo_nuevo)
-        cargo.id = cargo_nuevo.id
-        return cargo

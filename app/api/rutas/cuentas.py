@@ -1,9 +1,11 @@
 import logging
 import pandas as pd
+from io import BytesIO
 from decimal import Decimal
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
-from core.servicios.usuarios.crearCargo import CrearCargo
+from fastapi.responses import StreamingResponse
+from core.servicios.cargos.crearCargo import CrearCargo
 from core.servicios.cuentasBancarias.crearBanco import CrearBanco
 from core.servicios.usuarios.crearUsuario import CrearUsuario
 from core.servicios.descuentos.crearDescuento import CrearDescuento
@@ -18,14 +20,13 @@ from core.servicios.historialLaboral.crearHistorialLaboralUsuario import CrearHi
 from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
 from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
-from core.servicios.usuarios.crearMunicipio import CrearDepartamento, CrearMunicipio
+from core.servicios.municipio.crearMunicipio import CrearMunicipio
+from core.servicios.departamento.crearDepartamento import CrearDepartamento
 from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
     RepositorioHistorialLaboralUsuarioSqlAlchemy,
 )
-from infraestructura.db.repositorios.repositorioMunicipioSqlAlchemy import (
-    RepositorioMunicipioSqlAlchemy,
-    RepositorioDepartamentoSqlAlchemy,
-)
+from infraestructura.db.repositorios.repositorioMunicipioSqlAlchemy import RepositorioMunicipioSqlAlchemy
+from infraestructura.db.repositorios.repositorioDepartamentoSqlAlchemy import RepositorioDepartamentoSqlAlchemy
 
 
 from infraestructura.db.repositorios.repositorioCuentaBancariaSqlAlchemy import (
@@ -38,12 +39,16 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
 
-from core.servicios.usuarios.dtos import CrearDepartamentoDTO, CrearMunicipioDTO, CrearCargoDTO, CrearUsuarioDTO
+from core.servicios.usuarios.dtos import CrearUsuarioDTO, CrearCargoDTO
+from core.servicios.departamento.dtos import CrearDepartamentoDTO
+from core.servicios.municipio.dtos import CrearMunicipioDTO
+from core.servicios.municipio.dtos import CrearMunicipioDTO
 from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO
 from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
 from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
+
 
 router = APIRouter()
 
@@ -79,29 +84,17 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             departamento_service = CrearDepartamento(repo_crear=repo_departamento, repo_obtener=repo_departamento)
             departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
-            # ! Validar esta exepción
-            if departamento.id is None:
-                raise Exception("Departamento no encontrado")
-
             # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
             municipio_service = CrearMunicipio(repo_crear=repo_municipio, repo_obtener=repo_municipio)
             municipio = municipio_service.ejecutar(
-                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], id_departamento=departamento.id)
+                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], departamento=departamento)
             )
 
             # crear cargo
             repo_cargo = RepositorioCargoSqlAlchemy(db)
             cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
             cargo = cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
-
-            # ! Validar esta exepción
-            if cargo.id is None:
-                raise Exception("Cargo no encontrado")
-
-            # ! Validar esta exepción
-            if municipio.id is None:
-                raise Exception("Municipio no encontrado")
 
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
@@ -111,9 +104,9 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     documento=registro["DOCUMENTO"],
                     nombre=registro["NOMBRE"],
                     estado=registro["ESTADO_USUARIO"],  # ? agregrar enum
-                    id_municipio=municipio.id,
+                    municipio=municipio,
                     contrato=registro["TIPO_DE_CONTRATO"],
-                    id_cargo=cargo.id,
+                    cargo=cargo,
                     correo=registro["CORREO"],
                     telefono=registro["TELEFONO_USUARIO"],
                     seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
@@ -122,10 +115,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 )
             )
 
-            # ! Validar esta exepción
-            if usuario.id is None:
-                raise Exception("usuario no encontrado")
-
             # Crear registro del estado del usuario en el historial laboral
             repo_historialLaboralUsuario = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)
             historialLaboralUsuario_service = CrearHistorialLaboralUsuario(
@@ -133,15 +122,15 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
             historialLaboralUsuario = historialLaboralUsuario_service.ejecutar(
                 CrearHistorialLaboralUsuarioDTO(
-                    id_municipio=municipio.id,
+                    usuario=usuario,
+                    cargo=cargo,
+                    municipio=municipio,
                     contrato=registro["TIPO_DE_CONTRATO"],
-                    id_cargo=cargo.id,
                     claveHLU=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
-                    id_usuario=usuario.id,
                     fecha_contratacion=registro["FECHA_CONTRATACION"],
                     seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
                     fecha_aprobacion_seguridad_social=registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
@@ -155,34 +144,22 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             banco_service = CrearBanco(repo_crear=repo_banco, repo_obtener=repo_banco)
             banco = banco_service.ejecutar(CrearBancoDTO(nombre=registro["BANCO"]))
 
-            # ! Validar esta exepción
-            if banco.id is None:
-                raise Exception("banco no encontrado")
-
             repo_cuentaBancaria = RepositorioCuentaBancariaSqlAlchemy(db)
             cuentaBancaria_service = CrearCuentaBancaria(
                 repo_crear=repo_cuentaBancaria, repo_obtener=repo_cuentaBancaria
             )
             cuenta_bancaria = cuentaBancaria_service.ejecutar(
                 CrearCuentaBancariaDTO(
+                    usuario=usuario,
+                    banco=banco,
                     numero_cuenta=registro["NUM_CUENTA_BANCARIA"],
                     numero_certificado=registro["NUM_CERTIFICADO_BANCARIO"],
                     estado="INACTIVA",  # ? agregrar enum
-                    id_usuario=usuario.id,
-                    id_banco=banco.id,
-                    tipo_de_cuenta=None,  # ? agregrar enum
+                    tipo_de_cuenta="AHORROS",  # ? agregrar enum
                     fecha_actualizacion=None,
                     observaciones=None,
                 )
             )
-
-            # ! Validar esta exepción
-            if historialLaboralUsuario.id is None:
-                raise Exception("historialLaboralUsuario no encontrado")
-
-            # ! Validar esta exepción
-            if cuenta_bancaria.id is None:
-                raise Exception("cuenta_bancaria no encontrado")
 
             # Creacion de la cuenta por pagar
             repo_cuentaPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
@@ -191,13 +168,13 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
             cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
-                    id_historial_laboral=historialLaboralUsuario.id,
-                    id_cuenta_bancaria=cuenta_bancaria.id,
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
+                    historial_laboral=historialLaboralUsuario,
+                    cuenta_bancaria=cuenta_bancaria,
                     fecha_prestacion_servicio=registro["FECHA_PRESTACION_SERVICIO"],
                     fecha_radicacion_contable=registro["FECHA_RADICACION_CONTABLE"],
                     estado_aprobacion_cuenta_usuario=registro["ESTADO_APROBACION_CUENTA_DE_COBRO"],
@@ -220,7 +197,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     creado_por=None,  # ? agregrar enum
                     lider_paciente_asignado=registro["LIDER_ASIGNADO_PACIENTE"],
                     eps_paciente_asignado=registro["EPS_PACIENTE_ASIGNADO"],
-                    tipo_de_cuenta=None,
                 )
             )
 
@@ -260,10 +236,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 },
             ]
 
-            # ! Validar esta exepción
-            if cuenta_por_pagar.id is None:
-                raise Exception("cuenta_por_pagar no encontrado")
-
             descuentos_creados = []
             for descuento in descuentos_predefinidos:
                 if descuento["valor"] == 0.0:
@@ -273,9 +245,9 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 descuentos_service = CrearDescuento(repo_obtener=repo_descuentos, repo_crear=repo_descuentos)
                 descuento_nuevo = descuentos_service.ejecutar(
                     CrearDescuentoDTO(
-                        id_cuenta_por_pagar=cuenta_por_pagar.id,
-                        id_usuario=usuario.id,
-                        id_deuda=None,
+                        usuario=usuario,
+                        cuenta_por_pagar=cuenta_por_pagar,
+                        deuda=None,
                         valor=descuento["valor"],
                         fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],
                         tipo_de_descuento=descuento["tipo_descuento"],
@@ -285,7 +257,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 )
                 descuentos_creados.append(descuento_nuevo)
 
-            # # actualizacion de cueta por pagar
+            # # actualizacion de cuenta por pagar
             cuenta_por_pagar.calcular_descuentos(descuentos_creados)
             repo_cuentaPorPagar.actualizar(
                 cuenta_por_pagar,
@@ -317,61 +289,41 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
     if registros_fallidos:
         df_fallidos = pd.DataFrame(registros_fallidos)
-        df_fallidos.to_excel("registros_fallidos.xlsx", index=False)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df_fallidos.to_excel(writer, index=False, sheet_name="Errores")
+        output.seek(0)
 
-        return {
-            # status_code=207,  # Multi-Status (algunos OK, otros no)
-            "content": {
-                "mensaje": "Se procesaron algunos registros con errores",
-                "exitosos": registros_exitosos,
-                "fallidos": registros_fallidos,
-            }
-        }
-    return {"message": "Historial cargado correctamente", "data": registros_exitosos}
-
-
-# @router.get("/", response_model=list[CuentaPorPagarResponseSchema])
-# def obtener_cuentas(db: Session = Depends(get_db)):
-#     try:
-#         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-#         caso_de_uso = ObtenerCuentasPorPagar(repo_cuentasPorPagar)
-#         cuentas = caso_de_uso.ejecutar()
-#         cuentas_response = [CuentaPorPagarResponseSchema.model_validate(cuenta) for cuenta in cuentas]
-#         return cuentas_response
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": "attachment; filename=registros_fallidos.xlsx",
+                "Content-Type": "application/octet-stream",
+            },
+        )
+    return {"message": f"Se han cargado {len(registros_exitosos)} registros exitosamente"}
 
 
-@router.get("/{id_cuenta_por_pagar}", response_model=CuentaPorPagarResponseSchema)
-def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db)):
+
+
+@router.get("/", response_model=list[CuentaPorPagarResponseSchema])
+def obtener_cuentas(db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-        caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
-        cuenta = caso_de_uso.ejecutar(id_cuenta_por_pagar)
-        return CuentaPorPagarResponseSchema.model_validate(cuenta)
+        caso_de_uso = ObtenerCuentasPorPagar(repo_cuentasPorPagar)
+        cuentas = caso_de_uso.ejecutar()
+        return cuentas
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
-@router.get("/")
-def obtener_cuentas(db: Session = Depends(get_db)):
+@router.get("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
+def obtener_cuenta_por_id(id_cuenta: int, db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-        repo_historialLaboralUsuario = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)
-        repo_cuenta_bancaria = RepositorioCuentaBancariaSqlAlchemy(db)
-        repo_usuario = RepositorioUsuarioSqlAlchemy(db)
-        repo_municipio = RepositorioMunicipioSqlAlchemy(db)
-        repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
-        caso_de_uso = ObtenerCuentasPorPagar(
-            repo_cuenta_bancaria=repo_cuenta_bancaria,
-            repo_cuenta_por_pagar=repo_cuentasPorPagar,
-            repo_historial=repo_historialLaboralUsuario,
-            repo_usuario=repo_usuario,
-            rerpo_municipio=repo_municipio,
-            repo_departamento=repo_departamento,
-        )
-        cuentas = caso_de_uso.ejecutar()
-        # cuentas_response = [CuentaPorPagarResponseSchema.model_validate(cuenta) for cuenta in cuentas]
-        return cuentas
+        caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
+        cuenta = caso_de_uso.ejecutar(id_cuenta)
+        return cuenta
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

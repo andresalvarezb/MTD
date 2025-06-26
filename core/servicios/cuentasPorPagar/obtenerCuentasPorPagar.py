@@ -1,71 +1,32 @@
+from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
 from core.interfaces.repositorioCuentaPorPagar import ObtenerCuentasPorPagarProtocol
-from core.interfaces.repositorioHistorialLaboralUsuario import ObtenerHistorialLaboralPorIdProtocol
-from core.interfaces.repositorioCuentaBancaria import ObtenerCuentaBancariaPorIdProtocol
-from app.api.esquemas.cuentaPorPagar import CuentaPorPagarCompletoResponseSchema
-from core.interfaces.repositorioUsuario import ObtenerUsuarioPorIdProtocol
-from core.interfaces.repositorioMunicipio import ObtenerMunicipioPorIdProtocol, ObtenerDepartamentoPorIdProtocol
-
-
-
-
-
-# class ObtenerCuentasPorPagar:
-#     def __init__(self, repositorio: ObtenerCuentasPorPagarProtocol):
-#         self.repositorio = repositorio
-
-#     def ejecutar(self):
-#         return self.repositorio.obtener_cuentas_por_pagar()
 
 
 class ObtenerCuentasPorPagar:
     def __init__(
         self,
         repo_cuenta_por_pagar: ObtenerCuentasPorPagarProtocol,
-        repo_historial: ObtenerHistorialLaboralPorIdProtocol,
-        repo_cuenta_bancaria: ObtenerCuentaBancariaPorIdProtocol,
-        repo_usuario: ObtenerUsuarioPorIdProtocol,
-        rerpo_municipio: ObtenerMunicipioPorIdProtocol,
-        repo_departamento: ObtenerDepartamentoPorIdProtocol,
     ):
         self.repo_cuenta_por_pagar = repo_cuenta_por_pagar
-        self.repo_historial = repo_historial
-        self.repo_cuenta_bancaria = repo_cuenta_bancaria
-        self.repo_usuario = repo_usuario
-        self.repo_municipio = rerpo_municipio
-        self.repo_departamento = repo_departamento
-
-
 
     def ejecutar(self):
-        resultado = []
+        resultado: list[CuentaPorPagarResponseSchema] = []
         cuentas = self.repo_cuenta_por_pagar.obtener_cuentas_por_pagar()
 
         for cuenta in cuentas:
-            historial = self.repo_historial.obtener_por_id(cuenta.id_historial_laboral)
-            if not historial:
-                raise Exception("Cuanta por pagasr sin historial laboral asociado")
-            cuenta_bancaria = self.repo_cuenta_bancaria.obtener_por_id(cuenta.id_cuenta_bancaria)
-
-            if not cuenta_bancaria:
-                raise Exception("Cuanta por pagar sin cuenta bancaria asociada")
-
-            usuario = self.repo_usuario.obtener_por_id(historial.id_usuario)
-
-            if not usuario:
-                raise Exception("Cuanta por pagar sin usuario asociado")
-
-            municipio = self.repo_municipio.obtener_por_id(usuario.id_municipio)
-
-            if not municipio:
-                raise Exception("Cuanta por pagar sin municipio asociado")
-
-            departamento = self.repo_departamento.obtener_por_id(municipio.id_departamento)
-
-            if not departamento:
-                raise Exception("Cuanta por pagar sin departamento asociado")
-
+            cuenta_bancaria_schema = {
+                "id": cuenta.cuenta_bancaria.id,
+                "id_usuario": cuenta.cuenta_bancaria.usuario.id,
+                "numero_cuenta": cuenta.cuenta_bancaria.numero_cuenta,
+                "numero_certificado": cuenta.cuenta_bancaria.numero_certificado,
+                "estado": cuenta.cuenta_bancaria.estado,
+                "tipo_de_cuenta": cuenta.cuenta_bancaria.tipo_de_cuenta,
+                "fecha_actualizacion": cuenta.cuenta_bancaria.fecha_actualizacion,
+                "observaciones": cuenta.cuenta_bancaria.observaciones,
+                "banco": cuenta.cuenta_bancaria.banco,
+            }
             resultado.append(
-                CuentaPorPagarCompletoResponseSchema(
+                CuentaPorPagarResponseSchema(
                     id=cuenta.id,
                     claveCPP=cuenta.claveCPP,
                     fecha_prestacion_servicio=cuenta.fecha_prestacion_servicio,
@@ -90,12 +51,8 @@ class ObtenerCuentasPorPagar:
                     creado_por=cuenta.creado_por,
                     lider_paciente_asignado=cuenta.lider_paciente_asignado,
                     eps_paciente_asignado=cuenta.eps_paciente_asignado,
-                    tipo_de_cuenta=cuenta.tipo_de_cuenta,
-                    usuario=usuario,
-                    municipio=municipio,
-                    departamento=departamento,
-                    historial_laboral=historial,
-                    cuenta_bancaria=cuenta_bancaria,
+                    historial_laboral=cuenta.historial_laboral,
+                    cuenta_bancaria=cuenta_bancaria_schema,
                 )
             )
         return resultado

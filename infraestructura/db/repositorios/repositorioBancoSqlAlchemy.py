@@ -8,23 +8,6 @@ class RepositorioBancoSqlAlchemy(CrearBancoProtocol, ObtenerBancoPorNombreProtoc
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    # def guardar(self, banco: Banco) -> Banco:
-    #     """Implementación para guardar el Banco en la base de datos"""
-
-    #     # verificar existencia
-    #     existe = self.obtener(banco)
-    #     if existe:
-    #         banco.id = existe.id
-    #         return banco
-
-    #     # creacion
-    #     nuevo_banco = BancoORM(nombre=banco.nombre)
-    #     self.db.add(nuevo_banco)
-    #     self.db.flush()
-    #     self.db.refresh(nuevo_banco)
-
-    #     banco.id = nuevo_banco.id
-    #     return banco
     def crear(self, banco: Banco) -> Banco:
         banco_nuevo = BancoORM(nombre=banco.nombre)
         self.db.add(banco_nuevo)
@@ -32,7 +15,6 @@ class RepositorioBancoSqlAlchemy(CrearBancoProtocol, ObtenerBancoPorNombreProtoc
         self.db.refresh(banco_nuevo)
         banco.id = banco_nuevo.id
         return banco
-
 
     def obtener_por_nombre(self, nombre: str) -> Banco | None:
         registro_orm = self.db.query(BancoORM).filter_by(nombre=nombre).first()
