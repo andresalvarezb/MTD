@@ -47,7 +47,26 @@ from core.servicios.descuentos.dtos import CrearDescuentoDTO
 router = APIRouter()
 
 
-@router.post("/cargar-historial")
+@router.post(
+    "/cargar-historial",
+    summary="Carga masiva del historial laboral",
+    description="""
+    Este endpoint permite la **carga masiva** de datos históricos a través de un archivo Excel.
+    Cada registro genera entidades como:
+    - Usuario
+    - Municipio y Departamento
+    - Cargo
+    - Historial laboral
+    - Cuenta bancaria
+    - Cuenta por pagar
+    - Descuentos asociados
+
+    Los registros procesados exitosamente y los que presenten errores serán devueltos en la respuesta.
+
+    ### Formato esperado del archivo Excel:
+    Las columnas deben incluir:
+    DOCUMENTO, NOMBRE, BANCO, DEPARTAMENTO, MUNICIPIO, ZONA, DSE, RUT, CORREO, CARGO CONTRATISTA, OPS O NOMINA, ESTADO CONTRATISTA, TELEFONO DE CONTACTO, NO.CUENTA BANCARIA, NÚMERO DE DOCUMENTO CERTIFICADO BANCARIO, EPS PACIENTE ASIGNADO, LIDER ASIGNADO, MES DE RADICACIÓN CONTABLE, FECHA DE SERVICIO, VALOR CUENTA DE COBRO AUTOMATICA, DESCUENTO RETEFUENTE, DESCUENTO TESORERIA, DESCUENTOS VARIOS, VALOR DCTO S.S., TOTAL A PAGAR, ESTADO CUENTA DE COBRO, FECHA APROBACIÓN CUENTA DE COBRO, SEGURIDAD SOCIAL, FECHA APROBACIÓN SEGURIDAD SOCIAL, FECHA APROBACIÓN RUT, FECHA OK CONTRATO, ESTADO REQUISITOS PARA PAGO, FECHA PROGRAMACION, FECHA DE PAGO, ESTADO DE PAGO, CAUSAL DE RECHAZO, FECHA REPROGRAMACIÓN PAGO, ESTADO DE REPROGRAMACIÓN, VALOR MINIMO, DESCUENTO REALIZADO, CANTIDAD DE DESCUENTOS, ACTIVO FIJO O DESCUENTO, VALOR DESCUENTO""",
+)
 def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends(get_db)):
     registros_fallidos = []
     registros_exitosos = []
@@ -243,7 +262,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             # ! Validar esta exepción
             if cuenta_por_pagar.id is None:
                 raise Exception("cuenta_por_pagar no encontrado")
-            
+
             descuentos_creados = []
             for descuento in descuentos_predefinidos:
                 if descuento["valor"] == 0.0:

@@ -23,6 +23,7 @@ class CrearDepartamento:
 
         # crearlo de no existir
         nuevo_departamento = self.repo_crear.crear(departamento)
+        print(nuevo_departamento)
         return nuevo_departamento
 
 
