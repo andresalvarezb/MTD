@@ -1,5 +1,8 @@
 from datetime import datetime
 from dataclasses import dataclass
+from core.entidades.cargo import Cargo
+from core.entidades.usuario import Usuario
+from core.entidades.municipio import Municipio
 
 
 @dataclass
@@ -13,13 +16,13 @@ class ActualizarSeguridadSocialDTO:
 
 @dataclass
 class CrearHistorialLaboralUsuarioDTO:
-    id_municipio: int
+    usuario: Usuario
     contrato: str
-    id_cargo: int
+    cargo: Cargo
     claveHLU: str
-    id_usuario: int
-    fecha_contratacion: datetime | None
+    municipio: Municipio
     seguridad_social: bool | None
-    fecha_aprobacion_seguridad_social: datetime | None
-    fecha_ultima_contratacion: datetime | None
+    fecha_contratacion: datetime | None
     fecha_fin_contratacion: datetime | None
+    fecha_ultima_contratacion: datetime | None
+    fecha_aprobacion_seguridad_social: datetime | None

@@ -18,31 +18,14 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
-    # def guardar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
-    #     """Implementación para guardar un HistorialLaboralUsuario en la base de datos"""
-
-    #     # verificar existencia
-    #     existe = self.obtener(historialLaboral)
-    #     if existe:
-    #         historialLaboral.id = existe.id
-    #         return historialLaboral
-
-    #     # creacion
-    #     nuevo_HistorialLaboralUsuario = HistorialLaboralORM(**historialLaboral.__dict__)
-    #     self.db.add(nuevo_HistorialLaboralUsuario)
-    #     self.db.flush()
-    #     self.db.refresh(nuevo_HistorialLaboralUsuario)
-
-    #     historialLaboral.id = nuevo_HistorialLaboralUsuario.id
-    #     return historialLaboral
 
     def crear(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
         nuevo_historial = HistorialLaboralORM(**historialLaboral.__dict__)
         self.db.add(nuevo_historial)
         self.db.flush()
         self.db.refresh(nuevo_historial)
-        historialLaboral.id = nuevo_historial.id
-        return historialLaboral
+        return historialLaboral.from_orm(nuevo_historial)
+
 
     def obtener(self, historialLaboral: HistorialLaboralUsuario):
         existe = self.db.query(HistorialLaboralORM).filter_by(claveHLU=historialLaboral.claveHLU).first()

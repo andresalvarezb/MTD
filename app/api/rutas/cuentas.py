@@ -23,10 +23,8 @@ from core.servicios.departamento.crearDepartamento import CrearDepartamento
 from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
     RepositorioHistorialLaboralUsuarioSqlAlchemy,
 )
-from infraestructura.db.repositorios.repositorioMunicipioSqlAlchemy import (
-    RepositorioMunicipioSqlAlchemy,
-    RepositorioDepartamentoSqlAlchemy,
-)
+from infraestructura.db.repositorios.repositorioMunicipioSqlAlchemy import RepositorioMunicipioSqlAlchemy
+from infraestructura.db.repositorios.repositorioDepartamentoSqlAlchemy import RepositorioDepartamentoSqlAlchemy
 
 
 from infraestructura.db.repositorios.repositorioCuentaBancariaSqlAlchemy import (
@@ -99,7 +97,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
             cargo = cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
 
-
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
             usuario_service = CrearUsuario(repo_crear=repo_usuario, repo_obtener=repo_usuario)
@@ -119,7 +116,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 )
             )
 
-
             # Crear registro del estado del usuario en el historial laboral
             repo_historialLaboralUsuario = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)
             historialLaboralUsuario_service = CrearHistorialLaboralUsuario(
@@ -127,15 +123,15 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
             historialLaboralUsuario = historialLaboralUsuario_service.ejecutar(
                 CrearHistorialLaboralUsuarioDTO(
-                    id_municipio=municipio.id,
+                    usuario=usuario,
+                    cargo=cargo,
+                    municipio=municipio,
                     contrato=registro["TIPO_DE_CONTRATO"],
-                    id_cargo=cargo.id,
                     claveHLU=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
-                    id_usuario=usuario.id,
                     fecha_contratacion=registro["FECHA_CONTRATACION"],
                     seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
                     fecha_aprobacion_seguridad_social=registro["FECHA_APROBACION_SEGURIDAD_SOCIAL"],
@@ -171,10 +167,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
 
             # ! Validar esta exepción
-            if historialLaboralUsuario.id is None:
-                raise Exception("historialLaboralUsuario no encontrado")
-
-            # ! Validar esta exepción
             if cuenta_bancaria.id is None:
                 raise Exception("cuenta_bancaria no encontrado")
 
@@ -185,7 +177,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
             cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
-                    id_historial_laboral=historialLaboralUsuario.id,
+                    historial_laboral=historialLaboralUsuario,
                     id_cuenta_bancaria=cuenta_bancaria.id,
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
@@ -322,8 +314,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             }
         }
     return {"message": f"Se han cargado {len(registros_exitosos)} registros exitosamente"}
-
-
 
 
 @router.get("/{id_cuenta_por_pagar}", response_model=CuentaPorPagarResponseSchema)

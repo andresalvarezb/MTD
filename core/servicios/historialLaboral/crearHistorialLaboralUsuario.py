@@ -16,16 +16,16 @@ class CrearHistorialLaboralUsuario:
     def ejecutar(self, datos: CrearHistorialLaboralUsuarioDTO) -> HistorialLaboralUsuario:
         # obtener
         historial = HistorialLaboralUsuario(
-            id_municipio=datos.id_municipio,
+            usuario=datos.usuario,
             contrato=datos.contrato,
-            id_cargo=datos.id_cargo,
-            fecha_contratacion=datos.fecha_contratacion,
+            cargo=datos.cargo,
+            municipio=datos.municipio,
             claveHLU=datos.claveHLU,
+            fecha_contratacion=datos.fecha_contratacion,
             seguridad_social=datos.seguridad_social,
             fecha_aprobacion_seguridad_social=datos.fecha_aprobacion_seguridad_social,
             fecha_ultima_contratacion=datos.fecha_ultima_contratacion,
             fecha_fin_contratacion=datos.fecha_fin_contratacion,
-            id_usuario=datos.id_usuario,
         )
 
         historial_existente = self.repo_obtener.obtener_por_clave(historial)

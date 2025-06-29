@@ -7,6 +7,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .usuario import UsuarioORM
     from .departamento import DepartamentoORM
+    from .historialLaboralUsuario import HistorialLaboralORM
+
+
 
 
 class MunicipioORM(Base):
@@ -22,3 +25,5 @@ class MunicipioORM(Base):
     # Relaciones 1:N
     departamento: Mapped["DepartamentoORM"] = relationship(back_populates="municipios")
     usuarios: Mapped[list["UsuarioORM"]] = relationship(back_populates="municipio")
+    historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="municipio")
+    
