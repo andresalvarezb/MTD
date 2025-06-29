@@ -11,7 +11,7 @@ class Cargo:
         self.nombre = self.nombre.upper()
 
     def _actualizar_nombre_cargo(self, nuevo_nombre: str):
-        self.nombre = nuevo_nombre.capitalize()
+        self.nombre = nuevo_nombre.upper()
 
     @classmethod
     def from_orm(cls, orm_object: CargoORM) -> "Cargo":
