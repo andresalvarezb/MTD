@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from datetime import datetime
 
 
-
 @dataclass
 class CrearBancoDTO:
     nombre: str
+
 
 @dataclass
 class CrearCuentaBancariaDTO:
