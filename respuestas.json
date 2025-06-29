@@ -1,0 +1,79 @@
+{
+    "id": 5,
+    "claveCPP": "",
+    "fecha_prestacion_servicio": "",
+    "fecha_radicacion_contable": "",
+    "estado_de_pago": "",
+    "estado_aprobacion_cuenta_usuario": "",
+    "estado_cuenta_por_pagar": "",
+    "valor_cuenta_cobro": "",
+    "total_descuentos": "",
+    "total_a_pagar": "",
+    "fecha_actualizacion": "",
+    "fecha_aprobacion_rut": "",
+    "fecha_creacion": "",
+    "fecha_aprobacion_cuenta_usuario": "",
+    "fecha_programacion_pago": "",
+    "fecha_reprogramacion": "",
+    "fecha_pago": "",
+    "rut": "",
+    "dse": "",
+    "causal_rechazo": "",
+    "creado_por": "",
+    "lider_paciente_asignado": "",
+    "eps_paciente_asignado": "",
+    "tipo_de_cuenta": "",
+    "historial_laboral": {
+        "id": "",
+        "claveHLU": "",
+        "contrato": "",
+        "seguridad_social": "",
+        "fecha_contratacion": "",
+        "fecha_fin_contratacion": "",
+        "fecha_aprobacion_seguridad_social": "",
+        "fecha_ultima_contratacion": "",
+        "usuario": {
+            "id": "",
+            "documento": "",
+            "nombre": "",
+            "estado": "",
+            "contrato": "",
+            "correo": "",
+            "telefono": "",
+            "seguridad_social": "",
+            "fecha_ultima_contratacion": "",
+            "fecha_aprobacion_seguridad_social": "",
+            "cargo": {
+                "id": "",
+                "nombre": ""
+            },
+            "municipio": {
+                "id": "",
+                "nombre": "",
+                "departamento": {
+                    "id": "",
+                    "nombre": ""
+                }
+            }
+        },
+        "id_municipio": "",
+        "cargo": {
+            "id": "",
+            "nombre": ""
+        }
+    },
+    "cuenta_bancaria": {
+        "id": "",
+        "id_usuario": "",
+        "numero_certificado": "",
+        "numero_cuenta": "",
+        "estado": "",
+        "tipo_de_cuenta": "",
+        "fecha_actualizacion": "",
+        "observaciones": "",
+        "banco": {
+            "id": "",
+            "nombre": ""
+        }
+    }
+}

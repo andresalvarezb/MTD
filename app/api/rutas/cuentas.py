@@ -44,7 +44,6 @@ from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
 from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
-from app.api.esquemas.cuentaPorPagar import CuentaPorPagarCompletoResponseSchema
 
 
 router = APIRouter()
@@ -325,23 +324,13 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             # status_code=207,  # Multi-Status (algunos OK, otros no)
             "content": {
                 "mensaje": "Se procesaron algunos registros con errores",
-                "exitosos": registros_exitosos,
-                "fallidos": registros_fallidos,
+                "exitosos": len(registros_exitosos),
+                "fallidos": len(registros_fallidos),
             }
         }
-    return {"message": "Historial cargado correctamente", "data": registros_exitosos}
+    return {"message": f"Se han cargado {len(registros_exitosos)} registros exitosamente"}
 
 
-# @router.get("/", response_model=list[CuentaPorPagarResponseSchema])
-# def obtener_cuentas(db: Session = Depends(get_db)):
-#     try:
-#         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-#         caso_de_uso = ObtenerCuentasPorPagar(repo_cuentasPorPagar)
-#         cuentas = caso_de_uso.ejecutar()
-#         cuentas_response = [CuentaPorPagarResponseSchema.model_validate(cuenta) for cuenta in cuentas]
-#         return cuentas_response
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
 @router.get("/{id_cuenta_por_pagar}", response_model=CuentaPorPagarResponseSchema)
@@ -355,7 +344,7 @@ def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
-@router.get("/", response_model=list[CuentaPorPagarCompletoResponseSchema])
+@router.get("/", response_model=list[CuentaPorPagarResponseSchema])
 def obtener_cuentas(db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)

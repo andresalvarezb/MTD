@@ -2,6 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from infraestructura.db.modelos.usuario import UsuarioORM
 
+from core.entidades.cargo import Cargo
+from core.entidades.municipio import Municipio
+
+
+
 
 
 
@@ -10,9 +15,9 @@ class Usuario:
     documento: str
     nombre: str
     estado: str
-    id_municipio: int
+    municipio: Municipio
     contrato: str
-    id_cargo: int
+    cargo: Cargo
     id: int | None = None
     correo: str | None = None
     telefono: str | None = None
@@ -37,13 +42,13 @@ class Usuario:
     @classmethod
     def from_orm(cls, orm_obj: UsuarioORM) -> "Usuario":
         return cls (
+            id= orm_obj.id,
             documento= orm_obj.documento,
             nombre= orm_obj.nombre,
             estado= orm_obj.estado,
-            id_municipio= orm_obj.id_municipio,
+            municipio=Municipio.from_orm(orm_obj.municipio),
             contrato= orm_obj.contrato,
-            id_cargo= orm_obj.id_cargo,
-            id= orm_obj.id,
+            cargo=Cargo.from_orm(orm_obj.cargo),
             correo= orm_obj.correo,
             telefono= orm_obj.telefono,
             seguridad_social= orm_obj.seguridad_social,

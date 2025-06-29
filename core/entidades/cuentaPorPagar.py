@@ -3,13 +3,17 @@ from datetime import datetime
 from decimal import Decimal
 from .descuento import Descuento
 from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
+from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
+from core.entidades.cuentaBancaria import CuentaBancaria
+
+
 
 
 @dataclass
 class CuentaPorPagar:
 
-    id_historial_laboral: int
-    id_cuenta_bancaria: int
+    historial_laboral: HistorialLaboralUsuario
+    cuenta_bancaria: CuentaBancaria
     claveCPP: str
     fecha_prestacion_servicio: datetime
     fecha_radicacion_contable: datetime
@@ -44,7 +48,7 @@ class CuentaPorPagar:
         if self.estado_de_pago:
             self.estado_de_pago = self.estado_de_pago.upper()
         if self.estado_reprogramacion_pago:
-            self.estado_reprogramacion_pago = self.estado_reprogramacion_pago
+            self.estado_reprogramacion_pago = self.estado_reprogramacion_pago.upper()
         if self.creado_por:
             self.creado_por = self.creado_por.upper()
         if self.lider_paciente_asignado:
@@ -59,18 +63,15 @@ class CuentaPorPagar:
         # self.total_descuentos = sum((descuento.valor for descuento in descuentos), Decimal(0))
 
     def calcular_descuentos(self, descuentos: list[Descuento]):
-        if not descuentos:
-            self.total_descuentos = Decimal("0.0")
-
-        descuento_total = Decimal(sum(descuento.valor for descuento in descuentos))
+        descuento_total = sum((descuento.valor for descuento in descuentos), Decimal("0.0"))
         self.total_descuentos = descuento_total
         self.total_a_pagar = self.valor_cuenta_cobro - descuento_total
 
     @classmethod
     def from_orm(cls, orm_obj: CuentaPorPagarORM) -> "CuentaPorPagar":
         return cls(
-            id_historial_laboral=orm_obj.id_historial_laboral,
-            id_cuenta_bancaria=orm_obj.id_cuenta_bancaria,
+            historial_laboral=HistorialLaboralUsuario.from_orm(orm_obj.historial_laboral),
+            cuenta_bancaria=CuentaBancaria.from_orm(orm_obj.cuenta_bancaria),
             claveCPP=orm_obj.claveCPP,
             fecha_prestacion_servicio=orm_obj.fecha_prestacion_servicio,
             fecha_radicacion_contable=orm_obj.fecha_radicacion_contable,

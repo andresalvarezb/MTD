@@ -8,6 +8,13 @@ from core.interfaces.repositorioCuentaPorPagar import (
     ObtenerCuentaPorPagarPorClaveProtocol,
 )
 from fastapi import HTTPException
+from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
+from infraestructura.db.modelos.usuario import UsuarioORM
+from infraestructura.db.modelos.municipio import MunicipioORM
+from infraestructura.db.modelos.cargo import CargoORM
+from sqlalchemy.orm import joinedload
+
+
 
 
 class RepositorioCuentaPorPagarSqlAlchemy(
@@ -59,7 +66,17 @@ class RepositorioCuentaPorPagarSqlAlchemy(
                 setattr(cuenta_por_pagar_db, attr, value)
 
     def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
-        registros_orm = self.db.query(CuentaPorPagarORM).all()
+        registros_orm = self.db.query(CuentaPorPagarORM).options(
+            joinedload(CuentaPorPagarORM.historial_laboral)
+                .joinedload(HistorialLaboralORM.usuario)
+                    .joinedload(UsuarioORM.cargo)
+                    .joinedload(UsuarioORM.municipio)
+                        .joinedload(MunicipioORM.departamento),
+            joinedload(CuentaPorPagarORM.historial_laboral)
+                .joinedload(HistorialLaboralORM.cargo),
+            joinedload(CuentaPorPagarORM.cuenta_bancaria)
+                .joinedload(CuentaPorPagarORM.cuenta_bancaria.banco),
+        )
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
 
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
