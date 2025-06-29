@@ -1,5 +1,7 @@
-from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass
+from core.entidades.banco import Banco
+from core.entidades.usuario import Usuario
 
 
 @dataclass
@@ -9,11 +11,11 @@ class CrearBancoDTO:
 
 @dataclass
 class CrearCuentaBancariaDTO:
+    usuario: Usuario
+    banco: Banco
     numero_cuenta: str
     numero_certificado: str | None
     estado: str
-    id_usuario: int
-    id_banco: int
     tipo_de_cuenta: str | None
     fecha_actualizacion: datetime | None
     observaciones: str | None

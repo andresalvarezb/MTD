@@ -145,30 +145,23 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             banco_service = CrearBanco(repo_crear=repo_banco, repo_obtener=repo_banco)
             banco = banco_service.ejecutar(CrearBancoDTO(nombre=registro["BANCO"]))
 
-            # ! Validar esta exepción
-            if banco.id is None:
-                raise Exception("banco no encontrado")
-
             repo_cuentaBancaria = RepositorioCuentaBancariaSqlAlchemy(db)
             cuentaBancaria_service = CrearCuentaBancaria(
                 repo_crear=repo_cuentaBancaria, repo_obtener=repo_cuentaBancaria
             )
             cuenta_bancaria = cuentaBancaria_service.ejecutar(
                 CrearCuentaBancariaDTO(
+                    usuario=usuario,
+                    banco=banco,
                     numero_cuenta=registro["NUM_CUENTA_BANCARIA"],
                     numero_certificado=registro["NUM_CERTIFICADO_BANCARIO"],
                     estado="INACTIVA",  # ? agregrar enum
-                    id_usuario=usuario.id,
-                    id_banco=banco.id,
-                    tipo_de_cuenta=None,  # ? agregrar enum
+                    tipo_de_cuenta="AHORROS",  # ? agregrar enum
                     fecha_actualizacion=None,
                     observaciones=None,
                 )
             )
 
-            # ! Validar esta exepción
-            if cuenta_bancaria.id is None:
-                raise Exception("cuenta_bancaria no encontrado")
 
             # Creacion de la cuenta por pagar
             repo_cuentaPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
@@ -178,7 +171,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
                     historial_laboral=historialLaboralUsuario,
-                    id_cuenta_bancaria=cuenta_bancaria.id,
+                    cuenta_bancaria=cuenta_bancaria,
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
