@@ -3,7 +3,7 @@ import pandas as pd
 from decimal import Decimal
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
-from core.servicios.usuarios.crearCargo import CrearCargo
+from core.servicios.cargos.crearCargo import CrearCargo
 from core.servicios.cuentasBancarias.crearBanco import CrearBanco
 from core.servicios.usuarios.crearUsuario import CrearUsuario
 from core.servicios.descuentos.crearDescuento import CrearDescuento
@@ -18,7 +18,8 @@ from core.servicios.historialLaboral.crearHistorialLaboralUsuario import CrearHi
 from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
 from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
-from core.servicios.usuarios.crearMunicipio import CrearDepartamento, CrearMunicipio
+from core.servicios.municipio.crearMunicipio import CrearMunicipio
+from core.servicios.departamento.crearDepartamento import CrearDepartamento
 from infraestructura.db.repositorios.repositorioHistorialLaboralUsuarioSqlAlchemy import (
     RepositorioHistorialLaboralUsuarioSqlAlchemy,
 )
@@ -38,7 +39,10 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
 
-from core.servicios.usuarios.dtos import CrearDepartamentoDTO, CrearMunicipioDTO, CrearCargoDTO, CrearUsuarioDTO
+from core.servicios.usuarios.dtos import CrearUsuarioDTO, CrearCargoDTO
+from core.servicios.departamento.dtos import CrearDepartamentoDTO
+from core.servicios.municipio.dtos import CrearMunicipioDTO
+from core.servicios.municipio.dtos import CrearMunicipioDTO
 from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO
 from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
 from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
@@ -80,15 +84,14 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             departamento_service = CrearDepartamento(repo_crear=repo_departamento, repo_obtener=repo_departamento)
             departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
-            # ! Validar esta exepción
-            if departamento.id is None:
-                raise Exception("Departamento no encontrado")
+            # if departamento.id is None:
+            #     raise Exception("Departamento no encontrado")
 
             # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
             municipio_service = CrearMunicipio(repo_crear=repo_municipio, repo_obtener=repo_municipio)
             municipio = municipio_service.ejecutar(
-                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], id_departamento=departamento.id)
+                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], departamento=departamento)
             )
 
             # crear cargo
@@ -96,13 +99,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
             cargo = cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
 
-            # ! Validar esta exepción
-            if cargo.id is None:
-                raise Exception("Cargo no encontrado")
-
-            # ! Validar esta exepción
-            if municipio.id is None:
-                raise Exception("Municipio no encontrado")
 
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
@@ -112,9 +108,9 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     documento=registro["DOCUMENTO"],
                     nombre=registro["NOMBRE"],
                     estado=registro["ESTADO_USUARIO"],  # ? agregrar enum
-                    id_municipio=municipio.id,
+                    municipio=municipio,
                     contrato=registro["TIPO_DE_CONTRATO"],
-                    id_cargo=cargo.id,
+                    cargo=cargo,
                     correo=registro["CORREO"],
                     telefono=registro["TELEFONO_USUARIO"],
                     seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
@@ -123,9 +119,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 )
             )
 
-            # ! Validar esta exepción
-            if usuario.id is None:
-                raise Exception("usuario no encontrado")
 
             # Crear registro del estado del usuario en el historial laboral
             repo_historialLaboralUsuario = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)

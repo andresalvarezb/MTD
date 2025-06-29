@@ -1,6 +1,6 @@
 from core.entidades.usuario import Usuario
-from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol
 from core.servicios.usuarios.dtos import CrearUsuarioDTO
+from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol
 
 
 class CrearUsuario:
@@ -14,9 +14,9 @@ class CrearUsuario:
             documento=datos.documento,
             nombre=datos.nombre,
             estado=datos.estado,
-            id_municipio=datos.id_municipio,
+            municipio=datos.municipio,
             contrato=datos.contrato,
-            id_cargo=datos.id_cargo,
+            cargo=datos.cargo,
             correo=datos.correo,
             telefono=datos.telefono,
             seguridad_social=datos.seguridad_social,
@@ -24,6 +24,7 @@ class CrearUsuario:
             fecha_ultima_contratacion=datos.fecha_ultima_contratacion,
         )
 
+        # Validar existencia de usuario
         usuario_existente = self.repo_obtener.obtener_por_documento(usuario.documento)
         if usuario_existente:
             return usuario_existente
