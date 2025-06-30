@@ -20,7 +20,18 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
 
 
     def crear(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
-        nuevo_historial = HistorialLaboralORM(**historialLaboral.__dict__)
+        nuevo_historial = HistorialLaboralORM(
+            id_municipio=historialLaboral.municipio.id,
+            contrato=historialLaboral.contrato,
+            id_cargo=historialLaboral.cargo.id,
+            fecha_contratacion=historialLaboral.fecha_contratacion,
+            claveHLU=historialLaboral.claveHLU,
+            seguridad_social=historialLaboral.seguridad_social,
+            fecha_aprobacion_seguridad_social=historialLaboral.fecha_aprobacion_seguridad_social,
+            fecha_ultima_contratacion=historialLaboral.fecha_ultima_contratacion,
+            fecha_fin_contratacion=historialLaboral.fecha_fin_contratacion,
+            id_usuario=historialLaboral.usuario.id,
+        )
         self.db.add(nuevo_historial)
         self.db.flush()
         self.db.refresh(nuevo_historial)

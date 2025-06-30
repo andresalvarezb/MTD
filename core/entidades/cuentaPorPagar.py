@@ -1,10 +1,10 @@
-from dataclasses import dataclass, field
-from datetime import datetime
 from decimal import Decimal
+from datetime import datetime
 from .descuento import Descuento
+from dataclasses import dataclass
+from core.entidades.cuentaBancaria import CuentaBancaria
 from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
 from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
-from core.entidades.cuentaBancaria import CuentaBancaria
 
 
 

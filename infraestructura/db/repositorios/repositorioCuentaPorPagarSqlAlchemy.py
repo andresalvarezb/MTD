@@ -27,7 +27,33 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         self.db = db
 
     def crear(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar:
-        cuenta_nueva = CuentaPorPagarORM(**cuenta_por_pagar.__dict__)
+        cuenta_nueva = CuentaPorPagarORM(
+            claveCPP=cuenta_por_pagar.claveCPP,
+            id_historial_laboral=cuenta_por_pagar.historial_laboral.id,
+            id_cuenta_bancaria=cuenta_por_pagar.cuenta_bancaria.id,
+            fecha_prestacion_servicio=cuenta_por_pagar.fecha_prestacion_servicio,
+            fecha_radicacion_contable=cuenta_por_pagar.fecha_radicacion_contable,
+            estado_aprobacion_cuenta_usuario=cuenta_por_pagar.estado_aprobacion_cuenta_usuario,
+            estado_cuenta_por_pagar=cuenta_por_pagar.estado_cuenta_por_pagar,
+            valor_cuenta_cobro=cuenta_por_pagar.valor_cuenta_cobro,
+            total_descuentos=cuenta_por_pagar.total_descuentos,
+            total_a_pagar=cuenta_por_pagar.total_a_pagar,
+            fecha_actualizacion=cuenta_por_pagar.fecha_actualizacion,
+            fecha_aprobacion_rut=cuenta_por_pagar.fecha_aprobacion_rut,
+            fecha_creacion=cuenta_por_pagar.fecha_creacion,
+            fecha_aprobacion_cuenta_usuario=cuenta_por_pagar.fecha_aprobacion_cuenta_usuario,
+            fecha_programacion_pago=cuenta_por_pagar.fecha_programacion_pago,
+            fecha_reprogramacion=cuenta_por_pagar.fecha_reprogramacion,
+            fecha_pago=cuenta_por_pagar.fecha_pago,
+            estado_reprogramacion_pago=cuenta_por_pagar.estado_reprogramacion_pago,
+            rut=cuenta_por_pagar.rut,
+            dse=cuenta_por_pagar.dse,
+            causal_rechazo=cuenta_por_pagar.causal_rechazo,
+            creado_por=cuenta_por_pagar.creado_por,
+            lider_paciente_asignado=cuenta_por_pagar.lider_paciente_asignado,
+            eps_paciente_asignado=cuenta_por_pagar.eps_paciente_asignado,
+
+        )
         self.db.add(cuenta_nueva)
         self.db.commit()
         self.db.refresh(cuenta_nueva)

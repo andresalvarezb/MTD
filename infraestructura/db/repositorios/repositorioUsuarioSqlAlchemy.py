@@ -15,9 +15,21 @@ class RepositorioUsuarioSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
- 
+
     def crear(self, usuario: Usuario) -> Usuario:
-        usuario_nuevo = UsuarioORM(**usuario.__dict__)
+        usuario_nuevo = UsuarioORM(
+            documento=usuario.documento,
+            nombre=usuario.nombre,
+            estado=usuario.estado,
+            id_municipio=usuario.municipio.id,
+            contrato=usuario.contrato,
+            id_cargo=usuario.cargo.id,
+            correo=usuario.correo,
+            telefono=usuario.telefono,
+            seguridad_social=usuario.seguridad_social,
+            fecha_aprobacion_seguridad_social=usuario.fecha_aprobacion_seguridad_social,
+            fecha_ultima_contratacion=usuario.fecha_ultima_contratacion,
+        )
         self.db.add(usuario_nuevo)
         self.db.flush()
         self.db.refresh(usuario_nuevo)

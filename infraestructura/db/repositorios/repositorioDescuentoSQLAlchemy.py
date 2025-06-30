@@ -13,7 +13,16 @@ class RepositorioDescuentoSqlAlchemy(CrearDescuentoProtocol, ObtenerDescuentosPr
         self.db = db
 
     def crear(self, descuento: Descuento) -> Descuento:
-        nuevo_descuento = DescuentosPorPagarORM(**descuento.__dict__)
+        nuevo_descuento = DescuentosPorPagarORM(
+            id_cuenta_por_pagar=descuento.id_cuenta_por_pagar,
+            id_usuario=descuento.id_usuario,
+            id_deuda=descuento.id_deuda,
+            valor=descuento.valor,
+            fecha_creacion=descuento.fecha_creacion,
+            tipo_de_descuento=descuento.tipo_de_descuento,
+            descripcion=descuento.descripcion,
+            fecha_actualizacion=descuento.fecha_actualizacion,
+        )
         self.db.add(nuevo_descuento)
         self.db.flush()
         self.db.refresh(nuevo_descuento)

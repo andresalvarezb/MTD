@@ -3,7 +3,8 @@ from core.interfaces.repositorioDepartamento import (
     ObtenerDepartamentoPorNombreProtocol,
     CrearDepartamentoProtocol,
 )
-from core.servicios.usuarios.dtos import CrearDepartamentoDTO
+
+from .dtos import CrearDepartamentoDTO
 
 
 class CrearDepartamento:

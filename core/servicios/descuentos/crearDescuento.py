@@ -10,9 +10,9 @@ class CrearDescuento:
 
     def ejecutar(self, datos: CrearDescuentoDTO) -> Descuento:
         descuento = Descuento(
-            usuario=datos.usuario,
-            cuenta_por_pagar=datos.cuenta_por_pagar,
-            deuda=datos.deuda,
+            id_usuario=datos.usuario.id,
+            id_cuenta_por_pagar=datos.cuenta_por_pagar.id,
+            id_deuda=datos.deuda.id,
             valor=datos.valor,
             fecha_creacion=datos.fecha_creacion,
             tipo_de_descuento=datos.tipo_de_descuento,

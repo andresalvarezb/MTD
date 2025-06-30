@@ -15,7 +15,16 @@ class RepositorioCuentaBancariaSqlAlchemy(
         self.db = db
 
     def crear(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
-        nueva_cuenta = CuentaBancariaORM(**cuenta_bancaria.__dict__)
+        nueva_cuenta = CuentaBancariaORM(
+            id_usuario=cuenta_bancaria.usuario.id,
+            id_banco=cuenta_bancaria.banco.id,
+            estado=cuenta_bancaria.estado,
+            numero_cuenta=cuenta_bancaria.numero_cuenta,
+            numero_certificado=cuenta_bancaria.numero_certificado,
+            tipo_de_cuenta=cuenta_bancaria.tipo_de_cuenta,
+            fecha_actualizacion=cuenta_bancaria.fecha_actualizacion,
+            observaciones=cuenta_bancaria.observaciones,
+        )
         self.db.add(nueva_cuenta)
         self.db.flush()
         self.db.refresh(nueva_cuenta)

@@ -1,20 +1,12 @@
-from core.interfaces.repositorioCuentaPorPagar import ObtenerCuentasPorPagarProtocol
-from core.interfaces.repositorioHistorialLaboralUsuario import ObtenerHistorialLaboralPorIdProtocol
-from core.interfaces.repositorioCuentaBancaria import ObtenerCuentaBancariaPorIdProtocol
 from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
 from core.interfaces.repositorioUsuario import ObtenerUsuarioPorIdProtocol
-from core.interfaces.repositorioMunicipio import ObtenerMunicipioPorIdProtocol, ObtenerDepartamentoPorIdProtocol
+from core.interfaces.repositorioMunicipio import ObtenerMunicipioPorIdProtocol
+from core.interfaces.repositorioDepartamento import ObtenerDepartamentoPorIdProtocol
+from core.interfaces.repositorioCuentaPorPagar import ObtenerCuentasPorPagarProtocol
+from core.interfaces.repositorioCuentaBancaria import ObtenerCuentaBancariaPorIdProtocol
+from core.interfaces.repositorioHistorialLaboralUsuario import ObtenerHistorialLaboralPorIdProtocol
 
 
-
-
-
-# class ObtenerCuentasPorPagar:
-#     def __init__(self, repositorio: ObtenerCuentasPorPagarProtocol):
-#         self.repositorio = repositorio
-
-#     def ejecutar(self):
-#         return self.repositorio.obtener_cuentas_por_pagar()
 
 
 class ObtenerCuentasPorPagar:

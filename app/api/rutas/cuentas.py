@@ -1,8 +1,10 @@
 import logging
 import pandas as pd
+from io import BytesIO
 from decimal import Decimal
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
+from fastapi.responses import StreamingResponse
 from core.servicios.cargos.crearCargo import CrearCargo
 from core.servicios.cuentasBancarias.crearBanco import CrearBanco
 from core.servicios.usuarios.crearUsuario import CrearUsuario
@@ -82,8 +84,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             departamento_service = CrearDepartamento(repo_crear=repo_departamento, repo_obtener=repo_departamento)
             departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
-            # if departamento.id is None:
-            #     raise Exception("Departamento no encontrado")
 
             # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
@@ -259,7 +259,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 )
                 descuentos_creados.append(descuento_nuevo)
 
-            # # actualizacion de cueta por pagar
+            # # actualizacion de cuenta por pagar
             cuenta_por_pagar.calcular_descuentos(descuentos_creados)
             repo_cuentaPorPagar.actualizar(
                 cuenta_por_pagar,
@@ -291,16 +291,20 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
     if registros_fallidos:
         df_fallidos = pd.DataFrame(registros_fallidos)
-        df_fallidos.to_excel("registros_fallidos.xlsx", index=False)
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_fallidos.to_excel(writer, index=False, sheet_name="Errores")
+        output.seek(0)
 
-        return {
-            # status_code=207,  # Multi-Status (algunos OK, otros no)
-            "content": {
-                "mensaje": "Se procesaron algunos registros con errores",
-                "exitosos": len(registros_exitosos),
-                "fallidos": len(registros_fallidos),
+
+        return StreamingResponse(
+            output,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": "attachment; filename=registros_fallidos.xlsx",
+                "Content-Type": "application/octet-stream"
             }
-        }
+        )
     return {"message": f"Se han cargado {len(registros_exitosos)} registros exitosamente"}
 
 

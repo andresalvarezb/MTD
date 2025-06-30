@@ -1,20 +1,16 @@
 from dataclasses import dataclass
 from decimal import Decimal
 from datetime import datetime
-from core.entidades.deuda import Deuda
-from core.entidades.usuario import Usuario
-from core.entidades.cuentaPorPagar import CuentaPorPagar
-
 
 
 @dataclass
 class Descuento:
-    cuenta_por_pagar: CuentaPorPagar
-    usuario: Usuario
+    id_cuenta_por_pagar: int
+    id_usuario: int
     valor: Decimal
     fecha_creacion: datetime
     tipo_de_descuento: str
-    deuda: Deuda | None = None
+    id_deuda: int | None = None
     id: int | None = None
     descripcion: str | None = None
     fecha_actualizacion: datetime | None = None
@@ -43,12 +39,12 @@ class Descuento:
     def from_orm(cls, orm_obj):
         return cls(
             id=orm_obj.id,
-            cuenta_por_pagar=orm_obj.cuenta_por_pagar,
-            usuario=orm_obj.usuario,
+            id_cuenta_por_pagar=orm_obj.id_cuenta_por_pagar,
+            id_usuario=orm_obj.id_usuario,
             valor=orm_obj.valor,
             fecha_creacion=orm_obj.fecha_creacion,
             tipo_de_descuento=orm_obj.tipo_de_descuento,
-            deuda=orm_obj.deuda,
+            id_deuda=orm_obj.id_deuda,
             descripcion=orm_obj.descripcion,
             fecha_actualizacion=orm_obj.fecha_actualizacion,
         )
