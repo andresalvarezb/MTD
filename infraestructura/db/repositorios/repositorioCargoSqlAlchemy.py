@@ -15,7 +15,6 @@ class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoPorNombreProtoc
         self.db.refresh(cargo_nuevo)
         return cargo.from_orm(cargo_nuevo)
 
-
     def obtener_por_nombre(self, cargo: Cargo) -> Cargo | None:
         registro_orm = self.db.query(CargoORM).filter_by(nombre=cargo.nombre).first()
         if registro_orm:

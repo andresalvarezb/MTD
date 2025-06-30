@@ -305,8 +305,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
     return {"message": f"Se han cargado {len(registros_exitosos)} registros exitosamente"}
 
 
-
-
 @router.get("/", response_model=list[CuentaPorPagarResponseSchema])
 def obtener_cuentas(db: Session = Depends(get_db)):
     try:

@@ -7,8 +7,6 @@ from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
 from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
 
 
-
-
 @dataclass
 class CuentaPorPagar:
 

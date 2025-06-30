@@ -1,5 +1,6 @@
 from core.interfaces.repositorioUsuario import ObtenerUsuarioPorIdProtocol
 
+
 class ObtenerUsuario:
     def __init__(self, repositorio_usuario: ObtenerUsuarioPorIdProtocol):
         self.repositorio_usuario = repositorio_usuario

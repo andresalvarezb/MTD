@@ -18,7 +18,6 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
-
     def crear(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
         nuevo_historial = HistorialLaboralORM(
             id_municipio=historialLaboral.municipio.id,
@@ -36,7 +35,6 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         self.db.flush()
         self.db.refresh(nuevo_historial)
         return historialLaboral.from_orm(nuevo_historial)
-
 
     def obtener(self, historialLaboral: HistorialLaboralUsuario):
         existe = self.db.query(HistorialLaboralORM).filter_by(claveHLU=historialLaboral.claveHLU).first()

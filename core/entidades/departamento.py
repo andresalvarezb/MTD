@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from infraestructura.db.modelos.departamento import DepartamentoORM
 
+
 @dataclass
 class Departamento:
     nombre: str

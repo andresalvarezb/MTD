@@ -5,8 +5,6 @@ from infraestructura.db.modelos.deuda import DeudaORM
 from typing import cast
 
 
-
-
 @dataclass
 class Deuda:
     id_usuario: int
@@ -18,7 +16,6 @@ class Deuda:
     id_area: int | None = None
     id: int | None = None
     descripcion: str | None = None
-
 
     def actualizar_saldo(self, descuento: Decimal):
         if descuento < 0:
@@ -37,7 +34,7 @@ class Deuda:
         return cls(
             id_usuario=orm_obj.id_usuario,
             estado=orm_obj.estado,
-            saldo=cast(Decimal, orm_obj.saldo), # el cast es para no generar errores de tipo Decimal =! DECIMAL
+            saldo=cast(Decimal, orm_obj.saldo),  # el cast es para no generar errores de tipo Decimal =! DECIMAL
             valor_total=cast(Decimal, orm_obj.valor_total),
             fecha_creacion=orm_obj.fecha_creacion,
             fecha_actualizacion=orm_obj.fecha_actualizacion,

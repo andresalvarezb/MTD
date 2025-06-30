@@ -4,7 +4,7 @@ from infraestructura.db.modelos.departamento import DepartamentoORM
 from core.interfaces.repositorioDepartamento import (
     CrearDepartamentoProtocol,
     ObtenerDepartamentoPorNombreProtocol,
-    ObtenerDepartamentoPorIdProtocol
+    ObtenerDepartamentoPorIdProtocol,
 )
 
 

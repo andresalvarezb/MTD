@@ -12,6 +12,7 @@ from fastapi import HTTPException
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
 from infraestructura.db.modelos.usuario import UsuarioORM
 from infraestructura.db.modelos.municipio import MunicipioORM
+
 # from infraestructura.db.modelos.cargo import CargoORM
 from sqlalchemy.orm import joinedload
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
@@ -91,7 +92,6 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         )
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
 
-
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
         registro = self.db.query(CuentaPorPagarORM).filter_by(id=id_cuenta_por_pagar).first()
         if not registro:
@@ -125,11 +125,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     #         return None
     #     return CuentaPorPagar.from_orm(registro_orm)
     def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
-        registro_orm = (
-            self.db.query(CuentaPorPagarORM)
-            .filter(CuentaPorPagarORM.id==id_cuenta_por_pagar)
-            .first()
-        )
+        registro_orm = self.db.query(CuentaPorPagarORM).filter(CuentaPorPagarORM.id == id_cuenta_por_pagar).first()
 
         if not registro_orm:
             return None

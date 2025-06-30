@@ -11,7 +11,4 @@ class AreaMTD:
 
     @classmethod
     def from_orm(cls, orm_object):
-        return cls(
-            id=orm_object.id,
-            nombre=orm_object.nombre
-        )
+        return cls(id=orm_object.id, nombre=orm_object.nombre)

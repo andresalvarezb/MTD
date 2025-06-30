@@ -6,8 +6,6 @@ from core.entidades.usuario import Usuario
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 
-
-
 @dataclass
 class CrearDescuentoDTO:
     cuenta_por_pagar: CuentaPorPagar

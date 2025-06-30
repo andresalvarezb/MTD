@@ -15,7 +15,6 @@ class RepositorioUsuarioSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
-
     def crear(self, usuario: Usuario) -> Usuario:
         usuario_nuevo = UsuarioORM(
             documento=usuario.documento,
@@ -34,7 +33,6 @@ class RepositorioUsuarioSqlAlchemy(
         self.db.flush()
         self.db.refresh(usuario_nuevo)
         return usuario.from_orm(usuario_nuevo)
-
 
     def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
         registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento_usuario).first()

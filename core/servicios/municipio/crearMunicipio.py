@@ -1,9 +1,7 @@
 from core.entidades.municipio import Municipio
-from core.interfaces.repositorioMunicipio import (
-    CrearMunicipioProtocol,
-    ObtenerMunicipioPorNombreProtocol
-)
+from core.interfaces.repositorioMunicipio import CrearMunicipioProtocol, ObtenerMunicipioPorNombreProtocol
 from core.servicios.municipio.dtos import CrearMunicipioDTO
+
 
 class CrearMunicipio:
     def __init__(self, repo_crear: CrearMunicipioProtocol, repo_obtener: ObtenerMunicipioPorNombreProtocol):

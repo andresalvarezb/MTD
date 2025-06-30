@@ -17,6 +17,7 @@ class ObtenerUsuarioPorDocumentoProtocol(Protocol):
 class ActulizarSeguridadSocialUsuarioProtocol(Protocol):
     def actualizar_seguridad_social(self, usuario: Usuario) -> Usuario: ...
 
+
 class ObtenerUsuariosProtocol(Protocol):
     def obtener_todos(self) -> list[Usuario]: ...
 

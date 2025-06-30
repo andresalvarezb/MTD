@@ -10,11 +10,15 @@ from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import Reposit
 from infraestructura.db.repositorios.repositorioAreaSqlAlchemy import RepositorioAreaMTDSqlAlchemy
 
 
-
 router = APIRouter()
 
 
-@router.post("/crear", response_model=DeudaRespuestaSchema, summary="Crear nueva deuda asociada a un usuario", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/crear",
+    response_model=DeudaRespuestaSchema,
+    summary="Crear nueva deuda asociada a un usuario",
+    status_code=status.HTTP_201_CREATED,
+)
 def crear_deuda(deuda: CrearDeudaSchema, db: Session = Depends(get_db)):
     try:
         repo_deuda = RepositorioDeudaSqlAlchemy(db)

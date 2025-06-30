@@ -6,6 +6,7 @@ class WrapperRespuesta(BaseModel):
     status_code: int
     data: dict | list | str | None
 
+
 from pydantic import BaseModel
 from datetime import datetime
 from decimal import Decimal
@@ -101,6 +102,7 @@ class DescuentoRead(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class CuentaPorPagarRead(BaseModel):
     id: int

@@ -3,8 +3,6 @@ from infraestructura.db.modelos.municipio import MunicipioORM
 from core.entidades.departamento import Departamento
 
 
-
-
 @dataclass
 class Municipio:
     nombre: str

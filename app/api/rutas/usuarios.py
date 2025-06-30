@@ -21,6 +21,7 @@ def obtener_usuarios(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
+
 @router.get("/{id_usuario}", response_model=Usuario)
 def obtener_un_usuario(id_usuario: int, db: Session = Depends(get_db)):
     try:

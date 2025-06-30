@@ -10,7 +10,7 @@ class ObtenerCuentaPorPagar:
         cuenta = self.repositorio.obtener_por_id(id_cuenta_por_pagar)
         if not cuenta:
             raise Exception("cuenta no encontrada")
-    
+
         cuenta_bancaria_schema = {
             "id": cuenta.cuenta_bancaria.id,
             "id_usuario": cuenta.cuenta_bancaria.usuario.id,

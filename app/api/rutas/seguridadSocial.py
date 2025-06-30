@@ -10,7 +10,6 @@ from app.api.esquemas.seguridadSocial import ActualizacionSeguridadSocialSchema
 from core.servicios.historialLaboral.dtos import ActualizarSeguridadSocialDTO
 
 
-
 router = APIRouter()
 
 

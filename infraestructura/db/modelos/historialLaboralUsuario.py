@@ -39,4 +39,3 @@ class HistorialLaboralORM(Base):
     cargo: Mapped["CargoORM"] = relationship(back_populates="historial_laboral")
     cuentas_por_pagar: Mapped[list["CuentaPorPagarORM"]] = relationship(back_populates="historial_laboral")
     municipio: Mapped["MunicipioORM"] = relationship(back_populates="historial_laboral")
-

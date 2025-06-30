@@ -10,8 +10,6 @@ if TYPE_CHECKING:
     from .historialLaboralUsuario import HistorialLaboralORM
 
 
-
-
 class MunicipioORM(Base):
     __tablename__ = "municipio"
 
@@ -26,4 +24,3 @@ class MunicipioORM(Base):
     departamento: Mapped["DepartamentoORM"] = relationship(back_populates="municipios")
     usuarios: Mapped[list["UsuarioORM"]] = relationship(back_populates="municipio")
     historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="municipio")
-    

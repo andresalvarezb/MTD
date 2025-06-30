@@ -1,15 +1,20 @@
-from core.interfaces.repositorioUsuario import ObtenerUsuarioPorDocumentoProtocol, ActulizarSeguridadSocialUsuarioProtocol
+from core.interfaces.repositorioUsuario import (
+    ObtenerUsuarioPorDocumentoProtocol,
+    ActulizarSeguridadSocialUsuarioProtocol,
+)
 from app.api.esquemas.seguridadSocial import ActualizacionSeguridadSocialSchema
-from core.interfaces.repositorioHistorialLaboralUsuario import ObtenerHistorialLaboralPorIdProtocol, ActulizarSeguridadSocialHistorialLaboralProtocol
+from core.interfaces.repositorioHistorialLaboralUsuario import (
+    ObtenerHistorialLaboralPorIdProtocol,
+    ActulizarSeguridadSocialHistorialLaboralProtocol,
+)
 from core.servicios.historialLaboral.dtos import ActualizarSeguridadSocialDTO
-
 
 
 class ActualizarSeguridadSocial:
     def __init__(
         self,
-        obtener_usuario_repo : ObtenerUsuarioPorDocumentoProtocol,
-        obtener_hlu_repo : ObtenerHistorialLaboralPorIdProtocol,
+        obtener_usuario_repo: ObtenerUsuarioPorDocumentoProtocol,
+        obtener_hlu_repo: ObtenerHistorialLaboralPorIdProtocol,
         actualizar_ss_usuario_repo: ActulizarSeguridadSocialUsuarioProtocol,
         actualizar_ss_hlu_repo: ActulizarSeguridadSocialHistorialLaboralProtocol,
     ):
@@ -18,10 +23,8 @@ class ActualizarSeguridadSocial:
         self.actualizar_ss_usuario_repo = actualizar_ss_usuario_repo
         self.actualizar_ss_hlu_repo = actualizar_ss_hlu_repo
 
-
     def ejecutar(self, data: ActualizarSeguridadSocialDTO):
         # obtener registros en base al id
-
 
         usuario = self.obtener_usuario_repo.obtener_por_documento(data.documento_usuario)
         if not usuario:
