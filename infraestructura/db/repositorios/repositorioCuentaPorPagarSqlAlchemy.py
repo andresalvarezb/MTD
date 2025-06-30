@@ -26,30 +26,12 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     def __init__(self, db: Session):
         self.db = db
 
-    # def guardar(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar:
-    #     """Implementación para guardar un CuentaPorPagar en la base de datos"""
-
-    #     # verificar existencia
-    #     existe = self.obtener(cuenta_por_pagar)
-    #     if existe:
-    #         cuenta_por_pagar.id = existe.id
-    #         return cuenta_por_pagar
-
-    #     # creacion
-    #     nuevo_cuenta_por_pagar = CuentaPorPagarORM(**cuenta_por_pagar.__dict__)
-    #     self.db.add(nuevo_cuenta_por_pagar)
-    #     self.db.flush()
-    #     self.db.refresh(nuevo_cuenta_por_pagar)
-
-    #     cuenta_por_pagar.id = nuevo_cuenta_por_pagar.id
-    #     return cuenta_por_pagar
     def crear(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar:
         cuenta_nueva = CuentaPorPagarORM(**cuenta_por_pagar.__dict__)
         self.db.add(cuenta_nueva)
         self.db.commit()
         self.db.refresh(cuenta_nueva)
-        cuenta_por_pagar.id = cuenta_nueva.id
-        return cuenta_por_pagar
+        return cuenta_por_pagar.from_orm(cuenta_nueva)
 
     def obtener(self, cuenta_por_pagar: CuentaPorPagar):
         existe = self.db.query(CuentaPorPagarORM).filter_by(claveCPP=cuenta_por_pagar.claveCPP).first()

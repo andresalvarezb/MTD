@@ -170,13 +170,13 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             )
             cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
-                    historial_laboral=historialLaboralUsuario,
-                    cuenta_bancaria=cuenta_bancaria,
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])
                         + str(registro["FECHA_RADICACION_CONTABLE"].strftime("%Y%m%d"))
                     ),
+                    historial_laboral=historialLaboralUsuario,
+                    cuenta_bancaria=cuenta_bancaria,
                     fecha_prestacion_servicio=registro["FECHA_PRESTACION_SERVICIO"],
                     fecha_radicacion_contable=registro["FECHA_RADICACION_CONTABLE"],
                     estado_aprobacion_cuenta_usuario=registro["ESTADO_APROBACION_CUENTA_DE_COBRO"],
@@ -198,8 +198,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     causal_rechazo=registro["CAUSAL_DE_RECHAZO"],
                     creado_por=None,  # ? agregrar enum
                     lider_paciente_asignado=registro["LIDER_ASIGNADO_PACIENTE"],
-                    eps_paciente_asignado=registro["EPS_PACIENTE_ASIGNADO"],
-                    tipo_de_cuenta=None,
+                    eps_paciente_asignado=registro["EPS_PACIENTE_ASIGNADO"]
                 )
             )
 
@@ -239,10 +238,6 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 },
             ]
 
-            # ! Validar esta exepción
-            if cuenta_por_pagar.id is None:
-                raise Exception("cuenta_por_pagar no encontrado")
-
             descuentos_creados = []
             for descuento in descuentos_predefinidos:
                 if descuento["valor"] == 0.0:
@@ -252,8 +247,8 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 descuentos_service = CrearDescuento(repo_obtener=repo_descuentos, repo_crear=repo_descuentos)
                 descuento_nuevo = descuentos_service.ejecutar(
                     CrearDescuentoDTO(
-                        id_cuenta_por_pagar=cuenta_por_pagar.id,
-                        id_usuario=usuario.id,
+                        usuario=usuario,
+                        cuenta_por_pagar=cuenta_por_pagar,
                         id_deuda=None,
                         valor=descuento["valor"],
                         fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],

@@ -38,7 +38,6 @@ class CuentaPorPagar:
     creado_por: str | None = None
     lider_paciente_asignado: str | None = None
     eps_paciente_asignado: str | None = None
-    tipo_de_cuenta: str | None = None
 
     def __post_init__(self):
         if self.estado_aprobacion_cuenta_usuario:
@@ -55,8 +54,6 @@ class CuentaPorPagar:
             self.lider_paciente_asignado = self.lider_paciente_asignado.upper()
         if self.eps_paciente_asignado:
             self.eps_paciente_asignado = self.eps_paciente_asignado.upper()
-        if self.tipo_de_cuenta:
-            self.tipo_de_cuenta = self.tipo_de_cuenta.upper()
         if self.dse:
             self.dse = self.dse.upper()
 
@@ -96,5 +93,4 @@ class CuentaPorPagar:
             creado_por=orm_obj.creado_por,
             lider_paciente_asignado=orm_obj.lider_paciente_asignado,
             eps_paciente_asignado=orm_obj.eps_paciente_asignado,
-            tipo_de_cuenta=orm_obj.tipo_de_cuenta,
         )

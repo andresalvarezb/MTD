@@ -44,7 +44,6 @@ class CuentaPorPagarORM(Base):
     creado_por: Mapped[str | None] = mapped_column(String(45), nullable=True)
     lider_paciente_asignado: Mapped[str | None] = mapped_column(String(45), nullable=True)
     eps_paciente_asignado: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    tipo_de_cuenta: Mapped[str | None] = mapped_column(String(45), nullable=True)
 
     # Relaciones 1:N
     historial_laboral: Mapped["HistorialLaboralORM"] = relationship(back_populates="cuentas_por_pagar")
