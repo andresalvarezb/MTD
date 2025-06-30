@@ -31,13 +31,11 @@ class UsuarioResponseSchema(BaseModel):
     correo: str = Field(..., description="Correo electrónico de contacto")
     telefono: str = Field(..., description="Número de teléfono de contacto")
     seguridad_social: bool = Field(..., description="Indica si el usuario está afiliado a seguridad social")
-    fecha_ultima_contratacion: datetime = Field(
-        ...,
+    fecha_ultima_contratacion: datetime | None = Field(None,
         description="Fecha de la última contratación del usuario (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
         examples=["2025-06-26T17:16:00", "2025-06-26"],
     )
-    fecha_aprobacion_seguridad_social: datetime = Field(
-        ...,
+    fecha_aprobacion_seguridad_social: datetime| None = Field(None,
         description="Fecha en que se aprobó la afiliación a seguridad social (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
         examples=["2025-06-26T17:16:00", "2025-06-26"],
     )

@@ -84,7 +84,6 @@ class CuentaPorPagarResponseSchema(BaseModel):
     creado_por: str | None = Field(None, description="Usuario o sistema que creó el registro")
     lider_paciente_asignado: str | None = Field(None, description="Nombre del líder asignado al paciente")
     eps_paciente_asignado: str | None = Field(None, description="EPS asignada al paciente")
-    tipo_de_cuenta: str | None = Field(None, description="Tipo de cuenta bancaria asociada")
 
     # Relaciones anidadas
     historial_laboral: HistorialLaboralResponseSchema = Field(

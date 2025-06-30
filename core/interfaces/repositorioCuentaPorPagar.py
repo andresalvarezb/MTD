@@ -15,3 +15,6 @@ class ObtenerCuentaPorPagarProtocol(Protocol):
 
 class ObtenerCuentaPorPagarPorClaveProtocol(Protocol):
     def obtener_por_clave(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar | None: ...
+
+class ObtenerCuentaPorPagarPorIdProtocol(Protocol):
+    def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None: ...

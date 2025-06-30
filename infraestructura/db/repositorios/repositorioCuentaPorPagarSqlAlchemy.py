@@ -6,6 +6,7 @@ from core.interfaces.repositorioCuentaPorPagar import (
     ObtenerCuentaPorPagarProtocol,
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
+    ObtenerCuentaPorPagarPorIdProtocol
 )
 from fastapi import HTTPException
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
@@ -13,6 +14,8 @@ from infraestructura.db.modelos.usuario import UsuarioORM
 from infraestructura.db.modelos.municipio import MunicipioORM
 from infraestructura.db.modelos.cargo import CargoORM
 from sqlalchemy.orm import joinedload
+from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
+
 
 
 
@@ -22,6 +25,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     ObtenerCuentaPorPagarProtocol,
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
+    ObtenerCuentaPorPagarPorIdProtocol
 ):
     def __init__(self, db: Session):
         self.db = db
@@ -77,14 +81,16 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         registros_orm = self.db.query(CuentaPorPagarORM).options(
             joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.usuario)
-                    .joinedload(UsuarioORM.cargo)
+                    .joinedload(UsuarioORM.cargo),
+            joinedload(CuentaPorPagarORM.historial_laboral)
+                .joinedload(HistorialLaboralORM.usuario)
                     .joinedload(UsuarioORM.municipio)
                         .joinedload(MunicipioORM.departamento),
             joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.cargo),
             joinedload(CuentaPorPagarORM.cuenta_bancaria)
-                .joinedload(CuentaPorPagarORM.cuenta_bancaria.banco),
-        )
+                .joinedload(CuentaBancariaORM.banco),
+        ).all()
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
 
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
@@ -98,3 +104,27 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         if not registro:
             return None
         return CuentaPorPagar.from_orm(registro)
+
+    def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
+        registro_orm = (
+            self.db.query(CuentaPorPagarORM)
+            .options(
+                joinedload(CuentaPorPagarORM.historial_laboral)
+                    .joinedload(HistorialLaboralORM.usuario)
+                        .joinedload(UsuarioORM.cargo),
+                joinedload(CuentaPorPagarORM.historial_laboral)
+                    .joinedload(HistorialLaboralORM.usuario)
+                        .joinedload(UsuarioORM.municipio)
+                            .joinedload(MunicipioORM.departamento),
+                joinedload(CuentaPorPagarORM.historial_laboral)
+                    .joinedload(HistorialLaboralORM.cargo),
+                joinedload(CuentaPorPagarORM.cuenta_bancaria)
+                    .joinedload(CuentaBancariaORM.banco)
+            )
+            .filter(CuentaPorPagarORM.id == id_cuenta_por_pagar)
+            .first()
+        )
+
+        if not registro_orm:
+            return None
+        return CuentaPorPagar.from_orm(registro_orm)

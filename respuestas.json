@@ -1,4 +1,4 @@
-{
+[{
     "id": 5,
     "claveCPP": "",
     "fecha_prestacion_servicio": "",
@@ -76,4 +76,115 @@
             "nombre": ""
         }
     }
-}
+},
+
+{
+        "historial_laboral": {
+            "usuario": {
+                "documento": "8357035",
+                "nombre": "EDWIN ALBEIRO JARABA VILLA",
+                "estado": "INACTIVO",
+                "contrato": "OPS",
+                "cargo": {
+                    "nombre": "AUXILIAR DE PROCEDIMIENTOS",
+                    "id": 11
+                },
+                "municipio": {
+                    "nombre": "MEDELLIN",
+                    "departamento": {
+                        "nombre": "ANTIOQUIA",
+                        "id": 11
+                    },
+                    "id": 11
+                },
+                "id": 1,
+                "correo": "edwinjarabav@gmail.com",
+                "telefono": "3147315499",
+                "seguridad_social": true,
+                "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
+                "fecha_ultima_contratacion": "2023-07-28T00:00:00"
+            },
+            "contrato": "OPS",
+            "cargo": {
+                "nombre": "AUXILIAR DE PROCEDIMIENTOS",
+                "id": 11
+            },
+            "claveHLU": "20230901835703520231001",
+            "municipio": {
+                "nombre": "MEDELLIN",
+                "departamento": {
+                    "nombre": "ANTIOQUIA",
+                    "id": 11
+                },
+                "id": 11
+            },
+            "id": 1,
+            "fecha_contratacion": "2023-07-28T00:00:00",
+            "seguridad_social": true,
+            "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
+            "fecha_ultima_contratacion": "2023-07-28T00:00:00",
+            "fecha_fin_contratacion": null
+        },
+        "cuenta_bancaria": {
+            "numero_cuenta": "1.30558000200002e+17",
+            "numero_certificado": null,
+            "estado": "INACTIVA",
+            "usuario": {
+                "documento": "8357035",
+                "nombre": "EDWIN ALBEIRO JARABA VILLA",
+                "estado": "INACTIVO",
+                "contrato": "OPS",
+                "cargo": {
+                    "nombre": "AUXILIAR DE PROCEDIMIENTOS",
+                    "id": 11
+                },
+                "municipio": {
+                    "nombre": "MEDELLIN",
+                    "departamento": {
+                        "nombre": "ANTIOQUIA",
+                        "id": 11
+                    },
+                    "id": 11
+                },
+                "id": 1,
+                "correo": "edwinjarabav@gmail.com",
+                "telefono": "3147315499",
+                "seguridad_social": true,
+                "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
+                "fecha_ultima_contratacion": "2023-07-28T00:00:00"
+            },
+            "banco": {
+                "nombre": "BBVA",
+                "id": 1
+            },
+            "id": 1,
+            "tipo_de_cuenta": "AHORROS",
+            "fecha_actualizacion": null,
+            "observaciones": null
+        },
+        "claveCPP": "20230901835703520231001",
+        "fecha_prestacion_servicio": "2023-09-01T00:00:00",
+        "fecha_radicacion_contable": "2023-10-01T00:00:00",
+        "estado_aprobacion_cuenta_usuario": "ACEPTAR",
+        "estado_cuenta_por_pagar": "PROCEDE PARA PAGO",
+        "valor_cuenta_cobro": 1145800,
+        "estado_de_pago": null,
+        "id": 1,
+        "total_descuentos": 0,
+        "total_a_pagar": 695800,
+        "fecha_actualizacion": null,
+        "fecha_aprobacion_rut": "2024-03-12T00:00:00",
+        "fecha_creacion": null,
+        "fecha_aprobacion_cuenta_usuario": "2024-03-12T00:00:00",
+        "fecha_programacion_pago": null,
+        "fecha_reprogramacion": null,
+        "fecha_pago": "2023-11-03T00:00:00",
+        "estado_reprogramacion_pago": "SIN VALOR",
+        "rut": true,
+        "dse": null,
+        "causal_rechazo": null,
+        "creado_por": null,
+        "lider_paciente_asignado": null,
+        "eps_paciente_asignado": "SANITAS"
+    }
+]
