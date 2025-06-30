@@ -12,7 +12,7 @@ from core.servicios.descuentos.crearDescuento import CrearDescuento
 from core.servicios.etlHistorico import procesar_historico
 from core.servicios.cuentasBancarias.crearCuentaBancaria import CrearCuentaBancaria
 from core.servicios.cuentasPorPagar.crearCuentaPorPagar import CrearCuentaPorPagar
-# from core.servicios.cuentasPorPagar.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
+from core.servicios.cuentasPorPagar.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
 from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
 from core.servicios.cuentasPorPagar.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
 from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
@@ -317,12 +317,13 @@ def obtener_cuentas(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
-@router.get("/{id_cuenta_por_pagar}", response_model=CuentaPorPagarResponseSchema)
-def obtener_cuenta_por_id(id_cuenta_por_pagar: int, db: Session = Depends(get_db)):
+
+@router.get("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
+def obtener_cuenta_por_id(id_cuenta: int, db: Session = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
-        caso_de_uso = ObtenerCuentasPorPagar(repo_cuenta=repo_cuentasPorPagar, repo_cuentas=repo_cuentasPorPagar)
-        cuenta = caso_de_uso.ejecutar(id_cuenta_por_pagar)
+        caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
+        cuenta = caso_de_uso.ejecutar(id_cuenta)
         return cuenta
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

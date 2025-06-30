@@ -6,18 +6,15 @@ from core.interfaces.repositorioCuentaPorPagar import (
     ObtenerCuentaPorPagarProtocol,
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
-    ObtenerCuentaPorPagarPorIdProtocol
+    ObtenerCuentaPorPagarPorIdProtocol,
 )
 from fastapi import HTTPException
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
 from infraestructura.db.modelos.usuario import UsuarioORM
 from infraestructura.db.modelos.municipio import MunicipioORM
-from infraestructura.db.modelos.cargo import CargoORM
+# from infraestructura.db.modelos.cargo import CargoORM
 from sqlalchemy.orm import joinedload
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
-
-
-
 
 
 class RepositorioCuentaPorPagarSqlAlchemy(
@@ -25,7 +22,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     ObtenerCuentaPorPagarProtocol,
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
-    ObtenerCuentaPorPagarPorIdProtocol
+    ObtenerCuentaPorPagarPorIdProtocol,
 ):
     def __init__(self, db: Session):
         self.db = db
@@ -56,7 +53,6 @@ class RepositorioCuentaPorPagarSqlAlchemy(
             creado_por=cuenta_por_pagar.creado_por,
             lider_paciente_asignado=cuenta_por_pagar.lider_paciente_asignado,
             eps_paciente_asignado=cuenta_por_pagar.eps_paciente_asignado,
-
         )
         self.db.add(cuenta_nueva)
         self.db.commit()
@@ -78,20 +74,23 @@ class RepositorioCuentaPorPagarSqlAlchemy(
                 setattr(cuenta_por_pagar_db, attr, value)
 
     def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
-        registros_orm = self.db.query(CuentaPorPagarORM).options(
-            joinedload(CuentaPorPagarORM.historial_laboral)
+        registros_orm = (
+            self.db.query(CuentaPorPagarORM)
+            .options(
+                joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.usuario)
-                    .joinedload(UsuarioORM.cargo),
-            joinedload(CuentaPorPagarORM.historial_laboral)
+                .joinedload(UsuarioORM.cargo),
+                joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.usuario)
-                    .joinedload(UsuarioORM.municipio)
-                        .joinedload(MunicipioORM.departamento),
-            joinedload(CuentaPorPagarORM.historial_laboral)
-                .joinedload(HistorialLaboralORM.cargo),
-            joinedload(CuentaPorPagarORM.cuenta_bancaria)
-                .joinedload(CuentaBancariaORM.banco),
-        ).all()
+                .joinedload(UsuarioORM.municipio)
+                .joinedload(MunicipioORM.departamento),
+                joinedload(CuentaPorPagarORM.historial_laboral).joinedload(HistorialLaboralORM.cargo),
+                joinedload(CuentaPorPagarORM.cuenta_bancaria).joinedload(CuentaBancariaORM.banco),
+            )
+            .all()
+        )
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
+
 
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
         registro = self.db.query(CuentaPorPagarORM).filter_by(id=id_cuenta_por_pagar).first()
@@ -99,29 +98,36 @@ class RepositorioCuentaPorPagarSqlAlchemy(
             raise HTTPException(status_code=404, detail="Registro no encontrado")
         return CuentaPorPagar.from_orm(registro)
 
-    def obtener_por_clave(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar | None:
-        registro = self.db.query(CuentaPorPagarORM).filter_by(claveCPP=cuenta_por_pagar.claveCPP).first()
+    def obtener_por_clave(self, clave: str) -> CuentaPorPagar | None:
+        registro = self.db.query(CuentaPorPagarORM).filter_by(claveCPP=clave).first()
         if not registro:
             return None
         return CuentaPorPagar.from_orm(registro)
 
+    # def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
+    #     registro_orm = (
+    #         self.db.query(CuentaPorPagarORM)
+    #         .options(
+    #             joinedload(CuentaPorPagarORM.historial_laboral)
+    #             .joinedload(HistorialLaboralORM.usuario)
+    #             .joinedload(UsuarioORM.cargo),
+    #             joinedload(CuentaPorPagarORM.historial_laboral)
+    #             .joinedload(HistorialLaboralORM.usuario)
+    #             .joinedload(UsuarioORM.municipio)
+    #             .joinedload(MunicipioORM.departamento),
+    #             joinedload(CuentaPorPagarORM.historial_laboral).joinedload(HistorialLaboralORM.cargo),
+    #             joinedload(CuentaPorPagarORM.cuenta_bancaria).joinedload(CuentaBancariaORM.banco),
+    #         ).filter(CuentaPorPagarORM.id==id_cuenta_por_pagar)
+    #         .first()
+    #     )
+
+    #     if not registro_orm:
+    #         return None
+    #     return CuentaPorPagar.from_orm(registro_orm)
     def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
         registro_orm = (
             self.db.query(CuentaPorPagarORM)
-            .options(
-                joinedload(CuentaPorPagarORM.historial_laboral)
-                    .joinedload(HistorialLaboralORM.usuario)
-                        .joinedload(UsuarioORM.cargo),
-                joinedload(CuentaPorPagarORM.historial_laboral)
-                    .joinedload(HistorialLaboralORM.usuario)
-                        .joinedload(UsuarioORM.municipio)
-                            .joinedload(MunicipioORM.departamento),
-                joinedload(CuentaPorPagarORM.historial_laboral)
-                    .joinedload(HistorialLaboralORM.cargo),
-                joinedload(CuentaPorPagarORM.cuenta_bancaria)
-                    .joinedload(CuentaBancariaORM.banco)
-            )
-            .filter(CuentaPorPagarORM.id == id_cuenta_por_pagar)
+            .filter(CuentaPorPagarORM.id==id_cuenta_por_pagar)
             .first()
         )
 
