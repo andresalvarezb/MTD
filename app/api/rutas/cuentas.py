@@ -249,7 +249,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     CrearDescuentoDTO(
                         usuario=usuario,
                         cuenta_por_pagar=cuenta_por_pagar,
-                        id_deuda=None,
+                        deuda=None,
                         valor=descuento["valor"],
                         fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],
                         tipo_de_descuento=descuento["tipo_descuento"],
