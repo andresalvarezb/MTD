@@ -5,11 +5,15 @@ from core.interfaces.repositorioCuentaBancaria import (
     CrearCuentaBancariaProtocol,
     ObtenerCuentaBancariaProtocol,
     ObtenerCuentaBancariaPorIdProtocol,
+    ActualizarCuentaBancariaProtocol,
 )
 
 
 class RepositorioCuentaBancariaSqlAlchemy(
-    ObtenerCuentaBancariaProtocol, CrearCuentaBancariaProtocol, ObtenerCuentaBancariaPorIdProtocol
+    ObtenerCuentaBancariaProtocol,
+    CrearCuentaBancariaProtocol,
+    ObtenerCuentaBancariaPorIdProtocol,
+    ActualizarCuentaBancariaProtocol,
 ):
     def __init__(self, db: Session):
         self.db = db
@@ -43,3 +47,25 @@ class RepositorioCuentaBancariaSqlAlchemy(
             return CuentaBancaria.from_orm(registro_orm)
         else:
             return None
+
+    def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
+        registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()
+        if not registro_orm:
+            raise ValueError("Cuenta bancaria no encontrada")
+
+        if not cuenta_bancaria.usuario.id:
+            raise ValueError("Usuario no asociado")
+
+        if not cuenta_bancaria.banco.id:
+            raise ValueError("Banco no asociado")
+
+        registro_orm.numero_certificado = cuenta_bancaria.numero_certificado
+        registro_orm.estado = cuenta_bancaria.estado
+        registro_orm.id_usuario = cuenta_bancaria.usuario.id
+        registro_orm.id_banco = cuenta_bancaria.banco.id
+        registro_orm.tipo_de_cuenta = cuenta_bancaria.tipo_de_cuenta
+        registro_orm.fecha_actualizacion = cuenta_bancaria.fecha_actualizacion
+        registro_orm.observaciones = cuenta_bancaria.observaciones
+
+        self.db.flush()
+        return CuentaBancaria.from_orm(registro_orm)

@@ -7,6 +7,7 @@ from core.interfaces.repositorioCuentaPorPagar import (
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
     ObtenerCuentaPorPagarPorIdProtocol,
+    ActualizarCuentaPorPagarProtocol,
 )
 from fastapi import HTTPException
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
@@ -24,6 +25,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     ObtenerCuentasPorPagarProtocol,
     ObtenerCuentaPorPagarPorClaveProtocol,
     ObtenerCuentaPorPagarPorIdProtocol,
+    ActualizarCuentaPorPagarProtocol,
 ):
     def __init__(self, db: Session):
         self.db = db
@@ -67,12 +69,41 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         else:
             return None
 
-    def actualizar(self, cuenta_por_pagar: CuentaPorPagar, dataToUpdate: dict):
-        cuenta_por_pagar_db = self.db.query(CuentaPorPagarORM).filter_by(id=cuenta_por_pagar.id).first()
+    def actualizar(self, cuenta_por_pagar: CuentaPorPagar):
+        registro_orm = self.db.query(CuentaPorPagarORM).filter_by(id=cuenta_por_pagar.id).first()
 
-        if cuenta_por_pagar_db:
-            for attr, value in dataToUpdate.items():
-                setattr(cuenta_por_pagar_db, attr, value)
+        if not registro_orm:
+            raise ValueError("Cuenta por pagar no encontrado")
+
+        if not cuenta_por_pagar.historial_laboral.id:
+            raise ValueError("Historial laboral no asociado")
+
+        if not cuenta_por_pagar.cuenta_bancaria.id:
+            raise ValueError("cuenta bancaria no asociada")
+
+        registro_orm.id_historial_laboral = cuenta_por_pagar.historial_laboral.id
+        registro_orm.id_cuenta_bancaria = cuenta_por_pagar.cuenta_bancaria.id
+        registro_orm.fecha_prestacion_servicio = cuenta_por_pagar.fecha_prestacion_servicio
+        registro_orm.fecha_radicacion_contable = cuenta_por_pagar.fecha_radicacion_contable
+        registro_orm.estado_aprobacion_cuenta_usuario = cuenta_por_pagar.estado_aprobacion_cuenta_usuario
+        registro_orm.estado_cuenta_por_pagar = cuenta_por_pagar.estado_cuenta_por_pagar
+        registro_orm.valor_cuenta_cobro = cuenta_por_pagar.valor_cuenta_cobro  # type: ignore
+        registro_orm.total_descuentos = cuenta_por_pagar.total_descuentos  # type: ignore
+        registro_orm.total_a_pagar = cuenta_por_pagar.total_a_pagar  # type: ignore
+        registro_orm.fecha_actualizacion = cuenta_por_pagar.fecha_actualizacion
+        registro_orm.fecha_aprobacion_rut = cuenta_por_pagar.fecha_aprobacion_rut
+        registro_orm.fecha_creacion = cuenta_por_pagar.fecha_creacion
+        registro_orm.fecha_aprobacion_cuenta_usuario = cuenta_por_pagar.fecha_aprobacion_cuenta_usuario
+        registro_orm.fecha_programacion_pago = cuenta_por_pagar.fecha_programacion_pago
+        registro_orm.fecha_reprogramacion = cuenta_por_pagar.fecha_reprogramacion
+        registro_orm.fecha_pago = cuenta_por_pagar.fecha_pago
+        registro_orm.estado_reprogramacion_pago = cuenta_por_pagar.estado_reprogramacion_pago
+        registro_orm.rut = cuenta_por_pagar.rut  # type: ignore
+        registro_orm.dse = cuenta_por_pagar.dse
+        registro_orm.causal_rechazo = cuenta_por_pagar.causal_rechazo
+
+        self.db.flush()
+        return CuentaPorPagar.from_orm(registro_orm)
 
     def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
         registros_orm = (

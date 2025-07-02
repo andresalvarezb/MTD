@@ -26,3 +26,16 @@ class CrearHistorialLaboralUsuarioDTO:
     fecha_fin_contratacion: datetime | None
     fecha_ultima_contratacion: datetime | None
     fecha_aprobacion_seguridad_social: datetime | None
+
+
+@dataclass
+class ActualizarHistorialLaboralUsuarioDTO:
+    usuario: Usuario | None
+    contrato: str | None
+    cargo: Cargo | None
+    municipio: Municipio | None
+    seguridad_social: bool | None
+    fecha_contratacion: datetime | None
+    fecha_fin_contratacion: datetime | None
+    fecha_ultima_contratacion: datetime | None
+    fecha_aprobacion_seguridad_social: datetime | None

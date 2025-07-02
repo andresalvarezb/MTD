@@ -1,190 +1,193 @@
-[{
-    "id": 5,
-    "claveCPP": "",
-    "fecha_prestacion_servicio": "",
-    "fecha_radicacion_contable": "",
-    "estado_de_pago": "",
-    "estado_aprobacion_cuenta_usuario": "",
-    "estado_cuenta_por_pagar": "",
-    "valor_cuenta_cobro": "",
-    "total_descuentos": "",
-    "total_a_pagar": "",
-    "fecha_actualizacion": "",
-    "fecha_aprobacion_rut": "",
-    "fecha_creacion": "",
-    "fecha_aprobacion_cuenta_usuario": "",
-    "fecha_programacion_pago": "",
-    "fecha_reprogramacion": "",
-    "fecha_pago": "",
-    "rut": "",
-    "dse": "",
-    "causal_rechazo": "",
-    "creado_por": "",
-    "lider_paciente_asignado": "",
-    "eps_paciente_asignado": "",
-    "tipo_de_cuenta": "",
+{
+    "id": 3,
+    // se actualiza segun la fecha de radicación y prestacion del servicio
+    // "claveCPP": "20230901107370617120231001"
+    "fecha_prestacion_servicio": "2023-09-01T00:00:00",
+    "fecha_radicacion_contable": "2023-10-01T00:00:00",
+    "estado_de_pago": null,
+    "estado_aprobacion_cuenta_usuario": "ACEPTAR",
+    // se actualiza segun el cambio del estado de sus antecesores: seguridad social, aprobacion del usuario, cuenta bancarai
+    // "estado_cuenta_por_pagar": "NO PROCEDE PARA PAGO",
+    "valor_cuenta_cobro": "1712000.00",
+    // se recalcula si hay un nuevo descuento
+    // "total_descuentos": "0.00",
+    // se recalcula si hay un nuevo descuento
+    // "total_a_pagar": "1712000.00",
+    //  se calcula al finalizar la ejecucion
+    // "fecha_actualizacion": null, 
+    "fecha_aprobacion_rut": null,
+    // se genera de porfa automatica
+    // "fecha_creacion": null,
+    "fecha_aprobacion_cuenta_usuario": "2024-03-12T00:00:00",
+    "fecha_programacion_pago": null,
+    "fecha_reprogramacion": null,
+    "fecha_pago": null,
+    "estado_reprogramacion_pago": "SIN VALOR",
+    "rut": false,
+    "dse": null,
+    "causal_rechazo": null,
+    // se genera cuando se pueda acceder a la app por credenciales
+    // "creado_por": null,
+    "lider_paciente_asignado": null,
+    "eps_paciente_asignado": "SANITAS",
     "historial_laboral": {
-        "id": "",
-        "claveHLU": "",
-        "contrato": "",
-        "seguridad_social": "",
-        "fecha_contratacion": "",
-        "fecha_fin_contratacion": "",
-        "fecha_aprobacion_seguridad_social": "",
-        "fecha_ultima_contratacion": "",
+        // "id": 3,
+        // se actualiza segun la fecha de radicación y prestacion del servicio
+        // "claveHLU": "20230901107370617120231001",
+        "contrato": "OPS",
+        "seguridad_social": false,
+        "fecha_contratacion": "2023-08-29T00:00:00",
+        "fecha_fin_contratacion": null,
+        "fecha_aprobacion_seguridad_social": null,
+        "fecha_ultima_contratacion": "2023-08-29T00:00:00",
         "usuario": {
-            "id": "",
-            "documento": "",
-            "nombre": "",
-            "estado": "",
-            "contrato": "",
-            "correo": "",
-            "telefono": "",
-            "seguridad_social": "",
-            "fecha_ultima_contratacion": "",
-            "fecha_aprobacion_seguridad_social": "",
-            "cargo": {
-                "id": "",
-                "nombre": ""
-            },
-            "municipio": {
-                "id": "",
-                "nombre": "",
-                "departamento": {
-                    "id": "",
-                    "nombre": ""
-                }
+            // "id": 3,
+            "documento": "1073706171",
+            "nombre": "MARIA HELENA PARDO POLANIA",
+            "estado": "INACTIVO",
+            "contrato": "OPS",
+            "correo": "pardopolaniamariah23@gmail.com",
+            "telefono": "3246516329",
+            // lo siguientes campos se actualizan con la informacion del historial laboral
+            // "seguridad_social": false,
+            // "fecha_ultima_contratacion": "2023-08-29T00:00:00",
+            // "fecha_aprobacion_seguridad_social": null,
+            // "cargo": {
+            //     // "id": 13,
+            //     "nombre": "CUIDADOR"
+            // },
+            // "municipio": {
+            //     // "id": 13,
+            //     "nombre": "BOGOTA",
+            //     "departamento": {
+            //         // "id": 13,
+            //         "nombre": "BOGOTÁ"
+            //     }
+            // }
+        },
+        "municipio": {
+            // "id": 13,
+            "nombre": "BOGOTA",
+            "departamento": {
+                // "id": 13,
+                "nombre": "BOGOTÁ"
             }
         },
-        "id_municipio": "",
         "cargo": {
-            "id": "",
-            "nombre": ""
+            // "id": 13,
+            "nombre": "CUIDADOR"
         }
     },
     "cuenta_bancaria": {
-        "id": "",
-        "id_usuario": "",
-        "numero_certificado": "",
-        "numero_cuenta": "",
-        "estado": "",
-        "tipo_de_cuenta": "",
-        "fecha_actualizacion": "",
-        "observaciones": "",
+        // "id": 3,
+        // "id_usuario": 3,
+        "numero_certificado": null,
+        "numero_cuenta": "24127410630.0",
+        "estado": "INACTIVA",
+        "tipo_de_cuenta": "AHORROS",
+        //  se calcula al finalizar la ejecucion
+        // "fecha_actualizacion": null,
+        "observaciones": null,
         "banco": {
-            "id": "",
-            "nombre": ""
+            // "id": 3,
+            "nombre": "CAJA SOCIAL"
         }
     }
-},
-
+}
 {
-        "historial_laboral": {
-            "usuario": {
-                "documento": "8357035",
-                "nombre": "EDWIN ALBEIRO JARABA VILLA",
-                "estado": "INACTIVO",
-                "contrato": "OPS",
-                "cargo": {
-                    "nombre": "AUXILIAR DE PROCEDIMIENTOS",
-                    "id": 11
-                },
-                "municipio": {
-                    "nombre": "MEDELLIN",
-                    "departamento": {
-                        "nombre": "ANTIOQUIA",
-                        "id": 11
-                    },
-                    "id": 11
-                },
-                "id": 1,
-                "correo": "edwinjarabav@gmail.com",
-                "telefono": "3147315499",
-                "seguridad_social": true,
-                "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
-                "fecha_ultima_contratacion": "2023-07-28T00:00:00"
-            },
+    "id": 3,
+    "fecha_prestacion_servicio": "2023-09-01T00:00:00",
+    "fecha_radicacion_contable": "2023-10-01T00:00:00",
+    "estado_de_pago": null,
+    "estado_aprobacion_cuenta_usuario": "ACEPTAR",
+    "valor_cuenta_cobro": "1712000.00",
+    "fecha_aprobacion_rut": null,
+    "fecha_aprobacion_cuenta_usuario": "2024-03-12T00:00:00",
+    "fecha_programacion_pago": null,
+    "fecha_reprogramacion": null,
+    "fecha_pago": null,
+    "estado_reprogramacion_pago": "SIN VALOR",
+    "rut": false,
+    "dse": null,
+    "causal_rechazo": null,
+    "lider_paciente_asignado": null,
+    "eps_paciente_asignado": "SANITAS",
+    "historial_laboral": {
+        "contrato": "OPS",
+        "seguridad_social": false,
+        "fecha_contratacion": "2023-08-29T00:00:00",
+        "fecha_fin_contratacion": null,
+        "fecha_aprobacion_seguridad_social": null,
+        "fecha_ultima_contratacion": "2023-08-29T00:00:00",
+        "usuario": {
+            "documento": "1073706171",
+            "nombre": "MARIA HELENA PARDO POLANIA",
+            "estado": "INACTIVO",
             "contrato": "OPS",
-            "cargo": {
-                "nombre": "AUXILIAR DE PROCEDIMIENTOS",
-                "id": 11
-            },
-            "claveHLU": "20230901835703520231001",
-            "municipio": {
-                "nombre": "MEDELLIN",
-                "departamento": {
-                    "nombre": "ANTIOQUIA",
-                    "id": 11
-                },
-                "id": 11
-            },
-            "id": 1,
-            "fecha_contratacion": "2023-07-28T00:00:00",
-            "seguridad_social": true,
-            "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
-            "fecha_ultima_contratacion": "2023-07-28T00:00:00",
-            "fecha_fin_contratacion": null
+            "correo": "pardopolaniamariah23@gmail.com",
+            "telefono": "3246516329",
         },
-        "cuenta_bancaria": {
-            "numero_cuenta": "1.30558000200002e+17",
-            "numero_certificado": null,
-            "estado": "INACTIVA",
-            "usuario": {
-                "documento": "8357035",
-                "nombre": "EDWIN ALBEIRO JARABA VILLA",
-                "estado": "INACTIVO",
-                "contrato": "OPS",
-                "cargo": {
-                    "nombre": "AUXILIAR DE PROCEDIMIENTOS",
-                    "id": 11
-                },
-                "municipio": {
-                    "nombre": "MEDELLIN",
-                    "departamento": {
-                        "nombre": "ANTIOQUIA",
-                        "id": 11
-                    },
-                    "id": 11
-                },
-                "id": 1,
-                "correo": "edwinjarabav@gmail.com",
-                "telefono": "3147315499",
-                "seguridad_social": true,
-                "fecha_aprobacion_seguridad_social": "2024-03-12T00:00:00",
-                "fecha_ultima_contratacion": "2023-07-28T00:00:00"
-            },
-            "banco": {
-                "nombre": "BBVA",
-                "id": 1
-            },
-            "id": 1,
-            "tipo_de_cuenta": "AHORROS",
-            "fecha_actualizacion": null,
-            "observaciones": null
+        "municipio": {
+            "nombre": "BOGOTA",
+            "departamento": {
+                "nombre": "BOGOTÁ"
+            }
         },
-        "claveCPP": "20230901835703520231001",
-        "fecha_prestacion_servicio": "2023-09-01T00:00:00",
-        "fecha_radicacion_contable": "2023-10-01T00:00:00",
-        "estado_aprobacion_cuenta_usuario": "ACEPTAR",
-        "estado_cuenta_por_pagar": "PROCEDE PARA PAGO",
-        "valor_cuenta_cobro": 1145800,
-        "estado_de_pago": null,
-        "id": 1,
-        "total_descuentos": 0,
-        "total_a_pagar": 695800,
-        "fecha_actualizacion": null,
-        "fecha_aprobacion_rut": "2024-03-12T00:00:00",
-        "fecha_creacion": null,
-        "fecha_aprobacion_cuenta_usuario": "2024-03-12T00:00:00",
-        "fecha_programacion_pago": null,
-        "fecha_reprogramacion": null,
-        "fecha_pago": "2023-11-03T00:00:00",
-        "estado_reprogramacion_pago": "SIN VALOR",
-        "rut": true,
-        "dse": null,
-        "causal_rechazo": null,
-        "creado_por": null,
-        "lider_paciente_asignado": null,
-        "eps_paciente_asignado": "SANITAS"
+        "cargo": {
+            "nombre": "CUIDADOR"
+        }
+    },
+    "cuenta_bancaria": {
+        "numero_certificado": null,
+        "numero_cuenta": "24127410630.0",
+        "estado": "INACTIVA",
+        "tipo_de_cuenta": "AHORROS",
+        "observaciones": null,
+        "banco": {
+            "nombre": "CAJA SOCIAL"
+        }
     }
-]
+}
+{
+    "id":,
+    "estado_de_pago":,
+    "estado_aprobacion_cuenta_usuario":,
+    "valor_cuenta_cobro":,
+    "fecha_aprobacion_rut":,
+    "fecha_aprobacion_cuenta_usuario":,
+    "fecha_programacion_pago":,
+    "fecha_reprogramacion":,
+    "fecha_pago":,
+    "estado_reprogramacion_pago":,
+    "rut":,
+    "dse":,
+    "causal_rechazo":,
+    "lider_paciente_asignado":,
+    "eps_paciente_asignado":,
+    "historial_laboral": {
+        "contrato":,
+        "seguridad_social":,
+        "fecha_contratacion":,
+        "fecha_fin_contratacion":,
+        "fecha_aprobacion_seguridad_social":,
+        "fecha_ultima_contratacion":,
+        "usuario": {
+            "documento":,
+            "nombre":,
+            "estado":,
+            "contrato":,
+            "correo":,
+            "telefono":,
+        },
+        "municipio": {
+            "nombre": "BOGOTA",
+            "departamento": {
+                "nombre": "BOGOTÁ"
+            }
+        },,
+        "cargo":,
+    },
+    "cuenta_bancaria":,
+}
+{
+}

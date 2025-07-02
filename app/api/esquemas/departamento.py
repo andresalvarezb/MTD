@@ -6,3 +6,7 @@ class DepartamentoResponseSchema(BaseModel):
     nombre: str = Field(..., description="Nombre del departamento")
 
     model_config = {"from_attributes": True}
+
+
+class DepartamentoUpdateSchema(BaseModel):
+    nombre: str | None = Field(None, description="Nombre del departamento")

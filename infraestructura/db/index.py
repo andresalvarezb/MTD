@@ -15,7 +15,8 @@ DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB
 
 
 print("🔗 DATABASE_URL:", DATABASE_URL)
-engine = create_engine(DATABASE_URL, echo=True, future=True)
+# engine = create_engine(DATABASE_URL, echo=True, future=True)
+engine = create_engine(DATABASE_URL, future=True)
 SessionLocal = sessionmaker(bind=engine, future=True)
 
 

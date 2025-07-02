@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 from decimal import Decimal
 
-from .historialLaboralUsuario import HistorialLaboralResponseSchema
-from .cuentaBancaria import CuentaBancariaResponseSchema
+from .historialLaboralUsuario import HistorialLaboralResponseSchema, HistorialLaboralUpdateSchema
+from .cuentaBancaria import CuentaBancariaResponseSchema, CuentaBancariaUpdateSchema
 
 
 class CuentaPorPagarResponseSchema(BaseModel):
@@ -90,5 +90,63 @@ class CuentaPorPagarResponseSchema(BaseModel):
         ..., description="Historial laboral relacionado con esta cuenta"
     )
     cuenta_bancaria: CuentaBancariaResponseSchema = Field(..., description="Cuenta bancaria donde se realizará el pago")
+
+    model_config = {"from_attributes": True}
+
+
+class CuentaPorPagarUpdateSchema(BaseModel):
+    estado_de_pago: str | None = Field(
+        "PENDIENTE", description="Estado actual del pago (Ej: PENDIENTE, PAGADO, REPROGRAMADO, NO APLICA)"
+    )
+    estado_aprobacion_cuenta_usuario: str | None = Field(
+        None, description="Estado de aprobación de la cuenta por parte del usuario (Ej: ACEPTADO, RACHAZADO)"
+    )
+
+    valor_cuenta_cobro: Decimal | None = Field(
+        None, description="Valor bruto de la cuenta de cobro", examples=[100_000]
+    )
+
+    fecha_aprobacion_rut: datetime | None = Field(
+        None,
+        description="Fecha en que se aprobó el RUT del usuario en formato ISO 8601 YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+
+    fecha_aprobacion_cuenta_usuario: datetime | None = Field(
+        None, description="Fecha de aprobación de la cuenta por el usuario en formato ISO 8601 YYYY-MM-DDTHH:MM:SS"
+    )
+    fecha_programacion_pago: datetime | None = Field(
+        None,
+        description="Fecha en que se programó el pago en formato ISO 8601 YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    fecha_reprogramacion: datetime | None = Field(
+        None,
+        description="Fecha de reprogramación del pago en formato ISO 8601 YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    fecha_pago: datetime | None = Field(
+        None,
+        description="Fecha en que se realizó el pago  en formato ISO 8601 YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+
+    estado_reprogramacion_pago: str | None = Field(
+        None, description="Estado de la reprogramación del pago (Ej: PENDIENTE, PAGADO, REPROGRAMADO, NO APLICA)"
+    )
+
+    rut: bool | None = Field(None, description="Indica si el RUT fue aprobado (True) o no (False)")
+    dse: str | None = Field(None, description="Información sobre DSE asociada")
+    causal_rechazo: str | None = Field(None, description="Motivo del rechazo si la cuenta fue rechazada")
+    lider_paciente_asignado: str | None = Field(None, description="Nombre del líder asignado al paciente")
+    eps_paciente_asignado: str | None = Field(None, description="EPS asignada al paciente")
+
+    # Relaciones anidadas
+    historial_laboral: HistorialLaboralUpdateSchema | None = Field(
+        None, description="Historial laboral relacionado con esta cuenta"
+    )
+    cuenta_bancaria: CuentaBancariaUpdateSchema | None = Field(
+        None, description="Cuenta bancaria donde se realizará el pago"
+    )
 
     model_config = {"from_attributes": True}

@@ -15,6 +15,9 @@ class RepositorioMunicipioSqlAlchemy(
         self.db = db
 
     def crear(self, municipio: Municipio) -> Municipio:
+        if not municipio.departamento:
+            raise ValueError("El municipio debe estar asociado a un departamento")
+
         nuevo_municipio = MunicipioORM(nombre=municipio.nombre, id_departamento=municipio.departamento.id)
         self.db.add(nuevo_municipio)
         self.db.flush()

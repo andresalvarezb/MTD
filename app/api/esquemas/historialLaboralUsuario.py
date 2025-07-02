@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from .usuario import UsuarioResponseSchema
-from .municipio import MunicipioResponseSchema
-from .cargo import CargoResponseSchema
+from .usuario import UsuarioResponseSchema, UsuarioUpdateSchema
+from .municipio import MunicipioResponseSchema, MunicipioUpdateSchema
+from .cargo import CargoResponseSchema, CargoUpdateSchema
 
 
 # class HistorialLaboralResponseSchema(BaseModel):
@@ -53,5 +53,35 @@ class HistorialLaboralResponseSchema(BaseModel):
     usuario: UsuarioResponseSchema = Field(..., description="Información del usuario asociado")
     municipio: MunicipioResponseSchema = Field(..., description="Municipio relacionado con el historial laboral")
     cargo: CargoResponseSchema = Field(..., description="Cargo o puesto desempeñado por el usuario")
+
+    model_config = {"from_attributes": True}
+
+
+class HistorialLaboralUpdateSchema(BaseModel):
+    contrato: str | None = Field(None, description="Tipo del contrato asociado")
+    seguridad_social: bool | None = Field(None, description="Indica si el trabajador está afiliado a seguridad social")
+    fecha_contratacion: datetime | None = Field(
+        None,
+        description="Fecha en que inició la contratación (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    fecha_fin_contratacion: datetime | None = Field(
+        None,
+        description="Fecha en que terminó la contratación (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    fecha_aprobacion_seguridad_social: datetime | None = Field(
+        None,
+        description="Fecha de aprobación de la afiliación a la seguridad social (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    fecha_ultima_contratacion: datetime | None = Field(
+        None,
+        description="Fecha de la última contratación del usuario (formato ISO 8601) YYYY-MM-DDTHH:MM:SS",
+        examples=["2025-06-26T17:16:00", "2025-06-26"],
+    )
+    usuario: UsuarioUpdateSchema | None = Field(None, description="Información del usuario asociado")
+    municipio: MunicipioUpdateSchema | None = Field(None, description="Municipio relacionado con el historial laboral")
+    cargo: CargoUpdateSchema | None = Field(None, description="Cargo o puesto desempeñado por el usuario")
 
     model_config = {"from_attributes": True}
