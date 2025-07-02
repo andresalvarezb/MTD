@@ -12,3 +12,7 @@ class ObtenerCuentaBancariaProtocol(Protocol):
 
 class ObtenerCuentaBancariaPorIdProtocol(Protocol):
     def obtener_por_id(self, id_cuenta_bancaria: int) -> CuentaBancaria | None: ...
+
+
+class ActualizarCuentaBancariaProtocol(Protocol):
+    def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria: ...

@@ -1,5 +1,5 @@
 from core.entidades.cargo import Cargo
-from core.servicios.usuarios.dtos import CrearCargoDTO
+from core.servicios.cargos.dtos import CrearCargoDTO
 from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
 
 

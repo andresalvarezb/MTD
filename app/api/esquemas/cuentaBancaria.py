@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from .banco import BancoResponseSchema
+from .banco import BancoResponseSchema, BancoUpdateSchema
 
 
 class CuentaBancariaResponseSchema(BaseModel):
@@ -17,5 +17,16 @@ class CuentaBancariaResponseSchema(BaseModel):
     )
     observaciones: str | None = Field(None, description="Observaciones o notas adicionales sobre la cuenta bancaria")
     banco: "BancoResponseSchema" = Field(..., description="Información del banco asociado a la cuenta")
+
+    model_config = {"from_attributes": True}
+
+
+class CuentaBancariaUpdateSchema(BaseModel):
+    numero_certificado: str | None = Field(None, description="Número del certificado bancario asociado")
+    numero_cuenta: str | None = Field(None, description="Número de la cuenta bancaria")
+    estado: str | None = Field(None, description="Estado actual de la cuenta (Ej: ACTIVA, INACTIVA, RECHAZADA)")
+    tipo_de_cuenta: str | None = Field(None, description="Tipo de cuenta (Ej: AHORROS, CORRIENTE)")
+    observaciones: str | None = Field(None, description="Observaciones o notas adicionales sobre la cuenta bancaria")
+    banco: BancoUpdateSchema | None = Field(None, description="Información del banco asociado a la cuenta")
 
     model_config = {"from_attributes": True}

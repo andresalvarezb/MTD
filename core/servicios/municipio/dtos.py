@@ -6,3 +6,8 @@ from core.entidades.departamento import Departamento
 class CrearMunicipioDTO:
     nombre: str
     departamento: Departamento
+
+
+@dataclass
+class ObtenerMunicipioDTO:
+    nombre: str

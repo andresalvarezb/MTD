@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
 from fastapi.responses import StreamingResponse
 from core.servicios.cargos.crearCargo import CrearCargo
+from core.servicios.cargos.obtenerCargo import ObtenerCargo
 from core.servicios.cuentasBancarias.crearBanco import CrearBanco
 from core.servicios.usuarios.crearUsuario import CrearUsuario
 from core.servicios.descuentos.crearDescuento import CrearDescuento
@@ -13,10 +14,11 @@ from core.servicios.etlHistorico import procesar_historico
 from core.servicios.cuentasBancarias.crearCuentaBancaria import CrearCuentaBancaria
 from core.servicios.cuentasPorPagar.crearCuentaPorPagar import CrearCuentaPorPagar
 from core.servicios.cuentasPorPagar.obtenerCuentaPorPagar import ObtenerCuentaPorPagar
-from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema
+from app.api.esquemas.cuentaPorPagar import CuentaPorPagarResponseSchema, CuentaPorPagarUpdateSchema
 from core.servicios.cuentasPorPagar.obtenerCuentasPorPagar import ObtenerCuentasPorPagar
 from fastapi import APIRouter, UploadFile, File, Depends, status, HTTPException
 from core.servicios.historialLaboral.crearHistorialLaboralUsuario import CrearHistorialLaboralUsuario
+from core.servicios.historialLaboral.actualizarHistorialLaboral import ActualizarHistorialLaboral
 from infraestructura.db.repositorios.repositorioCargoSqlAlchemy import RepositorioCargoSqlAlchemy
 from infraestructura.db.repositorios.repositorioBancoSqlAlchemy import RepositorioBancoSqlAlchemy
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
@@ -39,15 +41,37 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
     RepositorioDescuentoSqlAlchemy,
 )
 
-from core.servicios.usuarios.dtos import CrearUsuarioDTO, CrearCargoDTO
+from core.servicios.usuarios.dtos import CrearUsuarioDTO, ActualizarUsuarioDTO
+from core.servicios.cargos.dtos import CrearCargoDTO, ObtenerCargoDTO
 from core.servicios.departamento.dtos import CrearDepartamentoDTO
+from core.servicios.municipio.dtos import CrearMunicipioDTO, ObtenerMunicipioDTO
 from core.servicios.municipio.dtos import CrearMunicipioDTO
-from core.servicios.municipio.dtos import CrearMunicipioDTO
-from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO
-from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO
-from core.servicios.cuentasBancarias.dtos import CrearBancoDTO, CrearCuentaBancariaDTO
+from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO, ActualizarHistorialLaboralUsuarioDTO
+from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO, ActualizarCuentaPorPagarDTO
+from core.servicios.cuentasBancarias.dtos import (
+    CrearBancoDTO,
+    CrearCuentaBancariaDTO,
+    ActualizarCuentaBancariaDTO,
+    ObtenerBancoDTO,
+)
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
+from core.servicios.municipio.ObtenerMunicipio import ObtenerMunicipio
+from core.servicios.usuarios.actualizarUsuario import ActualizarUsuario
+from core.servicios.historialLaboral.actualizarHistorialLaboral import ActualizarHistorialLaboral
+from core.servicios.cuentasBancarias.actualizarCuentaBancaria import ActualizarCuentaBancaria
+from core.servicios.cuentasBancarias.obtenerBanco import ObtenerBanco
+from core.servicios.cuentasPorPagar.actualizarCuentaPorPagar import ActualizarCuentaPorPagar
+from core.entidades.usuario import Usuario
+from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
+from app.api.esquemas.historialLaboralUsuario import HistorialLaboralUpdateSchema
+from app.api.esquemas.usuario import UsuarioUpdateSchema
+from app.api.esquemas.municipio import MunicipioUpdateSchema
+from app.api.esquemas.cargo import CargoUpdateSchema
+from app.api.esquemas.cuentaBancaria import CuentaBancariaUpdateSchema, BancoUpdateSchema
+from core.entidades.cuentaBancaria import CuentaBancaria
+from core.entidades.cuentaPorPagar import CuentaPorPagar
+from core.entidades.banco import Banco
 
 
 router = APIRouter()
@@ -323,5 +347,154 @@ def obtener_cuenta_por_id(id_cuenta: int, db: Session = Depends(get_db)):
         caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
         cuenta = caso_de_uso.ejecutar(id_cuenta)
         return cuenta
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+
+@router.patch("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
+# @router.patch("/{id_cuenta}")
+def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchema, db: Session = Depends(get_db)):
+    try:
+        # obtener cuenta de la base de datos
+        repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
+        caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
+        cuenta_por_pagar_bd = caso_de_uso.ejecutar(id_cuenta)
+
+        # destructura el registro que llega, compararlo con la data de la base y actualizar
+        historial_actualizado = None
+        cuenta_bancaria_actualizada = None
+        municipio_actualizado = None
+        cargo_actualizado = None
+        usuario_actualizado = None
+
+        # obtener nuevo municipio
+        if registro.historial_laboral:
+
+            if registro.historial_laboral.municipio and registro.historial_laboral.municipio.nombre:
+                repo_municipio = RepositorioMunicipioSqlAlchemy(db)
+                caso_de_uso_municipio = ObtenerMunicipio(repo_municipio)
+                municipio_actualizado = caso_de_uso_municipio.ejecutar(
+                    ObtenerMunicipioDTO(nombre=registro.historial_laboral.municipio.nombre)
+                )
+                # historial["municipio"]=municipio
+
+            # obtener nuevo cargo
+            if registro.historial_laboral.cargo and registro.historial_laboral.cargo.nombre:
+                repo_cargo = RepositorioCargoSqlAlchemy(db)
+                caso_de_uso_cargo = ObtenerCargo(repo_cargo)
+                cargo_actualizado = caso_de_uso_cargo.ejecutar(
+                    ObtenerCargoDTO(nombre=registro.historial_laboral.cargo.nombre)
+                )
+                # historial["cargo"]=cargo
+
+            # actualizar usuario
+            if registro.historial_laboral.usuario:
+                repo_usuario = RepositorioUsuarioSqlAlchemy(db)
+                caso_de_uso_usuario = ActualizarUsuario(repo_actualizar=repo_usuario, repo_obtener=repo_usuario)
+                usuario_actualizado = caso_de_uso_usuario.ejecutar(
+                    info_nueva=ActualizarUsuarioDTO(
+                        documento=registro.historial_laboral.usuario.documento,
+                        nombre=registro.historial_laboral.usuario.nombre,
+                        estado=registro.historial_laboral.usuario.estado,
+                        contrato=registro.historial_laboral.usuario.contrato,
+                        correo=registro.historial_laboral.usuario.correo,
+                        telefono=registro.historial_laboral.usuario.telefono,
+                        seguridad_social=registro.historial_laboral.seguridad_social,
+                        fecha_aprobacion_seguridad_social=registro.historial_laboral.fecha_aprobacion_seguridad_social,
+                        cargo=cargo_actualizado,
+                        municipio=municipio_actualizado,
+                    ),
+                    info_vieja=Usuario(**cuenta_por_pagar_bd.historial_laboral.usuario.model_dump()),
+                )
+
+            # actualizar historial laboral
+            repo_historialLaboral = RepositorioHistorialLaboralUsuarioSqlAlchemy(db)
+            caso_de_uso_historial = ActualizarHistorialLaboral(
+                repo_actualizar=repo_historialLaboral, repo_obtener=repo_historialLaboral
+            )
+            historial_actualizado = caso_de_uso_historial.ejecutar(
+                info_nueva=ActualizarHistorialLaboralUsuarioDTO(
+                    usuario=usuario_actualizado,
+                    contrato=registro.historial_laboral.contrato,
+                    cargo=cargo_actualizado,
+                    municipio=municipio_actualizado,
+                    seguridad_social=registro.historial_laboral.seguridad_social,
+                    fecha_contratacion=registro.historial_laboral.fecha_contratacion,
+                    fecha_fin_contratacion=registro.historial_laboral.fecha_fin_contratacion,
+                    fecha_ultima_contratacion=registro.historial_laboral.fecha_ultima_contratacion,
+                    fecha_aprobacion_seguridad_social=registro.historial_laboral.fecha_aprobacion_seguridad_social,
+                ),
+                info_vieja=HistorialLaboralUsuario(**cuenta_por_pagar_bd.historial_laboral.model_dump()),
+            )
+
+        if registro.cuenta_bancaria:
+            banco_actualizado = None
+            if registro.cuenta_bancaria.banco and registro.cuenta_bancaria.banco.nombre:
+                # actualizar banco
+                repo_banco = RepositorioBancoSqlAlchemy(db)
+                caso_de_uso_banco = ObtenerBanco(repo_banco)
+                banco_actualizado = caso_de_uso_banco.ejecutar(
+                    ObtenerBancoDTO(nombre=registro.cuenta_bancaria.banco.nombre)
+                )
+
+            # actualizar cuenta bancaria
+            repo_cuenta_bancaria = RepositorioCuentaBancariaSqlAlchemy(db)
+            caso_de_uso_cuenta = ActualizarCuentaBancaria(
+                repo_actualizar=repo_cuenta_bancaria, repo_obtener=repo_cuenta_bancaria
+            )
+
+            cuenta_bancaria_actualizada = caso_de_uso_cuenta.ejecutar(
+                info_nueva=ActualizarCuentaBancariaDTO(
+                    usuario=usuario_actualizado,
+                    banco=banco_actualizado,
+                    numero_certificado=registro.cuenta_bancaria.numero_certificado,
+                    estado=registro.cuenta_bancaria.estado,
+                    tipo_de_cuenta=registro.cuenta_bancaria.tipo_de_cuenta,
+                    observaciones=registro.cuenta_bancaria.observaciones,
+                ),
+                info_vieja=CuentaBancaria(
+                    numero_cuenta=cuenta_por_pagar_bd.cuenta_bancaria.numero_cuenta,
+                    numero_certificado=cuenta_por_pagar_bd.cuenta_bancaria.numero_certificado,
+                    estado=cuenta_por_pagar_bd.cuenta_bancaria.estado,
+                    usuario=Usuario(**cuenta_por_pagar_bd.historial_laboral.usuario.model_dump()),
+                    banco=Banco(**cuenta_por_pagar_bd.cuenta_bancaria.banco.model_dump()),
+                    id=cuenta_por_pagar_bd.cuenta_bancaria.id,
+                    tipo_de_cuenta=cuenta_por_pagar_bd.cuenta_bancaria.tipo_de_cuenta,
+                    fecha_actualizacion=cuenta_por_pagar_bd.cuenta_bancaria.fecha_actualizacion,
+                    observaciones=cuenta_por_pagar_bd.cuenta_bancaria.observaciones,
+                ),
+            )
+
+        # actualizar cuenta por pagar
+        repo_cuenta_por_pagar = RepositorioCuentaPorPagarSqlAlchemy(db)
+        caso_de_uso_cuenta = ActualizarCuentaPorPagar(
+            repo_actualizar=repo_cuenta_por_pagar, repo_obtener=repo_cuenta_por_pagar
+        )
+        cuenta_por_pagar = caso_de_uso_cuenta.ejecutar(
+            info_nueva=ActualizarCuentaPorPagarDTO(
+                historial_laboral=historial_actualizado,
+                cuenta_bancaria=cuenta_bancaria_actualizada,
+                estado_aprobacion_cuenta_usuario=registro.estado_aprobacion_cuenta_usuario,
+                valor_cuenta_cobro=registro.valor_cuenta_cobro,
+                estado_de_pago=registro.estado_de_pago,
+                fecha_aprobacion_rut=registro.fecha_aprobacion_rut,
+                fecha_aprobacion_cuenta_usuario=registro.fecha_aprobacion_cuenta_usuario,
+                fecha_programacion_pago=registro.fecha_programacion_pago,
+                fecha_reprogramacion=registro.fecha_reprogramacion,
+                fecha_pago=registro.fecha_pago,
+                estado_reprogramacion_pago=registro.estado_reprogramacion_pago,
+                rut=registro.rut,
+                dse=registro.dse,
+                causal_rechazo=registro.causal_rechazo,
+                lider_paciente_asignado=registro.lider_paciente_asignado,
+                eps_paciente_asignado=registro.eps_paciente_asignado,
+            ),
+            info_vieja=CuentaPorPagar(**cuenta_por_pagar_bd.model_dump()),
+        )
+        db.commit()
+
+        # obtener cuenta por pagar
+        cuenta_actualizada = obtener_cuenta_por_id(id_cuenta, db)
+        return cuenta_actualizada
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

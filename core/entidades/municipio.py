@@ -6,7 +6,7 @@ from core.entidades.departamento import Departamento
 @dataclass
 class Municipio:
     nombre: str
-    departamento: Departamento
+    departamento: Departamento | None = None
     id: int | None = None
 
     def __post_init__(self):

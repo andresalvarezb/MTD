@@ -17,3 +17,7 @@ class ActulizarSeguridadSocialHistorialLaboralProtocol(Protocol):
 
 class ObtenerHistorialLaboralPorClaveProtocol(Protocol):
     def obtener_por_clave(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario | None: ...
+
+
+class ActualizarHistorialLaboralUsuarioProtocol(Protocol):
+    def actualizar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario: ...

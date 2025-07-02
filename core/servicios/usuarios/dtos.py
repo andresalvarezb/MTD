@@ -5,11 +5,6 @@ from core.entidades.municipio import Municipio
 
 
 @dataclass
-class CrearCargoDTO:
-    nombre: str
-
-
-@dataclass
 class CrearUsuarioDTO:
     documento: str
     nombre: str
@@ -22,3 +17,17 @@ class CrearUsuarioDTO:
     seguridad_social: bool
     fecha_aprobacion_seguridad_social: datetime | None
     fecha_ultima_contratacion: datetime | None
+
+
+@dataclass
+class ActualizarUsuarioDTO:
+    documento: str | None
+    nombre: str | None
+    estado: str | None
+    contrato: str | None
+    correo: str | None
+    telefono: str | None
+    seguridad_social: bool | None
+    fecha_aprobacion_seguridad_social: datetime | None
+    cargo: Cargo | None
+    municipio: Municipio | None

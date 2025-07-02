@@ -32,3 +32,23 @@ class CrearCuentaPorPagarDTO:
     creado_por: str | None
     lider_paciente_asignado: str | None
     eps_paciente_asignado: str | None
+
+
+@dataclass
+class ActualizarCuentaPorPagarDTO:
+    historial_laboral: HistorialLaboralUsuario | None
+    cuenta_bancaria: CuentaBancaria | None
+    estado_aprobacion_cuenta_usuario: str | None
+    valor_cuenta_cobro: Decimal | None
+    estado_de_pago: str | None
+    fecha_aprobacion_rut: datetime | None
+    fecha_aprobacion_cuenta_usuario: datetime | None
+    fecha_programacion_pago: datetime | None
+    fecha_reprogramacion: datetime | None
+    fecha_pago: datetime | None
+    estado_reprogramacion_pago: str | None
+    rut: bool | None
+    dse: str | None
+    causal_rechazo: str | None
+    lider_paciente_asignado: str | None
+    eps_paciente_asignado: str | None

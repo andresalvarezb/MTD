@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from .municipio import MunicipioResponseSchema
-from .cargo import CargoResponseSchema
+from .municipio import MunicipioResponseSchema, MunicipioUpdateSchema
+from .cargo import CargoResponseSchema, CargoUpdateSchema
 
 
 # class UsuarioResponseSchema(BaseModel):
@@ -43,5 +43,16 @@ class UsuarioResponseSchema(BaseModel):
     )
     cargo: CargoResponseSchema = Field(..., description="Cargo que desempeña el usuario")
     municipio: MunicipioResponseSchema = Field(..., description="Municipio asociado al usuario")
+
+    model_config = {"from_attributes": True}
+
+
+class UsuarioUpdateSchema(BaseModel):
+    documento: str | None = Field(None, description="Número de documento del usuario")
+    nombre: str | None = Field(None, description="Nombre completo del usuario")
+    estado: str | None = Field(None, description="Estado actual del usuario (activo, inactivo, etc.)")
+    contrato: str | None = Field(None, description="Tipo o número de contrato del usuario")
+    correo: str | None = Field(None, description="Correo electrónico de contacto")
+    telefono: str | None = Field(None, description="Número de teléfono de contacto")
 
     model_config = {"from_attributes": True}

@@ -10,6 +10,11 @@ class CrearBancoDTO:
 
 
 @dataclass
+class ObtenerBancoDTO:
+    nombre: str
+
+
+@dataclass
 class CrearCuentaBancariaDTO:
     usuario: Usuario
     banco: Banco
@@ -18,4 +23,14 @@ class CrearCuentaBancariaDTO:
     estado: str
     tipo_de_cuenta: str | None
     fecha_actualizacion: datetime | None
+    observaciones: str | None
+
+
+@dataclass
+class ActualizarCuentaBancariaDTO:
+    usuario: Usuario | None
+    banco: Banco | None
+    numero_certificado: str | None
+    estado: str | None
+    tipo_de_cuenta: str | None
     observaciones: str | None

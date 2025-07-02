@@ -6,6 +6,7 @@ from core.interfaces.repositorioHistorialLaboralUsuario import (
     ObtenerHistorialLaboralPorIdProtocol,
     ActulizarSeguridadSocialHistorialLaboralProtocol,
     ObtenerHistorialLaboralPorClaveProtocol,
+    ActualizarHistorialLaboralUsuarioProtocol,
 )
 
 
@@ -14,6 +15,7 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     ObtenerHistorialLaboralPorIdProtocol,
     ActulizarSeguridadSocialHistorialLaboralProtocol,
     ObtenerHistorialLaboralPorClaveProtocol,
+    ActualizarHistorialLaboralUsuarioProtocol,
 ):
     def __init__(self, db: Session):
         self.db = db
@@ -60,4 +62,34 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         registro_orm = self.db.query(HistorialLaboralORM).filter_by(claveHLU=historialLaboral.claveHLU).first()
         if not registro_orm:
             return None
+        return HistorialLaboralUsuario.from_orm(registro_orm)
+
+    def actualizar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
+        registro_orm = self.db.query(HistorialLaboralORM).filter_by(id=historialLaboral.id).first()
+
+        if not registro_orm:
+            raise ValueError("Usuario no encontrado")
+
+        if not historialLaboral.municipio.id:
+            raise ValueError("Municipio no asociado")
+
+        if not historialLaboral.cargo.id:
+            raise ValueError("Cargo no asociado")
+
+        if not historialLaboral.usuario.id:
+            raise ValueError("Usuario no asociado")
+
+        registro_orm.id_municipio = historialLaboral.municipio.id
+        registro_orm.contrato = historialLaboral.contrato
+        registro_orm.id_cargo = historialLaboral.cargo.id
+        registro_orm.fecha_contratacion = historialLaboral.fecha_contratacion
+        registro_orm.claveHLU = historialLaboral.claveHLU
+        registro_orm.seguridad_social = historialLaboral.seguridad_social
+        registro_orm.fecha_aprobacion_seguridad_social = historialLaboral.fecha_aprobacion_seguridad_social
+        registro_orm.fecha_ultima_contratacion = historialLaboral.fecha_ultima_contratacion
+        registro_orm.fecha_fin_contratacion = historialLaboral.fecha_fin_contratacion
+        registro_orm.id_usuario = historialLaboral.usuario.id
+
+        # Sincronizar con la sesión (no guarda todavía)
+        self.db.flush()
         return HistorialLaboralUsuario.from_orm(registro_orm)
