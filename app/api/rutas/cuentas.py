@@ -283,13 +283,16 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
             # # actualizacion de cuenta por pagar
             cuenta_por_pagar.calcular_descuentos(descuentos_creados)
-            repo_cuentaPorPagar.actualizar(
-                cuenta_por_pagar,
-                {
-                    "total_descuentos": cuenta_por_pagar.total_descuentos,
-                    "total_a_pagar": cuenta_por_pagar.total_a_pagar,
-                },
-            )
+            # repo_cuentaPorPagar.actualizar(
+            #     cuenta_por_pagar,
+            #     {
+            #         "total_descuentos": cuenta_por_pagar.total_descuentos,
+            #         "total_a_pagar": cuenta_por_pagar.total_a_pagar,
+            #     },
+            # )
+            cuenta_por_pagar.total_descuentos = cuenta_por_pagar.total_descuentos
+            cuenta_por_pagar.total_a_pagar = cuenta_por_pagar.total_a_pagar
+            repo_cuentaPorPagar.actualizar(cuenta_por_pagar)
 
             db.commit()
             registros_exitosos.append(
