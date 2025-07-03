@@ -16,3 +16,10 @@ class CrearDescuentoDTO:
     tipo_de_descuento: str
     descripcion: str | None
     fecha_actualizacion: datetime | None
+
+
+@dataclass
+class FiltrarDescuentosDTO:
+    id_cuenta_por_pagar: int | None
+    id_usuario: int | None
+    id_deuda: int | None = None

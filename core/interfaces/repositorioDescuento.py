@@ -1,5 +1,6 @@
 from typing import Protocol, runtime_checkable
 from core.entidades.descuento import Descuento
+from core.servicios.descuentos.dtos import FiltrarDescuentosDTO
 
 
 @runtime_checkable
@@ -9,7 +10,7 @@ class CrearDescuentoProtocol(Protocol):
 
 @runtime_checkable
 class ObtenerDescuentosProtocol(Protocol):
-    def obtener_descuentos(self) -> list[Descuento]: ...
+    def obtener_descuentos(self, filtros: FiltrarDescuentosDTO) -> list[Descuento]: ...
 
 
 @runtime_checkable

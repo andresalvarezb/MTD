@@ -6,7 +6,7 @@ from core.interfaces.repositorioDescuento import (
     ObtenerDescuentosProtocol,
     ObtenerDescuentoPorIdProtocol,
 )
-
+from core.servicios.descuentos.dtos import FiltrarDescuentosDTO
 
 class RepositorioDescuentoSqlAlchemy(CrearDescuentoProtocol, ObtenerDescuentosProtocol, ObtenerDescuentoPorIdProtocol):
     def __init__(self, db: Session) -> None:
@@ -28,25 +28,32 @@ class RepositorioDescuentoSqlAlchemy(CrearDescuentoProtocol, ObtenerDescuentosPr
         self.db.refresh(nuevo_descuento)
         return descuento.from_orm(nuevo_descuento)
 
-    # def obtener(self, descuento: Descuento):
-    #     existe = (
-    #         self.db.query(DescuentosPorPagarORM)
-    #         .filter_by(
-    #             id_cuenta_por_pagar=descuento.cuenta_por_pagar.id,
-    #             id_usuario=descuento.usuario.id,
-    #             id_deuda=descuento.deuda.id,
-    #             tipo_de_descuento=descuento.tipo_de_descuento,
-    #         )
-    #         .first()
-    #     )
-    #     if existe:
-    #         return existe
-    #     else:
-    #         return None
 
-    def obtener_descuentos(self) -> list[Descuento]:
-        registros_orm = self.db.query(DescuentosPorPagarORM).all()
+    def obtener_descuentos(self, filtros: FiltrarDescuentosDTO) -> list[Descuento]:
+
+        query = self.db.query(DescuentosPorPagarORM)
+
+        filtros_query = []
+
+        if filtros.id_cuenta_por_pagar is not None:
+            filtros_query.append(DescuentosPorPagarORM.id_cuenta_por_pagar == filtros.id_cuenta_por_pagar)
+
+        if filtros.id_usuario is not None:
+            filtros_query.append(DescuentosPorPagarORM.id_usuario == filtros.id_usuario)
+
+        if filtros.id_deuda is not None:
+            filtros_query.append(DescuentosPorPagarORM.id_deuda == filtros.id_deuda)
+
+        if filtros_query:
+            query = query.filter(*filtros_query)
+
+        registros_orm = query.all()
+
+        if not registros_orm:
+            raise Exception("No se encontraron registros")
+
         return [Descuento.from_orm(orm_obj) for orm_obj in registros_orm]
+
 
     def obtener_descuento_por_id(self, id_descuento: int) -> Descuento | None:
         registro_orm = self.db.query(DescuentosPorPagarORM).filter_by(id=id_descuento).first()

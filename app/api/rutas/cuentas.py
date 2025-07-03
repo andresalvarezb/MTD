@@ -72,6 +72,8 @@ from app.api.esquemas.cuentaBancaria import CuentaBancariaUpdateSchema, BancoUpd
 from core.entidades.cuentaBancaria import CuentaBancaria
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 from core.entidades.banco import Banco
+from core.servicios.descuentos.dtos import FiltrarDescuentosDTO
+from core.servicios.descuentos.obtenerDescuentos import ObtenerDescuentos
 
 
 router = APIRouter()
@@ -494,6 +496,18 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
             ),
             info_vieja=CuentaPorPagar(**cuenta_por_pagar_bd.model_dump()),
         )
+
+        # obtener descuntos asociados a la cuenta para recalsular su valor
+        repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
+        caso_de_uso_descuentos = ObtenerDescuentos(repo_descuentos)
+        descuentos = caso_de_uso_descuentos.ejecutar(
+            FiltrarDescuentosDTO(id_cuenta_por_pagar=cuenta_por_pagar.id, id_usuario=usuario_actualizado.id)
+        )
+
+        cuenta_por_pagar.calcular_descuentos(descuentos)
+        cuenta_por_pagar.total_descuentos = cuenta_por_pagar.total_descuentos
+        cuenta_por_pagar.total_a_pagar = cuenta_por_pagar.total_a_pagar
+        repo_cuenta_por_pagar.actualizar(cuenta_por_pagar)
         db.commit()
 
         # obtener cuenta por pagar
