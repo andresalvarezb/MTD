@@ -52,12 +52,6 @@ class RepositorioUsuarioSqlAlchemy(
             return None
         return Usuario.from_orm(registro_orm)
 
-    def actualizar_seguridad_social(self, usuario: Usuario):
-        registro_orm = self.db.query(UsuarioORM).filter_by(id=usuario.id).first()
-        if not registro_orm:
-            raise ValueError("Usuario no encontrado")
-        registro_orm.seguridad_social = usuario.seguridad_social
-        return Usuario.from_orm(registro_orm)
 
     def obtener_todos(self) -> list[Usuario]:
         registros_orm = self.db.query(UsuarioORM).all()

@@ -1,4 +1,5 @@
 from core.entidades.descuento import Descuento
+from datetime import datetime
 from core.interfaces.repositorioDescuento import CrearDescuentoProtocol, ObtenerDescuentoPorIdProtocol
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
 
@@ -10,14 +11,14 @@ class CrearDescuento:
 
     def ejecutar(self, datos: CrearDescuentoDTO) -> Descuento:
         descuento = Descuento(
-            id_usuario=datos.usuario.id,
-            id_cuenta_por_pagar=datos.cuenta_por_pagar.id,
-            id_deuda=datos.deuda.id,
+            id_usuario=datos.id_usuario,
+            id_cuenta_por_pagar=datos.id_cuenta_por_pagar,
+            id_deuda=datos.id_deuda,
             valor=datos.valor,
-            fecha_creacion=datos.fecha_creacion,
+            fecha_creacion=datetime.now(),
             tipo_de_descuento=datos.tipo_de_descuento,
             descripcion=datos.descripcion,
-            fecha_actualizacion=datos.fecha_actualizacion,
+            fecha_actualizacion=datetime.now(),
         )
         if descuento.id:
             descuento_existente = self.repo_obtener.obtener_descuento_por_id(descuento.id)

@@ -267,13 +267,19 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 if descuento["valor"] == 0.0:
                     continue
 
+                if not usuario.id:
+                    raise Exception("Usuario no encontrado, no hay id que asociar al descuento")
+
+                if not cuenta_por_pagar.id:
+                    raise Exception("Cuenta por pagar no encontrada, no hay id que asociar al descuento")
+
                 repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
                 descuentos_service = CrearDescuento(repo_obtener=repo_descuentos, repo_crear=repo_descuentos)
                 descuento_nuevo = descuentos_service.ejecutar(
                     CrearDescuentoDTO(
-                        usuario=usuario,
-                        cuenta_por_pagar=cuenta_por_pagar,
-                        deuda=None,
+                        id_usuario=usuario.id,
+                        id_cuenta_por_pagar=cuenta_por_pagar.id,
+                        id_deuda=None,
                         valor=descuento["valor"],
                         fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],
                         tipo_de_descuento=descuento["tipo_descuento"],

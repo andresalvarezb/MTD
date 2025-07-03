@@ -4,7 +4,6 @@ from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralO
 from core.interfaces.repositorioHistorialLaboralUsuario import (
     CrearHistorialLaboralUsuarioProtocol,
     ObtenerHistorialLaboralPorIdProtocol,
-    ActulizarSeguridadSocialHistorialLaboralProtocol,
     ObtenerHistorialLaboralPorClaveProtocol,
     ActualizarHistorialLaboralUsuarioProtocol,
 )
@@ -13,7 +12,6 @@ from core.interfaces.repositorioHistorialLaboralUsuario import (
 class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     CrearHistorialLaboralUsuarioProtocol,
     ObtenerHistorialLaboralPorIdProtocol,
-    ActulizarSeguridadSocialHistorialLaboralProtocol,
     ObtenerHistorialLaboralPorClaveProtocol,
     ActualizarHistorialLaboralUsuarioProtocol,
 ):
@@ -44,13 +42,6 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
             return existe
         else:
             return None
-
-    def actualizar_seguridad_social(self, historialLaboral: HistorialLaboralUsuario):
-        registro_orm = self.obtener(historialLaboral)
-        if not registro_orm:
-            raise ValueError("Usuario no encontrado")
-        registro_orm.seguridad_social = historialLaboral.seguridad_social
-        return HistorialLaboralUsuario.from_orm(registro_orm)
 
     def obtener_por_id(self, id_historial_laboral: int) -> HistorialLaboralUsuario | None:
         registro_orm = self.db.query(HistorialLaboralORM).filter_by(id=id_historial_laboral).first()

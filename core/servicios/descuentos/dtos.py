@@ -8,14 +8,14 @@ from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 @dataclass
 class CrearDescuentoDTO:
-    cuenta_por_pagar: CuentaPorPagar
-    usuario: Usuario
-    deuda: Deuda | None
+    id_cuenta_por_pagar: int
+    id_usuario: int
     valor: Decimal
-    fecha_creacion: datetime
-    tipo_de_descuento: str
     descripcion: str | None
-    fecha_actualizacion: datetime | None
+    id_deuda: int | None = None
+    tipo_de_descuento: str | None = None
+    fecha_actualizacion: datetime | None = None
+    fecha_creacion: datetime | None = None
 
 
 @dataclass

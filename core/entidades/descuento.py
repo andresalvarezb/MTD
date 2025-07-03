@@ -9,14 +9,15 @@ class Descuento:
     id_usuario: int
     valor: Decimal
     fecha_creacion: datetime
-    tipo_de_descuento: str
+    tipo_de_descuento: str | None
     id_deuda: int | None = None
     id: int | None = None
     descripcion: str | None = None
     fecha_actualizacion: datetime | None = None
 
     def __post_init__(self):
-        self.tipo_de_descuento = self.tipo_de_descuento.capitalize()
+        if self.tipo_de_descuento:
+            self.tipo_de_descuento = self.tipo_de_descuento.capitalize()
 
         if self.descripcion:
             self.descripcion = self.descripcion.lower()
