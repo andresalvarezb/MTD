@@ -8,3 +8,4 @@ class ObtenerDescuentos:
 
     def ejecutar(self, filtros : FiltrarDescuentosDTO):
         return self.repositorio.obtener_descuentos(filtros)
+ 

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import datetime
 from core.entidades.cuentaBancaria import CuentaBancaria
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
 from core.interfaces.repositorioCuentaBancaria import (
@@ -26,7 +27,7 @@ class RepositorioCuentaBancariaSqlAlchemy(
             numero_cuenta=cuenta_bancaria.numero_cuenta,
             numero_certificado=cuenta_bancaria.numero_certificado,
             tipo_de_cuenta=cuenta_bancaria.tipo_de_cuenta,
-            fecha_actualizacion=cuenta_bancaria.fecha_actualizacion,
+            fecha_actualizacion=datetime.now(),
             observaciones=cuenta_bancaria.observaciones,
         )
         self.db.add(nueva_cuenta)
@@ -64,7 +65,7 @@ class RepositorioCuentaBancariaSqlAlchemy(
         registro_orm.id_usuario = cuenta_bancaria.usuario.id
         registro_orm.id_banco = cuenta_bancaria.banco.id
         registro_orm.tipo_de_cuenta = cuenta_bancaria.tipo_de_cuenta
-        registro_orm.fecha_actualizacion = cuenta_bancaria.fecha_actualizacion
+        registro_orm.fecha_actualizacion = datetime.now()
         registro_orm.observaciones = cuenta_bancaria.observaciones
 
         self.db.flush()

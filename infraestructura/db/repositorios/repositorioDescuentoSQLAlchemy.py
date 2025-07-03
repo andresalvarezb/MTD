@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import datetime
 from core.entidades.descuento import Descuento
 from infraestructura.db.modelos.descuento import DescuentosPorPagarORM
 from core.interfaces.repositorioDescuento import (
@@ -18,10 +19,10 @@ class RepositorioDescuentoSqlAlchemy(CrearDescuentoProtocol, ObtenerDescuentosPr
             id_usuario=descuento.id_usuario,
             id_deuda=descuento.id_deuda,
             valor=descuento.valor,
-            fecha_creacion=descuento.fecha_creacion,
+            fecha_creacion=datetime.now(),
             tipo_de_descuento=descuento.tipo_de_descuento,
             descripcion=descuento.descripcion,
-            fecha_actualizacion=descuento.fecha_actualizacion,
+            fecha_actualizacion=datetime.now(),
         )
         self.db.add(nuevo_descuento)
         self.db.flush()

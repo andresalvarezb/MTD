@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from core.entidades.deuda import Deuda
+from datetime import datetime
 from infraestructura.db.modelos.deuda import DeudaORM
 from core.interfaces.repositorioDeuda import CrearDeudaProtocol, ObtenerDeudasProtocol
 
@@ -23,8 +24,8 @@ class RepositorioDeudaSqlAlchemy(CrearDeudaProtocol, ObtenerDeudasProtocol):
             estado=deuda.estado,
             saldo=deuda.saldo,
             valor_total=deuda.valor_total,
-            fecha_creacion=deuda.fecha_creacion,
-            fecha_actualizacion=deuda.fecha_actualizacion,
+            fecha_creacion=datetime.now(),
+            fecha_actualizacion=datetime.now(),
             descripcion=deuda.descripcion,
             id_area=deuda.id_area,
         )

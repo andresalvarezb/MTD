@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import datetime
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
 from core.interfaces.repositorioCuentaPorPagar import (
@@ -42,9 +43,9 @@ class RepositorioCuentaPorPagarSqlAlchemy(
             valor_cuenta_cobro=cuenta_por_pagar.valor_cuenta_cobro,
             total_descuentos=cuenta_por_pagar.total_descuentos,
             total_a_pagar=cuenta_por_pagar.total_a_pagar,
-            fecha_actualizacion=cuenta_por_pagar.fecha_actualizacion,
+            fecha_actualizacion=datetime.now(),
             fecha_aprobacion_rut=cuenta_por_pagar.fecha_aprobacion_rut,
-            fecha_creacion=cuenta_por_pagar.fecha_creacion,
+            fecha_creacion=datetime.now(),
             fecha_aprobacion_cuenta_usuario=cuenta_por_pagar.fecha_aprobacion_cuenta_usuario,
             fecha_programacion_pago=cuenta_por_pagar.fecha_programacion_pago,
             fecha_reprogramacion=cuenta_por_pagar.fecha_reprogramacion,
@@ -90,7 +91,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         registro_orm.valor_cuenta_cobro = cuenta_por_pagar.valor_cuenta_cobro  # type: ignore
         registro_orm.total_descuentos = cuenta_por_pagar.total_descuentos  # type: ignore
         registro_orm.total_a_pagar = cuenta_por_pagar.total_a_pagar  # type: ignore
-        registro_orm.fecha_actualizacion = cuenta_por_pagar.fecha_actualizacion
+        registro_orm.fecha_actualizacion = datetime.now()
         registro_orm.fecha_aprobacion_rut = cuenta_por_pagar.fecha_aprobacion_rut
         registro_orm.fecha_creacion = cuenta_por_pagar.fecha_creacion
         registro_orm.fecha_aprobacion_cuenta_usuario = cuenta_por_pagar.fecha_aprobacion_cuenta_usuario
