@@ -507,7 +507,19 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
         cuenta_por_pagar.calcular_descuentos(descuentos)
         cuenta_por_pagar.total_descuentos = cuenta_por_pagar.total_descuentos
         cuenta_por_pagar.total_a_pagar = cuenta_por_pagar.total_a_pagar
+
+        # verificar estados para actualizar el estadod e la cuenta
+        if (
+            cuenta_por_pagar.historial_laboral.seguridad_social
+            and cuenta_por_pagar.cuenta_bancaria.estado == "ACTIVA"
+            and cuenta_por_pagar.estado_aprobacion_cuenta_usuario == "APROBADO"
+        ):
+            cuenta_por_pagar.estado_cuenta_por_pagar = "PROCEDE PARA PAGO"
+        else:
+            cuenta_por_pagar.estado_cuenta_por_pagar = "NO PROCEDE PARA PAGO"
+
         repo_cuenta_por_pagar.actualizar(cuenta_por_pagar)
+
         db.commit()
 
         # obtener cuenta por pagar
