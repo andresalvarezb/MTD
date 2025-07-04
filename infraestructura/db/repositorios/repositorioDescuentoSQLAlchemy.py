@@ -80,3 +80,12 @@ class RepositorioDescuentoSqlAlchemy(
 
         self.db.flush()
         return descuento.from_orm(registro_orm)
+
+    def eliminar(self, id_descuento: int) -> None:
+        registro_orm = self.db.query(DescuentosPorPagarORM).filter_by(id=id_descuento).first()
+        if not registro_orm:
+            raise ValueError(f"Descuento con ID {id_descuento} no encontrado.")
+
+        self.db.delete(registro_orm)
+        self.db.flush()
+        return None

@@ -23,3 +23,6 @@ class ObtenerDescuentoProtocol(Protocol):
 
 class ActualizarDescuentoProtocol(Protocol):
     def actualizar(self, descuento: Descuento) -> Descuento: ...
+    
+class EliminarDescuentoProtocol(Protocol):
+    def eliminar(self, id_descuento: int) -> None: ...

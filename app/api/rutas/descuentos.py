@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Path
 from app.api.esquemas.descuento import DescuentoResponseSchema, ActualizarDescuentoSchema
 from core.servicios.descuentos.dtos import FiltrarDescuentosDTO, CrearDescuentoDTO
 from core.servicios.descuentos.obtenerDescuentos import ObtenerDescuentos
@@ -9,6 +9,9 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import Repos
 from app.api.esquemas.descuento import CrearDescuentoSchema
 from core.servicios.descuentos.crearDescuento import CrearDescuento
 from core.servicios.descuentos.actualizarDescuento import ActualizarDescuento
+from core.servicios.descuentos.eliminarDescuento import EliminarDescuento
+
+
 
 
 
@@ -77,3 +80,14 @@ def actualizar_descuento(data_descuento: ActualizarDescuentoSchema, id_descuento
     descuento = caso_de_uso.ejecutar(id_descuento, data_descuento)
     return DescuentoResponseSchema.model_validate(descuento)
 
+
+
+@router.delete("/{id_descuento}")
+def eliminar_descuento(id_descuento: int = Path(..., description="ID del descuento a eliminar"), db: Session = Depends(get_db)):
+    try:
+        repo_descuento = RepositorioDescuentoSqlAlchemy(db)
+        caso_de_uso = EliminarDescuento(repo_eliminar=repo_descuento)
+        caso_de_uso.ejecutar(id_descuento)
+        return {"message": "Descuento eliminado correctamente"}
+    except:
+        raise HTTPException(status_code=500, detail="Error interno al eliminar el descuento")
