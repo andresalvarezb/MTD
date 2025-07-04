@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from core.entidades.areaMtd import AreaMTD
 from infraestructura.db.modelos.areaMTD import AreaMTDORM
-from core.interfaces.repositorioAreaMTD import ObtenerAreaPorNombreProtocol, CrearAreaMTDProtocol, ObtenerAreasProtocol, ObtnerAreaPorIdProtocol
+from core.interfaces.repositorioAreaMTD import ObtenerAreaPorNombreProtocol, CrearAreaMTDProtocol, ObtenerAreasProtocol, ObtnerAreaPorIdProtocol, EliminarAreaMTDProtocol
 
 
 class RepositorioAreaMTDSqlAlchemy(CrearAreaMTDProtocol, ObtenerAreaPorNombreProtocol, ObtenerAreasProtocol, ObtnerAreaPorIdProtocol):
@@ -32,3 +32,12 @@ class RepositorioAreaMTDSqlAlchemy(CrearAreaMTDProtocol, ObtenerAreaPorNombrePro
         if not registro_orm:
             return None
         return AreaMTD.from_orm(registro_orm)
+    
+    def eliminar(self, id_area: int) -> None:
+        registro_orm = self.db.query(AreaMTDORM).filter_by(id=id_area).first()
+        if not registro_orm:
+            raise ValueError(f"Area con ID {id_area} no encontrado.")
+
+        self.db.delete(registro_orm)
+        self.db.flush()
+        return None

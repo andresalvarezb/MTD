@@ -14,3 +14,7 @@ class ObtenerAreasProtocol(Protocol):
     
 class ObtnerAreaPorIdProtocol(Protocol):
     def obtener_por_id(self, id_area: int) -> AreaMTD | None: ...
+
+
+class EliminarAreaMTDProtocol(Protocol):
+    def eliminar(self, id_area: int) -> None: ...
