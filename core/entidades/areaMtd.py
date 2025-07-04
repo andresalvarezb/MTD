@@ -3,11 +3,15 @@ from dataclasses import dataclass
 
 @dataclass
 class AreaMTD:
-    id: int
     nombre: str
+    id: int | None = None
+
+
+    def __post_init__(self):
+        self._actualizar_nombre_area(self.nombre)
 
     def _actualizar_nombre_area(self, nuevo_nombre: str):
-        self.nombre = nuevo_nombre.capitalize()
+        self.nombre = nuevo_nombre.upper()
 
     @classmethod
     def from_orm(cls, orm_object):

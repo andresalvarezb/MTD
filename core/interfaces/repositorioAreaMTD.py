@@ -2,8 +2,8 @@ from typing import Protocol
 from core.entidades.areaMtd import AreaMTD
 
 
-# class RepositorioAreaMTD(Protocol):
-#     def guardar(self, AreaMTD: AreaMTD) -> AreaMTD: ...
+class CrearAreaMTDProtocol(Protocol):
+    def crear(self, area: AreaMTD) -> AreaMTD: ...
 
 
 class ObtenerAreaPorNombreProtocol(Protocol):

@@ -3,6 +3,7 @@ from .rutas.cuentas import router as cuentas
 from .rutas.descuentos import router as descuentos
 from .rutas.usuarios import router as usuarios
 from .rutas.deuda import router as deudas
+from .rutas.areaMTD import router as areas
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,6 +23,8 @@ router.include_router(cuentas, prefix="/cuentas", tags=["Cuentas por pagar"])
 router.include_router(descuentos, prefix="/descuentos", tags=["Descuentos"])
 router.include_router(usuarios, prefix="/usuarios", tags=["Usuarios"])
 router.include_router(deudas, prefix="/deudas", tags=["Deudas"])
+router.include_router(areas, prefix="/areas", tags=["Areas MTD"])
+
 
 
 app.include_router(router, prefix="/api")
