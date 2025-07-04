@@ -20,3 +20,6 @@ class ObtenerDescuentoPorIdProtocol(Protocol):
 
 class ObtenerDescuentoProtocol(Protocol):
     def obtener_descuento(self, descuento: Descuento) -> Descuento | None: ...
+
+class ActualizarDescuentoProtocol(Protocol):
+    def actualizar(self, descuento: Descuento) -> Descuento: ...

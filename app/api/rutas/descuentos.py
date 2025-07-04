@@ -1,14 +1,15 @@
 from sqlalchemy.orm import Session
 from infraestructura.db.index import get_db
 from fastapi import APIRouter, HTTPException, Depends, Query
-from app.api.esquemas.descuento import DescuentoResponseSchema
+from app.api.esquemas.descuento import DescuentoResponseSchema, ActualizarDescuentoSchema
 from core.servicios.descuentos.dtos import FiltrarDescuentosDTO, CrearDescuentoDTO
 from core.servicios.descuentos.obtenerDescuentos import ObtenerDescuentos
 from core.servicios.descuentos.obtenerDescuento import ObtenerDescuento
 from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import RepositorioDescuentoSqlAlchemy
 from app.api.esquemas.descuento import CrearDescuentoSchema
-
 from core.servicios.descuentos.crearDescuento import CrearDescuento
+from core.servicios.descuentos.actualizarDescuento import ActualizarDescuento
+
 
 
 
@@ -67,4 +68,12 @@ def crear_descuento(data_descuento: CrearDescuentoSchema, db: Session = Depends(
             descripcion=data_descuento.descripcion
         )
     )
-    return descuento
+    return DescuentoResponseSchema.model_validate(descuento)
+
+@router.patch("/{id_descuento}", response_model=DescuentoResponseSchema)
+def actualizar_descuento(data_descuento: ActualizarDescuentoSchema, id_descuento: int, db: Session = Depends(get_db)):
+    repo_descuento = RepositorioDescuentoSqlAlchemy(db)
+    caso_de_uso = ActualizarDescuento(repo_actualizar=repo_descuento, repo_obtener=repo_descuento)
+    descuento = caso_de_uso.ejecutar(id_descuento, data_descuento)
+    return DescuentoResponseSchema.model_validate(descuento)
+
