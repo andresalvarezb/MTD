@@ -6,6 +6,7 @@ from core.servicios.areaMTD.crearAreaMTD import CrearAreaMTD
 from infraestructura.db.repositorios.repositorioAreaSqlAlchemy import RepositorioAreaMTDSqlAlchemy
 from app.api.esquemas.area import AreaMTDResponseSchema
 from core.servicios.areaMTD.obtenerAreasMTD import ObtenerAreasMTD
+from core.servicios.areaMTD.obtenerAreaMTD import ObtenerAreaMTD
 
 
 
@@ -29,3 +30,10 @@ def obtener_areas(db: Session = Depends(get_db)):
     repo_area = RepositorioAreaMTDSqlAlchemy(db)
     areas = ObtenerAreasMTD(repo_area).ejecutar()
     return [AreaMTDResponseSchema.model_validate(area) for area in areas]
+
+@router.get("/{id_area}", response_model=AreaMTDResponseSchema)
+def obtener_area(id_area: int, db: Session = Depends(get_db)):
+    repo_area = RepositorioAreaMTDSqlAlchemy(db)
+    caso_de_uso = ObtenerAreaMTD(repo_area)
+    area = caso_de_uso.ejecutar(id_area)
+    return AreaMTDResponseSchema.model_validate(area)
