@@ -1,8 +1,7 @@
 from app.api.esquemas.descuento import ActualizarDescuentoSchema
 from core.interfaces.repositorioDescuento import ActualizarDescuentoProtocol, ObtenerDescuentoPorIdProtocol
+
 # from core.servicios.descuentos.dtos import ActualizarDescuentoDTO
-
-
 
 
 class ActualizarDescuento:

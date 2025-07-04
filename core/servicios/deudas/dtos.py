@@ -8,5 +8,12 @@ class CrearDeudaDTO:
     documento: str
     monto: Decimal
     fecha_creacion: datetime
-    area: str
-    descripcion: str | None
+    area: str | None = None
+    descripcion: str | None = None
+
+
+@dataclass(frozen=True)
+class ActualizarDeudaDTO:
+    area: str | None = None
+    monto: Decimal | None = None
+    descripcion: str | None = None

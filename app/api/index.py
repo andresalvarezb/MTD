@@ -26,5 +26,4 @@ router.include_router(deudas, prefix="/deudas", tags=["Deudas"])
 router.include_router(areas, prefix="/areas", tags=["Areas MTD"])
 
 
-
 app.include_router(router, prefix="/api")

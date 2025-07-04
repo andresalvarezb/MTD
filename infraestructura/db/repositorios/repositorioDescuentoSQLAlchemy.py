@@ -69,7 +69,7 @@ class RepositorioDescuentoSqlAlchemy(
         if not registro_orm:
             raise ValueError(f"Descuento con ID {descuento.id} no encontrado.")
 
-        registro_orm.valor = descuento.valor #type: ignore
+        registro_orm.valor = descuento.valor  # type: ignore
         registro_orm.fecha_actualizacion = datetime.now()
 
         if descuento.tipo_de_descuento:

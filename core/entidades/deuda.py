@@ -3,17 +3,19 @@ from datetime import datetime
 from dataclasses import dataclass
 from infraestructura.db.modelos.deuda import DeudaORM
 from typing import cast
+from core.entidades.usuario import Usuario
+from core.entidades.areaMtd import AreaMTD
 
 
 @dataclass
 class Deuda:
-    id_usuario: int
+    usuario: Usuario
     estado: str
     saldo: Decimal
     valor_total: Decimal
-    fecha_creacion: datetime
+    fecha_creacion: datetime | None = None
     fecha_actualizacion: datetime | None = None
-    id_area: int | None = None
+    area: AreaMTD | None = None
     id: int | None = None
     descripcion: str | None = None
 
@@ -32,13 +34,13 @@ class Deuda:
     @classmethod
     def from_orm(cls, orm_obj: DeudaORM) -> "Deuda":
         return cls(
-            id_usuario=orm_obj.id_usuario,
+            usuario=Usuario.from_orm(orm_obj.usuario),
             estado=orm_obj.estado,
             saldo=cast(Decimal, orm_obj.saldo),  # el cast es para no generar errores de tipo Decimal =! DECIMAL
             valor_total=cast(Decimal, orm_obj.valor_total),
             fecha_creacion=orm_obj.fecha_creacion,
             fecha_actualizacion=orm_obj.fecha_actualizacion,
-            id_area=orm_obj.id_area,
+            area=AreaMTD.from_orm(orm_obj.area),
             id=orm_obj.id,
             descripcion=orm_obj.descripcion,
         )

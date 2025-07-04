@@ -6,8 +6,6 @@ from core.entidades.usuario import Usuario
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 
 
-
-
 class DescuentoResponseSchema(BaseModel):
     id_cuenta_por_pagar: int
     id_usuario: int
@@ -31,6 +29,7 @@ class CrearDescuentoSchema(BaseModel):
     fecha_actualizacion: datetime | None = None
     fecha_creacion: datetime | None = None
     id_deuda: int | None = None
+
 
 class ActualizarDescuentoSchema(BaseModel):
     valor: Decimal | None = None

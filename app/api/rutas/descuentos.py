@@ -12,10 +12,6 @@ from core.servicios.descuentos.actualizarDescuento import ActualizarDescuento
 from core.servicios.descuentos.eliminarDescuento import EliminarDescuento
 
 
-
-
-
-
 router = APIRouter()
 
 
@@ -68,10 +64,11 @@ def crear_descuento(data_descuento: CrearDescuentoSchema, db: Session = Depends(
             fecha_actualizacion=data_descuento.fecha_actualizacion,
             fecha_creacion=data_descuento.fecha_creacion,
             tipo_de_descuento=data_descuento.tipo_de_descuento,
-            descripcion=data_descuento.descripcion
+            descripcion=data_descuento.descripcion,
         )
     )
     return DescuentoResponseSchema.model_validate(descuento)
+
 
 @router.patch("/{id_descuento}", response_model=DescuentoResponseSchema)
 def actualizar_descuento(data_descuento: ActualizarDescuentoSchema, id_descuento: int, db: Session = Depends(get_db)):
@@ -81,9 +78,10 @@ def actualizar_descuento(data_descuento: ActualizarDescuentoSchema, id_descuento
     return DescuentoResponseSchema.model_validate(descuento)
 
 
-
 @router.delete("/{id_descuento}")
-def eliminar_descuento(id_descuento: int = Path(..., description="ID del descuento a eliminar"), db: Session = Depends(get_db)):
+def eliminar_descuento(
+    id_descuento: int = Path(..., description="ID del descuento a eliminar"), db: Session = Depends(get_db)
+):
     try:
         repo_descuento = RepositorioDescuentoSqlAlchemy(db)
         caso_de_uso = EliminarDescuento(repo_eliminar=repo_descuento)

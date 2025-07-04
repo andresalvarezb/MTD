@@ -10,12 +10,6 @@ from core.servicios.areaMTD.eliminarAreaMTD import EliminarAreaMTD
 from infraestructura.db.repositorios.repositorioAreaSqlAlchemy import RepositorioAreaMTDSqlAlchemy
 
 
-
-
-
-
-
-
 router = APIRouter()
 
 
@@ -27,11 +21,13 @@ def crear_area(data_area: CrearAreaMTDSchema, db: Session = Depends(get_db)):
     db.commit()
     return AreaMTDResponseSchema.model_validate(area)
 
+
 @router.get("", response_model=list[AreaMTDResponseSchema])
 def obtener_areas(db: Session = Depends(get_db)):
     repo_area = RepositorioAreaMTDSqlAlchemy(db)
     areas = ObtenerAreasMTD(repo_area).ejecutar()
     return [AreaMTDResponseSchema.model_validate(area) for area in areas]
+
 
 @router.get("/{id_area}", response_model=AreaMTDResponseSchema)
 def obtener_area(id_area: int, db: Session = Depends(get_db)):
@@ -39,6 +35,7 @@ def obtener_area(id_area: int, db: Session = Depends(get_db)):
     caso_de_uso = ObtenerAreaMTD(repo_area)
     area = caso_de_uso.ejecutar(id_area)
     return AreaMTDResponseSchema.model_validate(area)
+
 
 @router.delete("/{id_area}")
 def eliminar_area(id_area: int, db: Session = Depends(get_db)):

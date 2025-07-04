@@ -6,7 +6,6 @@ class AreaMTD:
     nombre: str
     id: int | None = None
 
-
     def __post_init__(self):
         self._actualizar_nombre_area(self.nombre)
 

@@ -10,7 +10,6 @@ class ObtenerHistorialLaboralPorIdProtocol(Protocol):
     def obtener_por_id(self, id_historial_laboral: int) -> HistorialLaboralUsuario | None: ...
 
 
-
 class ObtenerHistorialLaboralPorClaveProtocol(Protocol):
     def obtener_por_clave(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario | None: ...
 
