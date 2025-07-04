@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from core.entidades.areaMtd import AreaMTD
 from infraestructura.db.modelos.areaMTD import AreaMTDORM
-from core.interfaces.repositorioAreaMTD import ObtenerAreaPorNombreProtocol, CrearAreaMTDProtocol
+from core.interfaces.repositorioAreaMTD import ObtenerAreaPorNombreProtocol, CrearAreaMTDProtocol, ObtenerAreasProtocol
 
 
-class RepositorioAreaMTDSqlAlchemy(CrearAreaMTDProtocol, ObtenerAreaPorNombreProtocol):
+class RepositorioAreaMTDSqlAlchemy(CrearAreaMTDProtocol, ObtenerAreaPorNombreProtocol, ObtenerAreasProtocol):
     def __init__(self, db: Session) -> None:
         self.db = db
 
@@ -22,3 +22,7 @@ class RepositorioAreaMTDSqlAlchemy(CrearAreaMTDProtocol, ObtenerAreaPorNombrePro
         if not registro_orm:
             return None
         return AreaMTD.from_orm(registro_orm)
+
+    def obtener_todos(self) -> list[AreaMTD]:
+        registros_orm = self.db.query(AreaMTDORM).all()
+        return [AreaMTD.from_orm(registro_orm) for registro_orm in registros_orm]
