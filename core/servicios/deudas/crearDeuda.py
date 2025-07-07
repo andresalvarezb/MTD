@@ -26,6 +26,9 @@ class CrearDeuda:
         if not usuario:
             raise ValueError(f"Usuario {datos.documento} no encontrado. No se puede asignar deuda")
 
+        if usuario.estado != "ACTIVO":
+            raise ValueError(f"Usuario {datos.documento} no esta activo. No se puede asignar deuda")
+
         # validar monto de la deuda
         if datos.monto <= 0 or datos.monto == None:
             raise ValueError("El monto de la deuda debe ser mayor a cero")
@@ -49,9 +52,4 @@ class CrearDeuda:
             area=area_deuda,
         )
 
-        deuda = self.repo_deuda.crear(deuda)
-
-        return deuda
-
-        # if usuario.id is None:
-        #     raise KeyError(f"El usuario no esta agregado a un en la base de datos.")
+        return self.repo_deuda.crear(deuda)

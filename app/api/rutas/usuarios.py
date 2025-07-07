@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from core.entidades.usuario import Usuario
 from infraestructura.db.index import get_db
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
 from core.servicios.usuarios.obtenerUsuarios import ObtenerUsuarios
 from infraestructura.db.repositorios.repositorioUsuarioSqlAlchemy import RepositorioUsuarioSqlAlchemy
@@ -11,11 +11,11 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[Usuario])
-def obtener_usuarios(db: Session = Depends(get_db)):
+def obtener_usuarios(documento: str | None = Query(None, description="Filtrar por documento de un usuario en particular"), db: Session = Depends(get_db)):
     try:
         repo_usuario = RepositorioUsuarioSqlAlchemy(db)
         caso_de_uso = ObtenerUsuarios(repo_usuario)
-        usuarios = caso_de_uso.ejecutar()
+        usuarios = caso_de_uso.ejecutar(documento)
         return usuarios
 
     except Exception as e:

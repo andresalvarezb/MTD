@@ -69,8 +69,7 @@ class RepositorioDeudaSqlAlchemy(
 
     def eliminar(self, id_deuda: int) -> None:
         registro_orm = self.db.query(DeudaORM).filter_by(id=id_deuda).first()
-        if registro_orm:
+        if not registro_orm:
             raise ValueError(f"No hay deuda identificada al id {id_deuda}")
 
         self.db.delete(registro_orm)
-        return None

@@ -19,7 +19,7 @@ class ActulizarSeguridadSocialUsuarioProtocol(Protocol):
 
 
 class ObtenerUsuariosProtocol(Protocol):
-    def obtener_todos(self) -> list[Usuario]: ...
+    def obtener_todos(self, documento: str | None = None) -> list[Usuario]: ...
 
 
 class ActualizarUsuarioProtocol(Protocol):

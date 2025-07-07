@@ -37,7 +37,7 @@ class CrearCuentaPorPagar:
             eps_paciente_asignado=datos.eps_paciente_asignado,
         )
 
-        cuenta_existente = self.repo_obtener.obtener_por_clave(cuenta)
+        cuenta_existente = self.repo_obtener.obtener_por_clave(cuenta.claveCPP)
         if cuenta_existente:
             return cuenta_existente
 

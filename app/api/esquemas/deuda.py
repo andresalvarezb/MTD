@@ -1,6 +1,11 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
 from decimal import Decimal
+from core.entidades.usuario import Usuario
+from core.entidades.areaMtd import AreaMTD
+
+
+
 
 
 class CrearDeudaSchema(BaseModel):
@@ -21,7 +26,7 @@ class CrearDeudaSchema(BaseModel):
 
 class DeudaRespuestaSchema(BaseModel):
     id: int = Field(..., description="ID único de la deuda", examples=[123])
-    id_usuario: int = Field(..., description="ID del usuario asociado a la deuda", examples=[45])
+    usuario: Usuario = Field(..., description="ID del usuario asociado a la deuda", examples=[45])
     estado: str = Field(
         ..., description="Estado actual de la deuda (ej: 'PENDIENTE', 'PAGADA')", examples=["PENDIENTE"]
     )
@@ -31,7 +36,7 @@ class DeudaRespuestaSchema(BaseModel):
     fecha_actualizacion: datetime | None = Field(
         None, description="Última fecha de actualización", examples=["2024-06-01T15:30:00"]
     )
-    id_area: int | None = Field(None, description="ID del área relacionada (si aplica)", examples=[10])
+    area: AreaMTD = Field(..., description="ID del área relacionada (si aplica)", examples=[10])
     descripcion: str | None = Field(None, description="Descripción de la deuda", examples=["Uniformes"])
 
     model_config = {"from_attributes": True}

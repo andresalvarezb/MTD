@@ -52,9 +52,13 @@ class RepositorioUsuarioSqlAlchemy(
             return None
         return Usuario.from_orm(registro_orm)
 
-    def obtener_todos(self) -> list[Usuario]:
-        registros_orm = self.db.query(UsuarioORM).all()
-        return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]
+    def obtener_todos(self, documento: str | None = None) -> list[Usuario]:
+        if documento:
+            registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento).first()
+            return [Usuario.from_orm(registro_orm)] if registro_orm else []
+        else:
+            registros_orm = self.db.query(UsuarioORM).all()
+            return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]
 
     def actualizar(self, usuario: Usuario) -> Usuario:
         registro_orm = self.db.query(UsuarioORM).filter_by(id=usuario.id).first()
