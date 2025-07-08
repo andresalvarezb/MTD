@@ -14,8 +14,8 @@ class CrearDescuentoDTO:
     descripcion: str | None
     id_deuda: int | None = None
     tipo_de_descuento: str | None = None
-    fecha_actualizacion: datetime | None = None
     fecha_creacion: datetime | None = None
+    # fecha_actualizacion: datetime | None = None
 
 
 @dataclass

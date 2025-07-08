@@ -59,8 +59,10 @@ class CuentaPorPagar:
 
     def calcular_descuentos(self, descuentos: list[Descuento]):
         descuento_total = sum((descuento.valor for descuento in descuentos), Decimal("0.0"))
-        self.total_descuentos = descuento_total
-        self.total_a_pagar = self.valor_cuenta_cobro - descuento_total
+        if not self.total_descuentos:
+            self.total_descuentos = Decimal("0.0")
+        self.total_descuentos = self.total_descuentos + descuento_total
+        self.total_a_pagar = self.valor_cuenta_cobro - self.total_descuentos
 
     @classmethod
     def from_orm(cls, orm_obj: CuentaPorPagarORM) -> "CuentaPorPagar":

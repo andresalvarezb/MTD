@@ -26,8 +26,8 @@ class CrearDescuentoSchema(BaseModel):
     valor: Decimal
     tipo_de_descuento: str | None
     descripcion: str | None = None
-    fecha_actualizacion: datetime | None = None
-    fecha_creacion: datetime | None = None
+    # fecha_actualizacion: datetime | None = None
+    # fecha_creacion: datetime | None = None
     id_deuda: int | None = None
 
 

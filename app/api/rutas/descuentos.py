@@ -10,7 +10,7 @@ from app.api.esquemas.descuento import CrearDescuentoSchema
 from core.servicios.descuentos.crearDescuento import CrearDescuento
 from core.servicios.descuentos.actualizarDescuento import ActualizarDescuento
 from core.servicios.descuentos.eliminarDescuento import EliminarDescuento
-
+from infraestructura.db.repositorios.repositorioCuentaPorPagarSqlAlchemy import RepositorioCuentaPorPagarSqlAlchemy
 
 router = APIRouter()
 
@@ -48,25 +48,28 @@ async def obtener_descuento(id_descuento: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
+    # caso_de_uso = CrearDescuento(
+    #     repo_crear=repo_descuento,
+    #     repo_obtener=repo_descuento,
+    # )
 @router.post("/", response_model=DescuentoResponseSchema)
 def crear_descuento(data_descuento: CrearDescuentoSchema, db: Session = Depends(get_db)):
+    repo_cuenta_por_pagar = RepositorioCuentaPorPagarSqlAlchemy(db)
     repo_descuento = RepositorioDescuentoSqlAlchemy(db)
-    caso_de_uso = CrearDescuento(
-        repo_crear=repo_descuento,
-        repo_obtener=repo_descuento,
-    )
+    caso_de_uso = CrearDescuento(repo_descuento, repo_cuenta_por_pagar)
     descuento = caso_de_uso.ejecutar(
         CrearDescuentoDTO(
             id_cuenta_por_pagar=data_descuento.id_cuenta_por_pagar,
             id_usuario=data_descuento.id_usuario,
             id_deuda=data_descuento.id_deuda,
             valor=data_descuento.valor,
-            fecha_actualizacion=data_descuento.fecha_actualizacion,
-            fecha_creacion=data_descuento.fecha_creacion,
+            # fecha_actualizacion=data_descuento.fecha_actualizacion,
+            # fecha_creacion=data_descuento.fecha_creacion,
             tipo_de_descuento=data_descuento.tipo_de_descuento,
             descripcion=data_descuento.descripcion,
         )
     )
+    db.commit()
     return DescuentoResponseSchema.model_validate(descuento)
 
 
