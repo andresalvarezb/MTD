@@ -54,6 +54,10 @@ class CuentaPorPagar:
             self.eps_paciente_asignado = self.eps_paciente_asignado.upper()
         if self.dse:
             self.dse = self.dse.upper()
+        if not self.total_descuentos:
+            self.total_descuentos = Decimal("0.0")
+        if not self.total_a_pagar:
+            self.total_a_pagar = Decimal("0.0")
 
         # self.total_descuentos = sum((descuento.valor for descuento in descuentos), Decimal(0))
 
@@ -61,6 +65,8 @@ class CuentaPorPagar:
         descuento_total = sum((descuento.valor for descuento in descuentos), Decimal("0.0"))
         if not self.total_descuentos:
             self.total_descuentos = Decimal("0.0")
+        if not self.total_a_pagar:
+            self.total_a_pagar = Decimal("0.0")
         self.total_descuentos = self.total_descuentos + descuento_total
         self.total_a_pagar = self.valor_cuenta_cobro - self.total_descuentos
 

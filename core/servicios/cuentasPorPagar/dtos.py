@@ -16,8 +16,8 @@ class CrearCuentaPorPagarDTO:
     estado_cuenta_por_pagar: str
     valor_cuenta_cobro: Decimal
     estado_de_pago: str | None
-    total_descuentos: Decimal | None
-    total_a_pagar: Decimal | None
+    # total_descuentos: Decimal | None
+    # total_a_pagar: Decimal | None
     fecha_actualizacion: datetime | None
     fecha_aprobacion_rut: datetime | None
     fecha_creacion: datetime | None
