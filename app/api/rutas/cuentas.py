@@ -262,7 +262,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                 },
             ]
 
-            descuentos_creados = []
+            # descuentos_creados = []
             for descuento in descuentos_predefinidos:
                 if descuento["valor"] == 0.0:
                     continue
@@ -286,35 +286,9 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                         descripcion=descuento["descripcion"]
                     )
                 )
-                descuentos_creados.append(descuento_nuevo)
-
-            # # actualizacion de cuenta por pagar
-            cuenta_por_pagar.calcular_descuentos(descuentos_creados)
-            # repo_cuentaPorPagar.actualizar(
-            #     cuenta_por_pagar,
-            #     {
-            #         "total_descuentos": cuenta_por_pagar.total_descuentos,
-            #         "total_a_pagar": cuenta_por_pagar.total_a_pagar,
-            #     },
-            # )
-            cuenta_por_pagar.total_descuentos = cuenta_por_pagar.total_descuentos
-            cuenta_por_pagar.total_a_pagar = cuenta_por_pagar.total_a_pagar
-            repo_cuentaPorPagar.actualizar(cuenta_por_pagar)
 
             db.commit()
-            registros_exitosos.append(
-                {
-                    "cuenta_por_pagar": cuenta_por_pagar,
-                    "descuentos": descuentos_creados,
-                    "cuenta_bancaria": cuenta_bancaria,
-                    "banco": banco,
-                    "cargo": cargo,
-                    "usuario": usuario,
-                    "historialLaboralUsuario": historialLaboralUsuario,
-                    "municipio": municipio,
-                    "departamento": departamento,
-                }
-            )
+            registros_exitosos.append(cuenta_por_pagar)
         except Exception as e:
             db.rollback()
             logging.warning(f"Error procesando registro {idx}: {e}")
