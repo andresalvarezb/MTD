@@ -15,12 +15,12 @@ class Descuento:
     descripcion: str | None = None
     fecha_actualizacion: datetime | None = None
 
-    def __post_init__(self):
-        if self.tipo_de_descuento:
-            self.tipo_de_descuento = self.tipo_de_descuento.capitalize()
+    # def __post_init__(self):
+    #     if self.tipo_de_descuento:
+    #         self.tipo_de_descuento = self.tipo_de_descuento.capitalize()
 
-        if self.descripcion:
-            self.descripcion = self.descripcion.lower()
+    #     if self.descripcion:
+    #         self.descripcion = self.descripcion.lower()
 
     def actualizar_valor(self, nuevo_valor: Decimal):
         if nuevo_valor < 0:

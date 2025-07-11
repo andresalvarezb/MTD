@@ -7,11 +7,11 @@ class Banco:
     nombre: str
     id: int | None = None
 
-    def _actualizar_nombre_banco(self, nuevo_nombre: str):
-        self.nombre = nuevo_nombre.upper()
+    # def _actualizar_nombre_banco(self, nuevo_nombre: str):
+    #     self.nombre = nuevo_nombre.upper()
 
-    def _actualizar_descripcion_banco(self, nueva_descripcion: str):
-        self.descripcion = nueva_descripcion.capitalize()
+    # def _actualizar_descripcion_banco(self, nueva_descripcion: str):
+    #     self.descripcion = nueva_descripcion.capitalize()
 
     @classmethod
     def from_orm(cls, orm_obj: BancoORM) -> "Banco":

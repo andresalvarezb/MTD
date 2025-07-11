@@ -478,7 +478,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
         repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
         caso_de_uso_descuentos = ObtenerDescuentos(repo_descuentos)
         descuentos = caso_de_uso_descuentos.ejecutar(
-            FiltrarDescuentosDTO(id_cuenta_por_pagar=cuenta_por_pagar.id, id_usuario=usuario_actualizado.id)
+            FiltrarDescuentosDTO(id_cuenta_por_pagar=cuenta_por_pagar.id, id_usuario=usuario_actualizado.id if usuario_actualizado else None)
         )
 
         cuenta_por_pagar.calcular_descuentos(descuentos)

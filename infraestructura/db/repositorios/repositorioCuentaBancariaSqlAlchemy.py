@@ -52,7 +52,7 @@ class RepositorioCuentaBancariaSqlAlchemy(
     def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
         registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()
         if not registro_orm:
-            raise ValueError("Cuenta bancaria no encontrada")
+            raise ValueError("Cuenta bancaria no encontrada para actualizar")
 
         if not cuenta_bancaria.usuario.id:
             raise ValueError("Usuario no asociado")

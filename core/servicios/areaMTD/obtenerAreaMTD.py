@@ -8,11 +8,11 @@ class ObtenerAreaMTD:
     def ejecutar(self, id_area: int):
 
         if not id_area:
-            raise ValueError("No hay id de area")
+            raise ValueError("No hay id de area ingresado")
 
         area = self.repo_obtener.obtener_por_id(id_area)
 
         if not area:
-            raise ValueError("Area no encontrada")
+            raise ValueError("Area no encontrada en bd")
 
         return area

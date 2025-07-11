@@ -74,7 +74,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         registro_orm = self.db.query(CuentaPorPagarORM).filter_by(id=cuenta_por_pagar.id).first()
 
         if not registro_orm:
-            raise ValueError("Cuenta por pagar no encontrado")
+            raise ValueError("Cuenta por pagar no encontrado en la bd para actualizar")
 
         if not cuenta_por_pagar.historial_laboral.id:
             raise ValueError("Historial laboral no asociado")
@@ -127,7 +127,7 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
         registro = self.db.query(CuentaPorPagarORM).filter_by(id=id_cuenta_por_pagar).first()
         if not registro:
-            raise HTTPException(status_code=404, detail="Registro no encontrado")
+            raise HTTPException(status_code=404, detail="Registro no encontrado en la base de datos cuando se busca por id")
         return CuentaPorPagar.from_orm(registro)
 
     def obtener_por_clave(self, clave: str) -> CuentaPorPagar | None:

@@ -38,22 +38,22 @@ class CuentaPorPagar:
     eps_paciente_asignado: str | None = None
 
     def __post_init__(self):
-        if self.estado_aprobacion_cuenta_usuario:
-            self.estado_aprobacion_cuenta_usuario = self.estado_aprobacion_cuenta_usuario.upper()
-        if self.estado_cuenta_por_pagar:
-            self.estado_cuenta_por_pagar = self.estado_cuenta_por_pagar.upper()
-        if self.estado_de_pago:
-            self.estado_de_pago = self.estado_de_pago.upper()
-        if self.estado_reprogramacion_pago:
-            self.estado_reprogramacion_pago = self.estado_reprogramacion_pago.upper()
-        if self.creado_por:
-            self.creado_por = self.creado_por.upper()
-        if self.lider_paciente_asignado:
-            self.lider_paciente_asignado = self.lider_paciente_asignado.upper()
-        if self.eps_paciente_asignado:
-            self.eps_paciente_asignado = self.eps_paciente_asignado.upper()
-        if self.dse:
-            self.dse = self.dse.upper()
+        # if self.estado_aprobacion_cuenta_usuario:
+        #     self.estado_aprobacion_cuenta_usuario = self.estado_aprobacion_cuenta_usuario.upper()
+        # if self.estado_cuenta_por_pagar:
+        #     self.estado_cuenta_por_pagar = self.estado_cuenta_por_pagar.upper()
+        # if self.estado_de_pago:
+        #     self.estado_de_pago = self.estado_de_pago.upper()
+        # if self.estado_reprogramacion_pago:
+        #     self.estado_reprogramacion_pago = self.estado_reprogramacion_pago.upper()
+        # if self.creado_por:
+        #     self.creado_por = self.creado_por.upper()
+        # if self.lider_paciente_asignado:
+        #     self.lider_paciente_asignado = self.lider_paciente_asignado.upper()
+        # if self.eps_paciente_asignado:
+        #     self.eps_paciente_asignado = self.eps_paciente_asignado.upper()
+        # if self.dse:
+        #     self.dse = self.dse.upper()
         if not self.total_descuentos:
             self.total_descuentos = Decimal("0.0")
         if not self.total_a_pagar:

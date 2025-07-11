@@ -12,6 +12,6 @@ class ObtenerCargo:
         cargo_obtenido = self.repo_obtener.obtener_por_nombre(Cargo(nombre=cargo.nombre))
 
         if not cargo_obtenido:
-            raise ValueError("Cargo no existe. Puede estar mal escrito o no creado")
+            raise ValueError("Cargo no existe. Puede estar mal escrito o no creado. no se puede actualizar")
 
         return cargo_obtenido

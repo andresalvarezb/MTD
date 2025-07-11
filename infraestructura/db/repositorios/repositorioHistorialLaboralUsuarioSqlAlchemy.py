@@ -59,7 +59,7 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         registro_orm = self.db.query(HistorialLaboralORM).filter_by(id=historialLaboral.id).first()
 
         if not registro_orm:
-            raise ValueError("Usuario no encontrado")
+            raise ValueError("Usuario no encontrado para actulizar HLU")
 
         if not historialLaboral.municipio.id:
             raise ValueError("Municipio no asociado")

@@ -11,5 +11,5 @@ class ObtenerMunicipio:
         municipio = Municipio(nombre=municipiodto.nombre)
         municipio_obtenido = self.repo_obtener.obtener_por_nombre(municipio)
         if not municipio_obtenido:
-            raise ValueError("Municipio no encontrado. Puede estar mal escrito o no creado")
+            raise ValueError("Municipio no encontrado. Puede estar mal escrito o no creado. no se puede actualizar")
         return municipio_obtenido

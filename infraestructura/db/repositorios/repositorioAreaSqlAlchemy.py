@@ -44,7 +44,7 @@ class RepositorioAreaMTDSqlAlchemy(
     def eliminar(self, id_area: int) -> None:
         registro_orm = self.db.query(AreaMTDORM).filter_by(id=id_area).first()
         if not registro_orm:
-            raise ValueError(f"Area con ID {id_area} no encontrado.")
+            raise ValueError(f"Area con ID {id_area} no encontrado. No se puede eliminar")
 
         self.db.delete(registro_orm)
         self.db.flush()
