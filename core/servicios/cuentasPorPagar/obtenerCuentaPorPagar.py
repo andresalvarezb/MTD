@@ -60,6 +60,6 @@ class ObtenerCuentaPorPagar:
             creado_por=cuenta.creado_por,
             lider_paciente_asignado=cuenta.lider_paciente_asignado,
             eps_paciente_asignado=cuenta.eps_paciente_asignado,
-            historial_laboral=HistorialLaboralResponseSchema(**cuenta.historial_laboral.__dict__),
-            cuenta_bancaria=CuentaBancariaResponseSchema(**cuenta_bancaria_schema.__dict__),
+            historial_laboral=HistorialLaboralResponseSchema.model_validate(cuenta.historial_laboral),
+            cuenta_bancaria=CuentaBancariaResponseSchema.model_validate(cuenta_bancaria_schema),
         )
