@@ -7,8 +7,8 @@ class Departamento:
     nombre: str
     id: int | None = None
 
-    def __post_init__(self):
-        self.nombre = self.nombre.upper()
+    # def __post_init__(self):
+    #     self.nombre = self.nombre.upper()
 
     @classmethod
     def from_orm(cls, orm_object: DepartamentoORM) -> "Departamento":

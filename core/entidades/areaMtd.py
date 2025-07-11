@@ -6,8 +6,8 @@ class AreaMTD:
     nombre: str
     id: int | None = None
 
-    def __post_init__(self):
-        self._actualizar_nombre_area(self.nombre)
+    # def __post_init__(self):
+    #     self._actualizar_nombre_area(self.nombre)
 
     def _actualizar_nombre_area(self, nuevo_nombre: str):
         self.nombre = nuevo_nombre.upper()
