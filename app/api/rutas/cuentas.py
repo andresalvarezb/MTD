@@ -474,6 +474,8 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
             info_vieja=CuentaPorPagar(**cuenta_por_pagar_bd.model_dump()),
         )
 
+        if not usuario_actualizado:
+            raise RuntimeError("no se pueden obtener descuentos. No hay usuario asociado")
         # obtener descuntos asociados a la cuenta para recalsular su valor
         repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
         caso_de_uso_descuentos = ObtenerDescuentos(repo_descuentos)
