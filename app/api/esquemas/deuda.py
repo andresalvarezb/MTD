@@ -5,9 +5,6 @@ from core.entidades.usuario import Usuario
 from core.entidades.areaMtd import AreaMTD
 
 
-
-
-
 class CrearDeudaSchema(BaseModel):
     documento: str = Field(
         ..., description="Numero de documento de identidad del usuario asociado a la deuda", examples=["10963846374"]

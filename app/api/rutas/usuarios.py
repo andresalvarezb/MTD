@@ -11,7 +11,10 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[Usuario])
-def obtener_usuarios(documento: str | None = Query(None, description="Filtrar por documento de un usuario en particular"), db: Session = Depends(get_db)):
+def obtener_usuarios(
+    documento: str | None = Query(None, description="Filtrar por documento de un usuario en particular"),
+    db: Session = Depends(get_db),
+):
     try:
         repo_usuario = RepositorioUsuarioSqlAlchemy(db)
         caso_de_uso = ObtenerUsuarios(repo_usuario)

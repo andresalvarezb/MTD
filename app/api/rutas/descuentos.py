@@ -47,11 +47,12 @@ async def obtener_descuento(id_descuento: int, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
-
     # caso_de_uso = CrearDescuento(
     #     repo_crear=repo_descuento,
     #     repo_obtener=repo_descuento,
     # )
+
+
 @router.post("/", response_model=DescuentoResponseSchema)
 def crear_descuento(data_descuento: CrearDescuentoSchema, db: Session = Depends(get_db)):
     repo_cuenta_por_pagar = RepositorioCuentaPorPagarSqlAlchemy(db)

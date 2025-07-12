@@ -5,9 +5,6 @@ from app.api.esquemas.historialLaboralUsuario import HistorialLaboralResponseSch
 from app.api.esquemas.cuentaPorPagar import CuentaBancariaResponseSchema
 
 
-
-
-
 class ObtenerCuentaPorPagar:
     def __init__(self, repositorio: ObtenerCuentaPorPagarPorIdProtocol):
         self.repositorio = repositorio

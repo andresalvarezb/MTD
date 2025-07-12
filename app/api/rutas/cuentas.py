@@ -281,7 +281,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                         valor=descuento["valor"],
                         fecha_creacion=registro["FECHA_RADICACION_CONTABLE"],
                         tipo_de_descuento=descuento["tipo_descuento"],
-                        descripcion=descuento["descripcion"]
+                        descripcion=descuento["descripcion"],
                     )
                 )
 

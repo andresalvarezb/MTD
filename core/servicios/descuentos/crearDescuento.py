@@ -2,7 +2,10 @@ from core.entidades.descuento import Descuento
 from datetime import datetime
 from core.interfaces.repositorioDescuento import CrearDescuentoProtocol, ObtenerDescuentoPorIdProtocol
 from core.servicios.descuentos.dtos import CrearDescuentoDTO
-from core.interfaces.repositorioCuentaPorPagar import ObtenerCuentaPorPagarPorIdProtocol, ActualizarCuentaPorPagarProtocol
+from core.interfaces.repositorioCuentaPorPagar import (
+    ObtenerCuentaPorPagarPorIdProtocol,
+    ActualizarCuentaPorPagarProtocol,
+)
 
 
 class CrearDescuento:
