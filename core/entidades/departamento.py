@@ -8,7 +8,7 @@ class Departamento:
     id: int | None = None
 
     def __post_init__(self):
-        self.nombre = self.nombre.upper()
+        self.nombre = self.nombre.strip().rstrip(".").upper()
 
     @classmethod
     def from_orm(cls, orm_object: DepartamentoORM) -> "Departamento":

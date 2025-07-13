@@ -107,7 +107,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
         try:
             # crear la ubciacion del profesional (Municipio, departamento)
             repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
-            departamento_service = CrearDepartamento(repo_crear=repo_departamento, repo_obtener=repo_departamento)
+            departamento_service = CrearDepartamento(repo_departamento)
             departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
             # crear el municipio
