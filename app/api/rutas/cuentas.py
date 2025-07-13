@@ -112,7 +112,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
             # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
-            municipio_service = CrearMunicipio(repo_crear=repo_municipio, repo_obtener=repo_municipio)
+            municipio_service = CrearMunicipio(repo_municipio)
             municipio = municipio_service.ejecutar(
                 CrearMunicipioDTO(nombre=registro["MUNICIPIO"], departamento=departamento)
             )
