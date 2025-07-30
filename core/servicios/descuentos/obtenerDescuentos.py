@@ -6,5 +6,5 @@ class ObtenerDescuentos:
     def __init__(self, repositorio: ObtenerDescuentosProtocol):
         self.repositorio = repositorio
 
-    def ejecutar(self, filtros: FiltrarDescuentosDTO):
-        return self.repositorio.obtener_descuentos(filtros)
+    async def ejecutar(self, filtros: FiltrarDescuentosDTO):
+        return await self.repositorio.obtener_descuentos(filtros)

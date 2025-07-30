@@ -7,7 +7,7 @@ from .rutas.areaMTD import router as areas
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="API Cuentas Medicas", description="", version="0.1.0")
+app = FastAPI(title="API Cuentas Medicas", description="Uso asincronico", version="0.5.0")
 
 app.add_middleware(
     CORSMiddleware,

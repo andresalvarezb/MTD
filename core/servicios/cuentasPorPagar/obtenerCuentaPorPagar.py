@@ -9,8 +9,8 @@ class ObtenerCuentaPorPagar:
     def __init__(self, repositorio: ObtenerCuentaPorPagarPorIdProtocol):
         self.repositorio = repositorio
 
-    def ejecutar(self, id_cuenta_por_pagar: int):
-        cuenta = self.repositorio.obtener_por_id(id_cuenta_por_pagar)
+    async def ejecutar(self, id_cuenta_por_pagar: int):
+        cuenta = await self.repositorio.obtener_por_id(id_cuenta_por_pagar)
         if not cuenta:
             raise Exception("cuenta no encontrada")
         if not cuenta.id:

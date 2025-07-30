@@ -8,7 +8,7 @@ class CrearUsuario:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearUsuarioDTO) -> Usuario:
+    async def ejecutar(self, datos: CrearUsuarioDTO) -> Usuario:
 
         usuario = Usuario(
             documento=datos.documento,
@@ -25,10 +25,10 @@ class CrearUsuario:
         )
 
         # Validar existencia de usuario
-        usuario_existente = self.repo_obtener.obtener_por_documento(usuario.documento)
+        usuario_existente = await self.repo_obtener.obtener_por_documento(usuario.documento)
         if usuario_existente:
             return usuario_existente
 
-        usuario_nuevo = self.repo_crear.crear(usuario)
+        usuario_nuevo = await self.repo_crear.crear(usuario)
 
         return usuario_nuevo

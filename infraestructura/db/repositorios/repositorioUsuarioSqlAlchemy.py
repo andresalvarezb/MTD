@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from core.entidades.usuario import Usuario
+from sqlalchemy import select
 from infraestructura.db.modelos.usuario import UsuarioORM
 from core.interfaces.repositorioUsuario import (
     CrearUsuarioProtocol,
@@ -17,10 +18,10 @@ class RepositorioUsuarioSqlAlchemy(
     ObtenerUsuariosProtocol,
     ActualizarUsuarioProtocol,
 ):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def crear(self, usuario: Usuario) -> Usuario:
+    async def crear(self, usuario: Usuario) -> Usuario:
         usuario_nuevo = UsuarioORM(
             documento=usuario.documento,
             nombre=usuario.nombre,
@@ -35,33 +36,38 @@ class RepositorioUsuarioSqlAlchemy(
             fecha_ultima_contratacion=usuario.fecha_ultima_contratacion,
         )
         self.db.add(usuario_nuevo)
-        self.db.flush()
-        self.db.refresh(usuario_nuevo)
+        await self.db.flush()
+        await self.db.refresh(usuario_nuevo)
         return usuario.from_orm(usuario_nuevo)
 
-    def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
-        registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento_usuario).first()
+    async def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
+        registro_orm = await self.db.execute(select(UsuarioORM).where(UsuarioORM.documento == documento_usuario))
+        registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Usuario.from_orm(registro_orm)
         else:
             return None
 
-    def obtener_por_id(self, id_usuario: int) -> Usuario | None:
-        registro_orm = self.db.query(UsuarioORM).filter_by(id=id_usuario).first()
+    async def obtener_por_id(self, id_usuario: int) -> Usuario | None:
+        registro_orm = await self.db.execute(select(UsuarioORM).where(UsuarioORM.id == id_usuario))
+        registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:
             return None
         return Usuario.from_orm(registro_orm)
 
-    def obtener_todos(self, documento: str | None = None) -> list[Usuario]:
+    async def obtener_todos(self, documento: str | None = None) -> list[Usuario]:
         if documento:
-            registro_orm = self.db.query(UsuarioORM).filter_by(documento=documento).first()
+            registro_orm = await self.db.execute(select(UsuarioORM).where(UsuarioORM.documento == documento))
+            registro_orm = registro_orm.scalar_one_or_none()
             return [Usuario.from_orm(registro_orm)] if registro_orm else []
         else:
-            registros_orm = self.db.query(UsuarioORM).all()
+            registros_orm = await self.db.execute(select(UsuarioORM))
+            registros_orm = registros_orm.scalars().all()
             return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]
 
-    def actualizar(self, usuario: Usuario) -> Usuario:
-        registro_orm = self.db.query(UsuarioORM).filter_by(id=usuario.id).first()
+    async def actualizar(self, usuario: Usuario) -> Usuario:
+        registro_orm = await self.db.execute(select(UsuarioORM).where(UsuarioORM.id == usuario.id))
+        registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:
             raise ValueError("Usuario no encontrado")
 
@@ -85,5 +91,5 @@ class RepositorioUsuarioSqlAlchemy(
         registro_orm.id_cargo = usuario.cargo.id
 
         # Sincronizar con la sesión (no guarda todavía)
-        self.db.flush()
+        await self.db.flush()
         return Usuario.from_orm(registro_orm)

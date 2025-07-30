@@ -18,10 +18,10 @@ class CrearDeuda:
         self.repo_usuario = obtener_usuario_repo
         self.repo_area = obtener_area_repo
 
-    def ejecutar(self, datos: CrearDeudaDTO) -> Deuda:
+    async def ejecutar(self, datos: CrearDeudaDTO) -> Deuda:
         # validar usuario al que se le asigna la deuda
         area_deuda = None
-        usuario = self.repo_usuario.obtener_por_documento(datos.documento)
+        usuario = await self.repo_usuario.obtener_por_documento(datos.documento)
 
         if not usuario:
             raise ValueError(f"Usuario {datos.documento} no encontrado. No se puede asignar deuda")
@@ -52,4 +52,4 @@ class CrearDeuda:
             area=area_deuda,
         )
 
-        return self.repo_deuda.crear(deuda)
+        return await self.repo_deuda.crear(deuda)

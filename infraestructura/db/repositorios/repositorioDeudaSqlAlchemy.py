@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from core.entidades.deuda import Deuda
 from datetime import datetime
 from decimal import Decimal
@@ -14,10 +15,10 @@ from core.interfaces.repositorioDeuda import (
 class RepositorioDeudaSqlAlchemy(
     CrearDeudaProtocol, ObtenerDeudasProtocol, ActualizarDeudaProtocol, ObtenerDeudaPorIdProtocol
 ):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    def crear(self, deuda: Deuda) -> Deuda:
+    async def crear(self, deuda: Deuda) -> Deuda:
         """Implementación para guardar un Deuda en la base de datos"""
         nuevo_deuda = DeudaORM(
             id_usuario=deuda.usuario.id,
@@ -30,17 +31,19 @@ class RepositorioDeudaSqlAlchemy(
             id_area=deuda.area.id if deuda.area else None,
         )
         self.db.add(nuevo_deuda)
-        self.db.flush()
-        self.db.refresh(nuevo_deuda)
+        await self.db.flush()
+        await self.db.refresh(nuevo_deuda)
         return Deuda.from_orm(nuevo_deuda)
 
-    def obtener_todas(self) -> list[Deuda]:
-        deudas = self.db.query(DeudaORM).all()
+    async def obtener_todas(self) -> list[Deuda]:
+        deudas = await self.db.execute(select(DeudaORM))
+        deudas = deudas.scalars().all()
         return [Deuda.from_orm(deuda) for deuda in deudas]
 
-    def actualizar(self, deuda: Deuda) -> Deuda:
+    async def actualizar(self, deuda: Deuda) -> Deuda:
         """Implementación para actualizar un Deuda en la base de datos"""
-        registro_orm = self.db.query(DeudaORM).filter_by(id=deuda.id).first()
+        registro_orm = await self.db.execute(select(DeudaORM).where(DeudaORM.id == deuda.id))
+        registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
             raise ValueError("Usuario no encontrado")
@@ -58,18 +61,20 @@ class RepositorioDeudaSqlAlchemy(
         registro_orm.descripcion = deuda.descripcion
 
         # Sincronizar con la sesión (no guarda todavía)
-        self.db.flush()
+        await self.db.flush()
         return Deuda.from_orm(registro_orm)
 
-    def obtener_por_id(self, id_deuda: int) -> Deuda | None:
-        registro_orm = self.db.query(DeudaORM).filter_by(id=id_deuda).first()
+    async def obtener_por_id(self, id_deuda: int) -> Deuda | None:
+        registro_orm = await self.db.execute(select(DeudaORM).where(DeudaORM.id == id_deuda))
+        registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Deuda.from_orm(registro_orm)
         return None
 
-    def eliminar(self, id_deuda: int) -> None:
-        registro_orm = self.db.query(DeudaORM).filter_by(id=id_deuda).first()
+    async def eliminar(self, id_deuda: int) -> None:
+        registro_orm = await self.db.execute(select(DeudaORM).where(DeudaORM.id == id_deuda))
+        registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:
             raise ValueError(f"No hay deuda identificada al id {id_deuda}")
 
-        self.db.delete(registro_orm)
+        await self.db.delete(registro_orm)

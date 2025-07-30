@@ -15,7 +15,7 @@ class ActualizarCuentaBancaria:
         self.repo_obtener = repo_obtener
         self.repo_actualizar = repo_actualizar
 
-    def ejecutar(self, info_nueva: ActualizarCuentaBancariaDTO, info_vieja: CuentaBancaria):
+    async def ejecutar(self, info_nueva: ActualizarCuentaBancariaDTO, info_vieja: CuentaBancaria):
 
         print(info_nueva)
         print(info_vieja)
@@ -23,6 +23,6 @@ class ActualizarCuentaBancaria:
         for key, value in info_nueva.__dict__.items():
             setattr(info_vieja, key, value)
 
-        cuenta_actualizada = self.repo_actualizar.actualizar(info_vieja)
+        cuenta_actualizada = await self.repo_actualizar.actualizar(info_vieja)
 
         return cuenta_actualizada

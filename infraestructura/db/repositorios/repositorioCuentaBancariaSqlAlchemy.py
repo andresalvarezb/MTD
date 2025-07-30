@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
+from sqlalchemy import select
 from core.entidades.cuentaBancaria import CuentaBancaria
 from infraestructura.db.modelos.cuentaBancaria import CuentaBancariaORM
 from core.interfaces.repositorioCuentaBancaria import (
@@ -16,10 +17,10 @@ class RepositorioCuentaBancariaSqlAlchemy(
     ObtenerCuentaBancariaPorIdProtocol,
     ActualizarCuentaBancariaProtocol,
 ):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def crear(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
+    async def crear(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
         nueva_cuenta = CuentaBancariaORM(
             id_usuario=cuenta_bancaria.usuario.id,
             id_banco=cuenta_bancaria.banco.id,
@@ -31,26 +32,29 @@ class RepositorioCuentaBancariaSqlAlchemy(
             observaciones=cuenta_bancaria.observaciones,
         )
         self.db.add(nueva_cuenta)
-        self.db.flush()
-        self.db.refresh(nueva_cuenta)
+        await self.db.flush()
+        await self.db.refresh(nueva_cuenta)
         return cuenta_bancaria.from_orm(nueva_cuenta)
 
-    def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria):
-        registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()
+    async def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria):
+        registro_orm = await self.db.execute(select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta))
+        registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return CuentaBancaria.from_orm(registro_orm)
         else:
             return None
 
-    def obtener_por_id(self, id_cuenta_bancaria: int):
-        registro_orm = self.db.query(CuentaBancariaORM).filter_by(id=id_cuenta_bancaria).first()
+    async def obtener_por_id(self, id_cuenta_bancaria: int):
+        registro_orm = await self.db.execute(select(CuentaBancariaORM).filter_by(id=id_cuenta_bancaria))
+        registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return CuentaBancaria.from_orm(registro_orm)
         else:
             return None
 
-    def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
-        registro_orm = self.db.query(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta).first()
+    async def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
+        registro_orm = await self.db.execute(select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta))
+        registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:
             raise ValueError("Cuenta bancaria no encontrada")
 
@@ -68,5 +72,5 @@ class RepositorioCuentaBancariaSqlAlchemy(
         registro_orm.fecha_actualizacion = datetime.now()
         registro_orm.observaciones = cuenta_bancaria.observaciones
 
-        self.db.flush()
+        await self.db.flush()
         return CuentaBancaria.from_orm(registro_orm)

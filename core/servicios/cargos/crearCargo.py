@@ -8,14 +8,14 @@ class CrearCargo:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearCargoDTO) -> Cargo:
+    async def ejecutar(self, datos: CrearCargoDTO) -> Cargo:
         # obtener cargo
         cargo = Cargo(nombre=datos.nombre)
-        cargo_existente = self.repo_obtener.obtener_por_nombre(cargo)
+        cargo_existente = await self.repo_obtener.obtener_por_nombre(cargo)
 
         if cargo_existente:
             return cargo_existente
 
         # Crear cargo
-        cargo_nuevo = self.repo_crear.crear(cargo)
+        cargo_nuevo = await self.repo_crear.crear(cargo)
         return cargo_nuevo

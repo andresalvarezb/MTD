@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
+from sqlalchemy import select
 from core.entidades.cuentaPorPagar import CuentaPorPagar
 from infraestructura.db.modelos.cuentaPorPagar import CuentaPorPagarORM
 from core.interfaces.repositorioCuentaPorPagar import (
@@ -28,10 +29,10 @@ class RepositorioCuentaPorPagarSqlAlchemy(
     ObtenerCuentaPorPagarPorIdProtocol,
     ActualizarCuentaPorPagarProtocol,
 ):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def crear(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar:
+    async def crear(self, cuenta_por_pagar: CuentaPorPagar) -> CuentaPorPagar:
         cuenta_nueva = CuentaPorPagarORM(
             claveCPP=cuenta_por_pagar.claveCPP,
             id_historial_laboral=cuenta_por_pagar.historial_laboral.id,
@@ -59,19 +60,21 @@ class RepositorioCuentaPorPagarSqlAlchemy(
             eps_paciente_asignado=cuenta_por_pagar.eps_paciente_asignado,
         )
         self.db.add(cuenta_nueva)
-        self.db.commit()
-        self.db.refresh(cuenta_nueva)
+        await self.db.commit()
+        await self.db.refresh(cuenta_nueva)
         return cuenta_por_pagar.from_orm(cuenta_nueva)
 
-    def obtener(self, cuenta_por_pagar: CuentaPorPagar):
-        existe = self.db.query(CuentaPorPagarORM).filter_by(claveCPP=cuenta_por_pagar.claveCPP).first()
+    async def obtener(self, cuenta_por_pagar: CuentaPorPagar):
+        existe = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP==cuenta_por_pagar.claveCPP))
+        existe = existe.scalar_one_or_none()
         if existe:
             return existe
         else:
             return None
 
-    def actualizar(self, cuenta_por_pagar: CuentaPorPagar):
-        registro_orm = self.db.query(CuentaPorPagarORM).filter_by(id=cuenta_por_pagar.id).first()
+    async def actualizar(self, cuenta_por_pagar: CuentaPorPagar):
+        registro_orm = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.id==cuenta_por_pagar.id))
+        registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
             raise ValueError("Cuenta por pagar no encontrado")
@@ -103,12 +106,12 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         registro_orm.dse = cuenta_por_pagar.dse
         registro_orm.causal_rechazo = cuenta_por_pagar.causal_rechazo
 
-        self.db.flush()
+        await self.db.flush()
         return CuentaPorPagar.from_orm(registro_orm)
 
-    def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
+    async def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
         registros_orm = (
-            self.db.query(CuentaPorPagarORM)
+            await self.db.execute(select(CuentaPorPagarORM)
             .options(
                 joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.usuario)
@@ -119,45 +122,29 @@ class RepositorioCuentaPorPagarSqlAlchemy(
                 .joinedload(MunicipioORM.departamento),
                 joinedload(CuentaPorPagarORM.historial_laboral).joinedload(HistorialLaboralORM.cargo),
                 joinedload(CuentaPorPagarORM.cuenta_bancaria).joinedload(CuentaBancariaORM.banco),
-            )
-            .all()
+            ))
         )
+        registros_orm = registros_orm.scalars().all()
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
 
-    def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
-        registro = self.db.query(CuentaPorPagarORM).filter_by(id=id_cuenta_por_pagar).first()
+    async def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
+        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.id==id_cuenta_por_pagar))
+        registro = registro.scalar_one_or_none()
         if not registro:
             raise HTTPException(status_code=404, detail="Registro no encontrado")
         return CuentaPorPagar.from_orm(registro)
 
-    def obtener_por_clave(self, clave: str) -> CuentaPorPagar | None:
-        registro = self.db.query(CuentaPorPagarORM).filter_by(claveCPP=clave).first()
+    async def obtener_por_clave(self, clave: str) -> CuentaPorPagar | None:
+        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP==clave))
+        registro = registro.scalar_one_or_none()
         if not registro:
             return None
         return CuentaPorPagar.from_orm(registro)
 
-    # def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
-    #     registro_orm = (
-    #         self.db.query(CuentaPorPagarORM)
-    #         .options(
-    #             joinedload(CuentaPorPagarORM.historial_laboral)
-    #             .joinedload(HistorialLaboralORM.usuario)
-    #             .joinedload(UsuarioORM.cargo),
-    #             joinedload(CuentaPorPagarORM.historial_laboral)
-    #             .joinedload(HistorialLaboralORM.usuario)
-    #             .joinedload(UsuarioORM.municipio)
-    #             .joinedload(MunicipioORM.departamento),
-    #             joinedload(CuentaPorPagarORM.historial_laboral).joinedload(HistorialLaboralORM.cargo),
-    #             joinedload(CuentaPorPagarORM.cuenta_bancaria).joinedload(CuentaBancariaORM.banco),
-    #         ).filter(CuentaPorPagarORM.id==id_cuenta_por_pagar)
-    #         .first()
-    #     )
 
-    #     if not registro_orm:
-    #         return None
-    #     return CuentaPorPagar.from_orm(registro_orm)
-    def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
-        registro_orm = self.db.query(CuentaPorPagarORM).filter(CuentaPorPagarORM.id == id_cuenta_por_pagar).first()
+    async def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
+        registro_orm = await self.db.execute(select(CuentaPorPagarORM).filter(CuentaPorPagarORM.id == id_cuenta_por_pagar))
+        registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
             return None

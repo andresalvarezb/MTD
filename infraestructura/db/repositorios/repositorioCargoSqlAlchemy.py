@@ -1,22 +1,24 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from core.entidades.cargo import Cargo
 from infraestructura.db.modelos.cargo import CargoORM
 from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
 
 
 class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoPorNombreProtocol):
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    def crear(self, cargo: Cargo) -> Cargo:
+    async def crear(self, cargo: Cargo) -> Cargo:
         cargo_nuevo = CargoORM(nombre=cargo.nombre)
         self.db.add(cargo_nuevo)
-        self.db.flush()
-        self.db.refresh(cargo_nuevo)
+        await self.db.flush()
+        await self.db.refresh(cargo_nuevo)
         return cargo.from_orm(cargo_nuevo)
 
-    def obtener_por_nombre(self, cargo: Cargo) -> Cargo | None:
-        registro_orm = self.db.query(CargoORM).filter_by(nombre=cargo.nombre).first()
+    async def obtener_por_nombre(self, cargo: Cargo) -> Cargo | None:
+        registro_orm = await self.db.execute(select(CargoORM).where(CargoORM.nombre==cargo.nombre))
+        registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Cargo.from_orm(registro_orm)
         else:

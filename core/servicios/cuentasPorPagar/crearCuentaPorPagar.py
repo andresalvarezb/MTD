@@ -8,7 +8,7 @@ class CrearCuentaPorPagar:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearCuentaPorPagarDTO) -> CuentaPorPagar:
+    async def ejecutar(self, datos: CrearCuentaPorPagarDTO) -> CuentaPorPagar:
         cuenta = CuentaPorPagar(
             claveCPP=datos.claveCPP,
             historial_laboral=datos.historial_laboral,
@@ -37,9 +37,9 @@ class CrearCuentaPorPagar:
             eps_paciente_asignado=datos.eps_paciente_asignado,
         )
 
-        cuenta_existente = self.repo_obtener.obtener_por_clave(cuenta.claveCPP)
+        cuenta_existente = await self.repo_obtener.obtener_por_clave(cuenta.claveCPP)
         if cuenta_existente:
             return cuenta_existente
 
-        cuenta_nueva = self.repo_crear.crear(cuenta)
+        cuenta_nueva = await self.repo_crear.crear(cuenta)
         return cuenta_nueva

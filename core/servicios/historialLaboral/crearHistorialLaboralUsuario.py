@@ -13,7 +13,7 @@ class CrearHistorialLaboralUsuario:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearHistorialLaboralUsuarioDTO) -> HistorialLaboralUsuario:
+    async def ejecutar(self, datos: CrearHistorialLaboralUsuarioDTO) -> HistorialLaboralUsuario:
         # obtener
         historial = HistorialLaboralUsuario(
             usuario=datos.usuario,
@@ -28,11 +28,11 @@ class CrearHistorialLaboralUsuario:
             fecha_fin_contratacion=datos.fecha_fin_contratacion,
         )
 
-        historial_existente = self.repo_obtener.obtener_por_clave(historial)
+        historial_existente = await self.repo_obtener.obtener_por_clave(historial)
         if historial_existente:
             return historial_existente
 
         # crear
-        nuevo_historial = self.repo_crear.crear(historial)
+        nuevo_historial = await self.repo_crear.crear(historial)
 
         return nuevo_historial

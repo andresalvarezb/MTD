@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 from io import BytesIO
 from decimal import Decimal
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from infraestructura.db.index import get_db
 from fastapi.responses import StreamingResponse
 from core.servicios.cargos.crearCargo import CrearCargo
@@ -99,7 +99,7 @@ router = APIRouter()
     Las columnas deben incluir:
     DOCUMENTO, NOMBRE, BANCO, DEPARTAMENTO, MUNICIPIO, ZONA, DSE, RUT, CORREO, CARGO CONTRATISTA, OPS O NOMINA, ESTADO CONTRATISTA, TELEFONO DE CONTACTO, NO.CUENTA BANCARIA, NÚMERO DE DOCUMENTO CERTIFICADO BANCARIO, EPS PACIENTE ASIGNADO, LIDER ASIGNADO, MES DE RADICACIÓN CONTABLE, FECHA DE SERVICIO, VALOR CUENTA DE COBRO AUTOMATICA, DESCUENTO RETEFUENTE, DESCUENTO TESORERIA, DESCUENTOS VARIOS, VALOR DCTO S.S., TOTAL A PAGAR, ESTADO CUENTA DE COBRO, FECHA APROBACIÓN CUENTA DE COBRO, SEGURIDAD SOCIAL, FECHA APROBACIÓN SEGURIDAD SOCIAL, FECHA APROBACIÓN RUT, FECHA OK CONTRATO, ESTADO REQUISITOS PARA PAGO, FECHA PROGRAMACION, FECHA DE PAGO, ESTADO DE PAGO, CAUSAL DE RECHAZO, FECHA REPROGRAMACIÓN PAGO, ESTADO DE REPROGRAMACIÓN, VALOR MINIMO, DESCUENTO REALIZADO, CANTIDAD DE DESCUENTOS, ACTIVO FIJO O DESCUENTO, VALOR DESCUENTO""",
 )
-def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def cargar_historial_cuentas(file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
     registros_fallidos = []
     registros_exitosos = []
     datos = procesar_historico(file)
@@ -108,24 +108,24 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             # crear la ubciacion del profesional (Municipio, departamento)
             repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
             departamento_service = CrearDepartamento(repo_departamento)
-            departamento = departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
+            departamento = await departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
 
             # crear el municipio
             repo_municipio = RepositorioMunicipioSqlAlchemy(db)
             municipio_service = CrearMunicipio(repo_municipio)
-            municipio = municipio_service.ejecutar(
+            municipio = await municipio_service.ejecutar(
                 CrearMunicipioDTO(nombre=registro["MUNICIPIO"], departamento=departamento)
             )
 
             # crear cargo
             repo_cargo = RepositorioCargoSqlAlchemy(db)
             cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
-            cargo = cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
+            cargo = await cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
 
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
             usuario_service = CrearUsuario(repo_crear=repo_usuario, repo_obtener=repo_usuario)
-            usuario = usuario_service.ejecutar(
+            usuario = await usuario_service.ejecutar(
                 CrearUsuarioDTO(
                     documento=registro["DOCUMENTO"],
                     nombre=registro["NOMBRE"],
@@ -146,7 +146,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             historialLaboralUsuario_service = CrearHistorialLaboralUsuario(
                 repo_crear=repo_historialLaboralUsuario, repo_obtener=repo_historialLaboralUsuario
             )
-            historialLaboralUsuario = historialLaboralUsuario_service.ejecutar(
+            historialLaboralUsuario = await historialLaboralUsuario_service.ejecutar(
                 CrearHistorialLaboralUsuarioDTO(
                     usuario=usuario,
                     cargo=cargo,
@@ -168,13 +168,13 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             # Crear cuenta bancaria
             repo_banco = RepositorioBancoSqlAlchemy(db)
             banco_service = CrearBanco(repo_crear=repo_banco, repo_obtener=repo_banco)
-            banco = banco_service.ejecutar(CrearBancoDTO(nombre=registro["BANCO"]))
+            banco = await banco_service.ejecutar(CrearBancoDTO(nombre=registro["BANCO"]))
 
             repo_cuentaBancaria = RepositorioCuentaBancariaSqlAlchemy(db)
             cuentaBancaria_service = CrearCuentaBancaria(
                 repo_crear=repo_cuentaBancaria, repo_obtener=repo_cuentaBancaria
             )
-            cuenta_bancaria = cuentaBancaria_service.ejecutar(
+            cuenta_bancaria = await cuentaBancaria_service.ejecutar(
                 CrearCuentaBancariaDTO(
                     usuario=usuario,
                     banco=banco,
@@ -192,7 +192,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
             cuentaPorPagar_service = CrearCuentaPorPagar(
                 repo_crear=repo_cuentaPorPagar, repo_obtener=repo_cuentaPorPagar
             )
-            cuenta_por_pagar = cuentaPorPagar_service.ejecutar(
+            cuenta_por_pagar =  await cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
@@ -273,7 +273,7 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
                 repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
                 descuentos_service = CrearDescuento(repo_descuentos, repo_cuentaPorPagar)
-                descuento_nuevo = descuentos_service.ejecutar(
+                descuento_nuevo = await descuentos_service.ejecutar(
                     CrearDescuentoDTO(
                         id_usuario=usuario.id,
                         id_cuenta_por_pagar=cuenta_por_pagar.id,
@@ -285,10 +285,10 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
                     )
                 )
 
-            db.commit()
+            await db.commit()
             registros_exitosos.append(cuenta_por_pagar)
         except Exception as e:
-            db.rollback()
+            await db.rollback()
             logging.warning(f"Error procesando registro {idx}: {e}")
             registro["error"] = str(e)
             registros_fallidos.append(registro)
@@ -312,22 +312,22 @@ def cargar_historial_cuentas(file: UploadFile = File(...), db: Session = Depends
 
 
 @router.get("/", response_model=list[CuentaPorPagarResponseSchema])
-def obtener_cuentas(db: Session = Depends(get_db)):
+async def obtener_cuentas(db: AsyncSession = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
         caso_de_uso = ObtenerCuentasPorPagar(repo_cuentasPorPagar)
-        cuentas = caso_de_uso.ejecutar()
+        cuentas = await caso_de_uso.ejecutar()
         return cuentas
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 
 @router.get("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
-def obtener_cuenta_por_id(id_cuenta: int, db: Session = Depends(get_db)):
+async def obtener_cuenta_por_id(id_cuenta: int, db: AsyncSession = Depends(get_db)):
     try:
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
         caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
-        cuenta = caso_de_uso.ejecutar(id_cuenta)
+        cuenta = await caso_de_uso.ejecutar(id_cuenta)
         return cuenta
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
@@ -335,12 +335,12 @@ def obtener_cuenta_por_id(id_cuenta: int, db: Session = Depends(get_db)):
 
 @router.patch("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
 # @router.patch("/{id_cuenta}")
-def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchema, db: Session = Depends(get_db)):
+async def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchema, db: AsyncSession = Depends(get_db)):
     try:
         # obtener cuenta de la base de datos
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)
         caso_de_uso = ObtenerCuentaPorPagar(repo_cuentasPorPagar)
-        cuenta_por_pagar_bd = caso_de_uso.ejecutar(id_cuenta)
+        cuenta_por_pagar_bd = await caso_de_uso.ejecutar(id_cuenta)
 
         # destructura el registro que llega, compararlo con la data de la base y actualizar
         historial_actualizado = None
@@ -355,7 +355,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
             if registro.historial_laboral.municipio and registro.historial_laboral.municipio.nombre:
                 repo_municipio = RepositorioMunicipioSqlAlchemy(db)
                 caso_de_uso_municipio = ObtenerMunicipio(repo_municipio)
-                municipio_actualizado = caso_de_uso_municipio.ejecutar(
+                municipio_actualizado = await caso_de_uso_municipio.ejecutar(
                     ObtenerMunicipioDTO(nombre=registro.historial_laboral.municipio.nombre)
                 )
                 # historial["municipio"]=municipio
@@ -364,7 +364,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
             if registro.historial_laboral.cargo and registro.historial_laboral.cargo.nombre:
                 repo_cargo = RepositorioCargoSqlAlchemy(db)
                 caso_de_uso_cargo = ObtenerCargo(repo_cargo)
-                cargo_actualizado = caso_de_uso_cargo.ejecutar(
+                cargo_actualizado = await caso_de_uso_cargo.ejecutar(
                     ObtenerCargoDTO(nombre=registro.historial_laboral.cargo.nombre)
                 )
                 # historial["cargo"]=cargo
@@ -394,7 +394,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
             caso_de_uso_historial = ActualizarHistorialLaboral(
                 repo_actualizar=repo_historialLaboral, repo_obtener=repo_historialLaboral
             )
-            historial_actualizado = caso_de_uso_historial.ejecutar(
+            historial_actualizado = await caso_de_uso_historial.ejecutar(
                 info_nueva=ActualizarHistorialLaboralUsuarioDTO(
                     usuario=usuario_actualizado,
                     contrato=registro.historial_laboral.contrato,
@@ -415,7 +415,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
                 # actualizar banco
                 repo_banco = RepositorioBancoSqlAlchemy(db)
                 caso_de_uso_banco = ObtenerBanco(repo_banco)
-                banco_actualizado = caso_de_uso_banco.ejecutar(
+                banco_actualizado = await caso_de_uso_banco.ejecutar(
                     ObtenerBancoDTO(nombre=registro.cuenta_bancaria.banco.nombre)
                 )
 
@@ -425,7 +425,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
                 repo_actualizar=repo_cuenta_bancaria, repo_obtener=repo_cuenta_bancaria
             )
 
-            cuenta_bancaria_actualizada = caso_de_uso_cuenta.ejecutar(
+            cuenta_bancaria_actualizada = await caso_de_uso_cuenta.ejecutar(
                 info_nueva=ActualizarCuentaBancariaDTO(
                     usuario=usuario_actualizado,
                     banco=banco_actualizado,
@@ -452,7 +452,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
         caso_de_uso_cuenta = ActualizarCuentaPorPagar(
             repo_actualizar=repo_cuenta_por_pagar, repo_obtener=repo_cuenta_por_pagar
         )
-        cuenta_por_pagar = caso_de_uso_cuenta.ejecutar(
+        cuenta_por_pagar = await caso_de_uso_cuenta.ejecutar(
             info_nueva=ActualizarCuentaPorPagarDTO(
                 historial_laboral=historial_actualizado,
                 cuenta_bancaria=cuenta_bancaria_actualizada,
@@ -479,7 +479,7 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
         # obtener descuntos asociados a la cuenta para recalsular su valor
         repo_descuentos = RepositorioDescuentoSqlAlchemy(db)
         caso_de_uso_descuentos = ObtenerDescuentos(repo_descuentos)
-        descuentos = caso_de_uso_descuentos.ejecutar(
+        descuentos = await caso_de_uso_descuentos.ejecutar(
             FiltrarDescuentosDTO(id_cuenta_por_pagar=cuenta_por_pagar.id, id_usuario=usuario_actualizado.id)
         )
 
@@ -497,12 +497,12 @@ def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchem
         else:
             cuenta_por_pagar.estado_cuenta_por_pagar = "NO PROCEDE PARA PAGO"
 
-        repo_cuenta_por_pagar.actualizar(cuenta_por_pagar)
+        await repo_cuenta_por_pagar.actualizar(cuenta_por_pagar)
 
-        db.commit()
+        await db.commit()
 
         # obtener cuenta por pagar
-        cuenta_actualizada = obtener_cuenta_por_id(id_cuenta, db)
+        cuenta_actualizada = await obtener_cuenta_por_id(id_cuenta, db)
         return cuenta_actualizada
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

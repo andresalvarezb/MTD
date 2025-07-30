@@ -9,9 +9,6 @@ from core.interfaces.repositorioCuentaPorPagar import (
 
 
 class CrearDescuento:
-    # def __init__(self, repo_crear: CrearDescuentoProtocol, repo_obtener_descuento: ObtenerDescuentoPorIdProtocol):
-    #     self.repo_crear = repo_crear
-    #     self.repo_obtener = repo_obtener
 
     def __init__(self, repo_descuento, repo_cuenta):
         self.repo_crear_descuento: CrearDescuentoProtocol = repo_descuento
@@ -19,15 +16,15 @@ class CrearDescuento:
         self.repo_obtener_cuenta: ObtenerCuentaPorPagarPorIdProtocol = repo_cuenta
         self.repo_actualizar_cuenta: ActualizarCuentaPorPagarProtocol = repo_cuenta
 
-    def ejecutar(self, datos: CrearDescuentoDTO) -> Descuento:
-        descuento = self._crear_descuento(datos)
+    async def ejecutar(self, datos: CrearDescuentoDTO) -> Descuento:
+        descuento = await self._crear_descuento(datos)
 
         # * Actualización cuenta por pagar
-        self._actualizar_cuenta_por_pagar(descuento)
+        await self._actualizar_cuenta_por_pagar(descuento)
 
         return descuento
 
-    def _crear_descuento(self, datos: CrearDescuentoDTO) -> Descuento:
+    async def _crear_descuento(self, datos: CrearDescuentoDTO) -> Descuento:
         descuento = Descuento(
             id_usuario=datos.id_usuario,
             id_cuenta_por_pagar=datos.id_cuenta_por_pagar,
@@ -39,16 +36,16 @@ class CrearDescuento:
             fecha_actualizacion=datetime.now(),
         )
         if descuento.id:
-            descuento_existente = self.repo_obtener_descuento.obtener_descuento_por_id(descuento.id)
+            descuento_existente = await self.repo_obtener_descuento.obtener_descuento_por_id(descuento.id)
             if descuento_existente:
                 return descuento_existente
 
-        descuento = self.repo_crear_descuento.crear(descuento)
+        descuento = await self.repo_crear_descuento.crear(descuento)
         return descuento
 
-    def _actualizar_cuenta_por_pagar(self, descuento: Descuento):
+    async def _actualizar_cuenta_por_pagar(self, descuento: Descuento):
         """Actualización del total a pagar y el total de descuentos"""
-        cuenta_por_pagar = self.repo_obtener_cuenta.obtener_por_id(descuento.id_cuenta_por_pagar)
+        cuenta_por_pagar = await self.repo_obtener_cuenta.obtener_por_id(descuento.id_cuenta_por_pagar)
         if not cuenta_por_pagar:
             raise ValueError(f"Cuenta por pagar con id {descuento.id_cuenta_por_pagar} no encontrada")
 
@@ -56,4 +53,4 @@ class CrearDescuento:
         cuenta_por_pagar.total_descuentos = cuenta_por_pagar.total_descuentos
         cuenta_por_pagar.total_a_pagar = cuenta_por_pagar.total_a_pagar
 
-        self.repo_actualizar_cuenta.actualizar(cuenta_por_pagar)
+        await self.repo_actualizar_cuenta.actualizar(cuenta_por_pagar)

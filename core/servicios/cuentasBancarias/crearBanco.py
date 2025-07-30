@@ -8,12 +8,12 @@ class CrearBanco:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearBancoDTO) -> Banco:
+    async def ejecutar(self, datos: CrearBancoDTO) -> Banco:
         banco = Banco(nombre=datos.nombre)
 
-        banco_existente = self.repo_obtener.obtener_por_nombre(banco.nombre)
+        banco_existente = await self.repo_obtener.obtener_por_nombre(banco.nombre)
         if banco_existente:
             return banco_existente
 
-        banco = self.repo_crear.crear(banco)
+        banco = await self.repo_crear.crear(banco)
         return banco

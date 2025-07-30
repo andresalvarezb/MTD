@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
 from core.interfaces.repositorioHistorialLaboralUsuario import (
@@ -15,10 +16,10 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     ObtenerHistorialLaboralPorClaveProtocol,
     ActualizarHistorialLaboralUsuarioProtocol,
 ):
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    def crear(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
+    async def crear(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
         nuevo_historial = HistorialLaboralORM(
             id_municipio=historialLaboral.municipio.id,
             contrato=historialLaboral.contrato,
@@ -32,31 +33,38 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
             id_usuario=historialLaboral.usuario.id,
         )
         self.db.add(nuevo_historial)
-        self.db.flush()
-        self.db.refresh(nuevo_historial)
+        await self.db.flush()
+        await self.db.refresh(nuevo_historial)
         return historialLaboral.from_orm(nuevo_historial)
 
-    def obtener(self, historialLaboral: HistorialLaboralUsuario):
-        existe = self.db.query(HistorialLaboralORM).filter_by(claveHLU=historialLaboral.claveHLU).first()
+    async def obtener(self, historialLaboral: HistorialLaboralUsuario):
+        existe = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU==historialLaboral.claveHLU))
+        existe = existe.scalar_one_or_none()
+
         if existe:
             return existe
         else:
             return None
 
-    def obtener_por_id(self, id_historial_laboral: int) -> HistorialLaboralUsuario | None:
-        registro_orm = self.db.query(HistorialLaboralORM).filter_by(id=id_historial_laboral).first()
+    async def obtener_por_id(self, id_historial_laboral: int) -> HistorialLaboralUsuario | None:
+        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.id==id_historial_laboral))
+        registro_orm = registro_orm.scalar_one_or_none()
+
         if not registro_orm:
             return None
         return HistorialLaboralUsuario.from_orm(registro_orm)
 
-    def obtener_por_clave(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario | None:
-        registro_orm = self.db.query(HistorialLaboralORM).filter_by(claveHLU=historialLaboral.claveHLU).first()
+    async def obtener_por_clave(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario | None:
+        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU==historialLaboral.claveHLU))
+        registro_orm = registro_orm.scalar_one_or_none()
+
         if not registro_orm:
             return None
         return HistorialLaboralUsuario.from_orm(registro_orm)
 
-    def actualizar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
-        registro_orm = self.db.query(HistorialLaboralORM).filter_by(id=historialLaboral.id).first()
+    async def actualizar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
+        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.id==historialLaboral.id))
+        registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
             raise ValueError("Usuario no encontrado")
@@ -82,5 +90,5 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         registro_orm.id_usuario = historialLaboral.usuario.id
 
         # Sincronizar con la sesión (no guarda todavía)
-        self.db.flush()
+        await self.db.flush()
         return HistorialLaboralUsuario.from_orm(registro_orm)

@@ -9,9 +9,9 @@ class ObtenerCuentasPorPagar:
     ):
         self.repo_cuenta_por_pagar = repo_cuenta_por_pagar
 
-    def ejecutar(self):
+    async def ejecutar(self):
         resultado: list[CuentaPorPagarResponseSchema] = []
-        cuentas = self.repo_cuenta_por_pagar.obtener_cuentas_por_pagar()
+        cuentas = await self.repo_cuenta_por_pagar.obtener_cuentas_por_pagar()
 
         for cuenta in cuentas:
             cuenta_bancaria_schema = {

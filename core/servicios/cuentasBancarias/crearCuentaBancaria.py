@@ -8,7 +8,7 @@ class CrearCuentaBancaria:
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, datos: CrearCuentaBancariaDTO) -> CuentaBancaria:
+    async def ejecutar(self, datos: CrearCuentaBancariaDTO) -> CuentaBancaria:
         cuenta_bancaria = CuentaBancaria(
             usuario=datos.usuario,
             banco=datos.banco,
@@ -20,10 +20,10 @@ class CrearCuentaBancaria:
             observaciones=datos.observaciones,
         )
 
-        cuenta_existente = self.repo_obtener.obtener_por_numero(cuenta_bancaria)
+        cuenta_existente = await self.repo_obtener.obtener_por_numero(cuenta_bancaria)
         if cuenta_existente:
             return cuenta_existente
 
-        cuenta_bancaria = self.repo_crear.crear(cuenta_bancaria)
+        cuenta_bancaria = await self.repo_crear.crear(cuenta_bancaria)
 
         return cuenta_bancaria

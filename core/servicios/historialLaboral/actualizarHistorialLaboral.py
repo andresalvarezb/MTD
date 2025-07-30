@@ -16,11 +16,11 @@ class ActualizarHistorialLaboral:
         self.repo_actualizar = repo_actualizar
         self.repo_obtener = repo_obtener
 
-    def ejecutar(self, info_nueva: ActualizarHistorialLaboralUsuarioDTO, info_vieja: HistorialLaboralUsuario):
+    async def ejecutar(self, info_nueva: ActualizarHistorialLaboralUsuarioDTO, info_vieja: HistorialLaboralUsuario):
 
         for key, value in info_nueva.__dict__.items():
             setattr(info_vieja, key, value)
 
-        historial_actualizado = self.repo_actualizar.actualizar(info_vieja)
+        historial_actualizado = await self.repo_actualizar.actualizar(info_vieja)
 
         return historial_actualizado
