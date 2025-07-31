@@ -9,6 +9,7 @@ from core.servicios.usuarios.crearUsuario import CrearUsuario
 from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol
 
 
+# * TEST UNITARIO PARA EL SERVICIO DE CREACIÓN DE USUARIOS
 @pytest.mark.asyncio
 async def test_unitario_crear_usuario_exitosamente():
     """
@@ -23,11 +24,11 @@ async def test_unitario_crear_usuario_exitosamente():
         documento="987654321",
         nombre="Test Unitario",
         estado="Activo",
-        contrato="Término Fijo",
+        contrato="nomina",
         cargo=Cargo(nombre="Desarrollador"),
         municipio=Municipio(nombre="Medellín"),
         correo="test.unitario@example.com",
-        telefono="555444333",
+        telefono="5554443",
         seguridad_social=False,
         fecha_aprobacion_seguridad_social=None,
         fecha_ultima_contratacion=None,
@@ -77,7 +78,7 @@ async def test_unitario_no_recrear_usuario_existecte():
         cargo=Cargo(nombre="Líder"),
         municipio=Municipio(nombre="Cali"),
         correo="existente@example.com",
-        telefono="111222333",
+        telefono="1112223",
         seguridad_social=True,
         fecha_aprobacion_seguridad_social=datetime.now(),
         fecha_ultima_contratacion=datetime.now(),
@@ -101,4 +102,40 @@ async def test_unitario_no_recrear_usuario_existecte():
     # Verificar que los mocks fueron llamados como se esperaba, este una sola vez
     mock_repo_obtener.obtener_por_documento.assert_awaited_once_with("111222333")
     # Verificar que el método de crear NO fue llamado, ya que el usuario ya existe
+    mock_repo_crear.crear.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_unitario_crear_usuario_datos_invalidos():
+    """
+    Este es un test UNITARIO.
+    Prueba que el servicio lanza una excepción si los datos del usuario son inválidos.
+    """
+    # Arrange / Preparar
+    mock_repo_obtener = AsyncMock(spec=ObtenerUsuarioPorDocumentoProtocol)
+    mock_repo_crear = AsyncMock(spec=CrearUsuarioProtocol)
+
+    datos_usuario_dto = CrearUsuarioDTO(
+        documento="",  # Documento vacío, lo que es inválido
+        nombre="Usuario Inválido",
+        estado="Activo",
+        contrato="otro",
+        cargo=Cargo(nombre="Tester"),
+        municipio=Municipio(nombre="Bogotá"),
+        correo="invalido@example.com",
+        telefono="55544330",
+        seguridad_social=False,
+        fecha_aprobacion_seguridad_social=None,
+        fecha_ultima_contratacion=None,
+    )
+
+    crear_usuario_servicio = CrearUsuario(repo_crear=mock_repo_crear, repo_obtener=mock_repo_obtener)
+
+    # Act / Ejecutar
+    with pytest.raises(ValueError):
+        await crear_usuario_servicio.ejecutar(datos_usuario_dto)
+
+    # Assert / Verificar
+    # Verificar que los mocks fueron llamados como se esperaba
+    mock_repo_obtener.obtener_por_documento.assert_not_awaited()
     mock_repo_crear.crear.assert_not_awaited()
