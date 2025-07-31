@@ -65,7 +65,9 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         return cuenta_por_pagar.from_orm(cuenta_nueva)
 
     async def obtener(self, cuenta_por_pagar: CuentaPorPagar):
-        existe = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP==cuenta_por_pagar.claveCPP))
+        existe = await self.db.execute(
+            select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP == cuenta_por_pagar.claveCPP)
+        )
         existe = existe.scalar_one_or_none()
         if existe:
             return existe
@@ -73,7 +75,9 @@ class RepositorioCuentaPorPagarSqlAlchemy(
             return None
 
     async def actualizar(self, cuenta_por_pagar: CuentaPorPagar):
-        registro_orm = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.id==cuenta_por_pagar.id))
+        registro_orm = await self.db.execute(
+            select(CuentaPorPagarORM).where(CuentaPorPagarORM.id == cuenta_por_pagar.id)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
@@ -110,9 +114,8 @@ class RepositorioCuentaPorPagarSqlAlchemy(
         return CuentaPorPagar.from_orm(registro_orm)
 
     async def obtener_cuentas_por_pagar(self) -> list[CuentaPorPagar]:
-        registros_orm = (
-            await self.db.execute(select(CuentaPorPagarORM)
-            .options(
+        registros_orm = await self.db.execute(
+            select(CuentaPorPagarORM).options(
                 joinedload(CuentaPorPagarORM.historial_laboral)
                 .joinedload(HistorialLaboralORM.usuario)
                 .joinedload(UsuarioORM.cargo),
@@ -122,28 +125,29 @@ class RepositorioCuentaPorPagarSqlAlchemy(
                 .joinedload(MunicipioORM.departamento),
                 joinedload(CuentaPorPagarORM.historial_laboral).joinedload(HistorialLaboralORM.cargo),
                 joinedload(CuentaPorPagarORM.cuenta_bancaria).joinedload(CuentaBancariaORM.banco),
-            ))
+            )
         )
         registros_orm = registros_orm.scalars().all()
         return [CuentaPorPagar.from_orm(orm_obj) for orm_obj in registros_orm]
 
     async def obtener_cuenta_por_pagar(self, id_cuenta_por_pagar: int) -> CuentaPorPagar:
-        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.id==id_cuenta_por_pagar))
+        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.id == id_cuenta_por_pagar))
         registro = registro.scalar_one_or_none()
         if not registro:
             raise HTTPException(status_code=404, detail="Registro no encontrado")
         return CuentaPorPagar.from_orm(registro)
 
     async def obtener_por_clave(self, clave: str) -> CuentaPorPagar | None:
-        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP==clave))
+        registro = await self.db.execute(select(CuentaPorPagarORM).where(CuentaPorPagarORM.claveCPP == clave))
         registro = registro.scalar_one_or_none()
         if not registro:
             return None
         return CuentaPorPagar.from_orm(registro)
 
-
     async def obtener_por_id(self, id_cuenta_por_pagar: int) -> CuentaPorPagar | None:
-        registro_orm = await self.db.execute(select(CuentaPorPagarORM).filter(CuentaPorPagarORM.id == id_cuenta_por_pagar))
+        registro_orm = await self.db.execute(
+            select(CuentaPorPagarORM).filter(CuentaPorPagarORM.id == id_cuenta_por_pagar)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:

@@ -36,7 +36,6 @@ class RepositorioDescuentoSqlAlchemy(
 
     async def obtener_descuentos(self, filtros: FiltrarDescuentosDTO) -> list[Descuento]:
 
-
         filtros_execute = []
 
         if filtros.id_cuenta_por_pagar is not None:

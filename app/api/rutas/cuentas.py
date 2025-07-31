@@ -192,7 +192,7 @@ async def cargar_historial_cuentas(file: UploadFile = File(...), db: AsyncSessio
             cuentaPorPagar_service = CrearCuentaPorPagar(
                 repo_crear=repo_cuentaPorPagar, repo_obtener=repo_cuentaPorPagar
             )
-            cuenta_por_pagar =  await cuentaPorPagar_service.ejecutar(
+            cuenta_por_pagar = await cuentaPorPagar_service.ejecutar(
                 CrearCuentaPorPagarDTO(
                     claveCPP=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
@@ -335,7 +335,9 @@ async def obtener_cuenta_por_id(id_cuenta: int, db: AsyncSession = Depends(get_d
 
 @router.patch("/{id_cuenta}", response_model=CuentaPorPagarResponseSchema)
 # @router.patch("/{id_cuenta}")
-async def actualizar_cuenta_por_id(id_cuenta: int, registro: CuentaPorPagarUpdateSchema, db: AsyncSession = Depends(get_db)):
+async def actualizar_cuenta_por_id(
+    id_cuenta: int, registro: CuentaPorPagarUpdateSchema, db: AsyncSession = Depends(get_db)
+):
     try:
         # obtener cuenta de la base de datos
         repo_cuentasPorPagar = RepositorioCuentaPorPagarSqlAlchemy(db)

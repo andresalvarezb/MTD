@@ -27,7 +27,7 @@ class RepositorioAreaMTDSqlAlchemy(
         return AreaMTD.from_orm(nueva_area)
 
     async def obtener_por_nombre(self, nombre_area: str) -> AreaMTD | None:
-        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.nombre==nombre_area))
+        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.nombre == nombre_area))
         registro_orm = resultado.scalar_one_or_none()
         if not registro_orm:
             return None
@@ -39,14 +39,14 @@ class RepositorioAreaMTDSqlAlchemy(
         return [AreaMTD.from_orm(registro_orm) for registro_orm in registros_orm]
 
     async def obtener_por_id(self, id_area: int) -> AreaMTD | None:
-        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.id==id_area))
+        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.id == id_area))
         registro_orm = resultado.scalar_one_or_none()
         if not registro_orm:
             return None
         return AreaMTD.from_orm(registro_orm)
 
     async def eliminar(self, id_area: int) -> None:
-        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.id==id_area))
+        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.id == id_area))
         registro_orm = resultado.scalar_one_or_none()
         if not registro_orm:
             raise ValueError(f"Area con ID {id_area} no encontrado.")

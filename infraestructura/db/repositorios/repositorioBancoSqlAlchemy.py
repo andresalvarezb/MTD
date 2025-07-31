@@ -18,7 +18,7 @@ class RepositorioBancoSqlAlchemy(CrearBancoProtocol, ObtenerBancoPorNombreProtoc
         return banco
 
     async def obtener_por_nombre(self, nombre: str) -> Banco | None:
-        registro_orm = await self.db.execute(select(BancoORM).where(BancoORM.nombre==nombre))
+        registro_orm = await self.db.execute(select(BancoORM).where(BancoORM.nombre == nombre))
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Banco.from_orm(registro_orm)

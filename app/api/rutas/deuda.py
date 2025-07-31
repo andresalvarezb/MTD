@@ -66,7 +66,9 @@ async def actualizar_deuda(id_deuda: int, deuda_actualizada: ActualizarDeudaSche
 
 
 @router.delete("/{id_deuda}")
-async def eliminar_deuda(id_deuda: int = Path(..., title="ID de la deuda a eliminar"), db: AsyncSession = Depends(get_db)):
+async def eliminar_deuda(
+    id_deuda: int = Path(..., title="ID de la deuda a eliminar"), db: AsyncSession = Depends(get_db)
+):
     try:
         repo_deuda = RepositorioDeudaSqlAlchemy(db)
         caso_de_uso = EliminarDeuda(repo_deuda)

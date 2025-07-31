@@ -26,7 +26,7 @@ class RepositorioMunicipioSqlAlchemy(
         return Municipio.from_orm(nuevo_municipio)
 
     async def obtener_por_nombre(self, municipio: Municipio) -> Municipio | None:
-        registro_orm = await self.db.execute(select(MunicipioORM).where(MunicipioORM.nombre==municipio.nombre))
+        registro_orm = await self.db.execute(select(MunicipioORM).where(MunicipioORM.nombre == municipio.nombre))
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Municipio.from_orm(registro_orm)
@@ -34,7 +34,7 @@ class RepositorioMunicipioSqlAlchemy(
             return None
 
     async def obtener_por_id(self, id_municipio: int) -> Municipio | None:
-        registro_orm = await self.db.execute(select(MunicipioORM).where(MunicipioORM.id==id_municipio))
+        registro_orm = await self.db.execute(select(MunicipioORM).where(MunicipioORM.id == id_municipio))
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Municipio.from_orm(registro_orm)

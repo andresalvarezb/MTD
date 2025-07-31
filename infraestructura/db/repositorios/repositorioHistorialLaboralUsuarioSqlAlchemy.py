@@ -38,7 +38,9 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         return historialLaboral.from_orm(nuevo_historial)
 
     async def obtener(self, historialLaboral: HistorialLaboralUsuario):
-        existe = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU==historialLaboral.claveHLU))
+        existe = await self.db.execute(
+            select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU == historialLaboral.claveHLU)
+        )
         existe = existe.scalar_one_or_none()
 
         if existe:
@@ -47,7 +49,9 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
             return None
 
     async def obtener_por_id(self, id_historial_laboral: int) -> HistorialLaboralUsuario | None:
-        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.id==id_historial_laboral))
+        registro_orm = await self.db.execute(
+            select(HistorialLaboralORM).where(HistorialLaboralORM.id == id_historial_laboral)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
@@ -55,7 +59,9 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         return HistorialLaboralUsuario.from_orm(registro_orm)
 
     async def obtener_por_clave(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario | None:
-        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU==historialLaboral.claveHLU))
+        registro_orm = await self.db.execute(
+            select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU == historialLaboral.claveHLU)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:
@@ -63,7 +69,9 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
         return HistorialLaboralUsuario.from_orm(registro_orm)
 
     async def actualizar(self, historialLaboral: HistorialLaboralUsuario) -> HistorialLaboralUsuario:
-        registro_orm = await self.db.execute(select(HistorialLaboralORM).where(HistorialLaboralORM.id==historialLaboral.id))
+        registro_orm = await self.db.execute(
+            select(HistorialLaboralORM).where(HistorialLaboralORM.id == historialLaboral.id)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
 
         if not registro_orm:

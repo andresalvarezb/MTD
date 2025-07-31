@@ -17,7 +17,7 @@ class RepositorioCargoSqlAlchemy(CrearCargoProtocol, ObtenerCargoPorNombreProtoc
         return cargo.from_orm(cargo_nuevo)
 
     async def obtener_por_nombre(self, cargo: Cargo) -> Cargo | None:
-        registro_orm = await self.db.execute(select(CargoORM).where(CargoORM.nombre==cargo.nombre))
+        registro_orm = await self.db.execute(select(CargoORM).where(CargoORM.nombre == cargo.nombre))
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Cargo.from_orm(registro_orm)

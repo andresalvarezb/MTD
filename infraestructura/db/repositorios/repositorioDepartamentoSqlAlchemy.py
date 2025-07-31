@@ -23,7 +23,9 @@ class RepositorioDepartamentoSqlAlchemy(
         return Departamento.from_orm(nuevo_departamento)
 
     async def obtener_por_nombre(self, departamento: Departamento) -> Departamento | None:
-        registro_orm = await self.db.execute(select(DepartamentoORM).where(DepartamentoORM.nombre==departamento.nombre))
+        registro_orm = await self.db.execute(
+            select(DepartamentoORM).where(DepartamentoORM.nombre == departamento.nombre)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Departamento.from_orm(registro_orm)
@@ -31,7 +33,7 @@ class RepositorioDepartamentoSqlAlchemy(
             return None
 
     async def obtener_por_id(self, id_departamento: int) -> Departamento | None:
-        registro_orm = await self.db.execute(select(DepartamentoORM).where(DepartamentoORM.id==id_departamento))
+        registro_orm = await self.db.execute(select(DepartamentoORM).where(DepartamentoORM.id == id_departamento))
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Departamento.from_orm(registro_orm)

@@ -37,7 +37,9 @@ class RepositorioCuentaBancariaSqlAlchemy(
         return cuenta_bancaria.from_orm(nueva_cuenta)
 
     async def obtener_por_numero(self, cuenta_bancaria: CuentaBancaria):
-        registro_orm = await self.db.execute(select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta))
+        registro_orm = await self.db.execute(
+            select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return CuentaBancaria.from_orm(registro_orm)
@@ -53,7 +55,9 @@ class RepositorioCuentaBancariaSqlAlchemy(
             return None
 
     async def actualizar(self, cuenta_bancaria: CuentaBancaria) -> CuentaBancaria:
-        registro_orm = await self.db.execute(select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta))
+        registro_orm = await self.db.execute(
+            select(CuentaBancariaORM).filter_by(numero_cuenta=cuenta_bancaria.numero_cuenta)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:
             raise ValueError("Cuenta bancaria no encontrada")
