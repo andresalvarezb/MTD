@@ -1,7 +1,6 @@
 import logging
 import pandas as pd
 from io import BytesIO
-from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 from infraestructura.db.index import get_db
 from fastapi.responses import StreamingResponse

@@ -2,6 +2,11 @@ from pydantic import BaseModel, Field
 from .departamento import DepartamentoResponseSchema, DepartamentoUpdateSchema
 
 
+class MunicipioCreateSchema(BaseModel):
+    nombre: str = Field(..., description="Nombre del municipio", examples=["Medellín"])
+    departamento: DepartamentoUpdateSchema = Field(..., description="Departamento al que pertenece el municipio", examples=["Antioquia"])
+
+
 class MunicipioResponseSchema(BaseModel):
     id: int = Field(..., description="Identificador único del municipio")
     nombre: str = Field(..., description="Nombre del municipio")

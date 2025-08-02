@@ -1,12 +1,16 @@
 import pytest
+from dataclasses import asdict
 from unittest.mock import AsyncMock
 from datetime import datetime
 from core.entidades.cargo import Cargo
 from core.entidades.usuario import Usuario
 from core.entidades.municipio import Municipio
-from core.servicios.usuarios.dtos import CrearUsuarioDTO
+from core.servicios.usuarios.dtos import CrearUsuarioDTO, ActualizarUsuarioDTO, CrearCargoDTO, CrearMunicipioDTO, CrearDepartamentoDTO
 from core.servicios.usuarios.crearUsuario import CrearUsuario
-from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol
+from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol, ActualizarUsuarioProtocol
+from core.servicios.usuarios.actualizarUsuario import ActualizarUsuario
+from utils.enums import EnumEstadoUsuario
+
 
 
 # * TEST UNITARIO PARA EL SERVICIO DE CREACIÓN DE USUARIOS
@@ -25,8 +29,8 @@ async def test_unitario_crear_usuario_exitosamente():
         nombre="Test Unitario",
         estado="Activo",
         contrato="nomina",
-        cargo=Cargo(nombre="Desarrollador"),
-        municipio=Municipio(nombre="Medellín"),
+        cargo=CrearCargoDTO(nombre="Desarrollador"),
+        municipio=CrearMunicipioDTO(nombre="Medellín", departamento=CrearDepartamentoDTO(nombre="Antioquia")),
         correo="test.unitario@example.com",
         telefono="5554443",
         seguridad_social=False,
@@ -139,3 +143,57 @@ async def test_unitario_crear_usuario_datos_invalidos():
     # Verificar que los mocks fueron llamados como se esperaba
     mock_repo_obtener.obtener_por_documento.assert_not_awaited()
     mock_repo_crear.crear.assert_not_awaited()
+
+# * TEST UNITARIO PARA EL SERVICIO DE ACTUALIZACION DE USUARIOS
+@pytest.mark.asyncio
+async def test_unitario_actualizar_usuario_exitosamente():
+    """
+    Este es un test UNITARIO.
+    Prueba que el servicio actualiza un usuario correctamente.
+    """
+    # Arrange / Preparar
+    mock_repo_actualizar = AsyncMock(spec=ActualizarUsuarioProtocol)
+
+    datos_usuario_dto = ActualizarUsuarioDTO(
+        documento="111222333",
+        nombre="Usuario Actualizado",
+        estado="Activo",
+        contrato="OPS",
+        cargo=Cargo(nombre="Líder"),
+        municipio=Municipio(nombre="Cali"),
+        correo="actualizado@example.com",
+        telefono="1112223",
+        seguridad_social=True,
+        fecha_aprobacion_seguridad_social=datetime.now(),
+    )
+
+    # Configuracion de mocks
+    # 1. Simular que el usuario YA existe en la base de datos
+    usuario_simulado = Usuario(id=1, **datos_usuario_dto.__dict__)
+    usuario_real = Usuario(
+        id=1,
+        documento="111222333",
+        nombre="Usuario Existente",
+        estado="inactivo",
+        contrato="nomina",
+        cargo=Cargo(nombre="auxiliar"),
+        municipio=Municipio(nombre="bucaramanga"),
+        correo="usuario@ejemplo.com",
+        telefono="5551234564",
+        seguridad_social=True,
+        fecha_aprobacion_seguridad_social=datetime.now(),
+    )
+
+    # 2. Simular la actualización
+    mock_repo_actualizar.actualizar.return_value = usuario_simulado
+
+    actualizar_usuario_servicio = ActualizarUsuario(repo_actualizar=mock_repo_actualizar)
+
+    # Act / Ejecutar
+    resultado = await actualizar_usuario_servicio.ejecutar(datos_usuario_dto, usuario_real)
+
+    # Assert / Verificar
+    assert resultado == usuario_simulado
+    assert usuario_real.nombre == "Usuario Actualizado"
+    assert usuario_real.estado == EnumEstadoUsuario.INACTIVO.value  # Verifica la transformación de la entidad
+    mock_repo_actualizar.actualizar.assert_awaited_once_with(usuario_real)

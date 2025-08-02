@@ -63,8 +63,8 @@ class Usuario:
             raise ValueError("Debe proporcionar la fecha de aprobación si la seguridad social está activa.")
 
         if self.fecha_aprobacion_seguridad_social and self.fecha_ultima_contratacion:
-            if self.fecha_aprobacion_seguridad_social > self.fecha_ultima_contratacion:
-                raise ValueError("La fecha de aprobación no puede ser posterior a la contratación.")
+            if self.fecha_aprobacion_seguridad_social < self.fecha_ultima_contratacion:
+                raise ValueError("La fecha de aprobación de la seguridad social no puede ser inferior a la fecha de última contratación.")
 
     def actualizar_seguridad_social(self, nueva_fecha: datetime):
 

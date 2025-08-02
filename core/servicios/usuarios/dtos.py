@@ -3,6 +3,19 @@ from datetime import datetime
 from core.entidades.cargo import Cargo
 from core.entidades.municipio import Municipio
 
+@dataclass
+class CrearCargoDTO:
+    nombre: str
+
+@dataclass
+class CrearDepartamentoDTO:
+    nombre: str
+
+@dataclass
+class CrearMunicipioDTO:
+    nombre: str
+    departamento: CrearDepartamentoDTO | None
+
 
 @dataclass
 class CrearUsuarioDTO:
@@ -12,9 +25,9 @@ class CrearUsuarioDTO:
     contrato: str
     correo: str
     telefono: str
-    cargo: Cargo
-    municipio: Municipio
-    seguridad_social: bool
+    cargo: CrearCargoDTO
+    municipio: CrearMunicipioDTO
+    seguridad_social: bool | None
     fecha_aprobacion_seguridad_social: datetime | None
     fecha_ultima_contratacion: datetime | None
 
