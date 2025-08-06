@@ -1,13 +1,24 @@
-from fastapi import APIRouter
+from fastapi import FastAPI, APIRouter
 from .rutas.cuentas import router as cuentas
 from .rutas.descuentos import router as descuentos
 from .rutas.usuarios import router as usuarios
 from .rutas.deuda import router as deudas
 from .rutas.areaMTD import router as areas
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from infraestructura.db.index import Base, async_engine
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="API Cuentas Medicas", description="Uso asincronico", version="0.5.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with async_engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all) # Opcional: para borrar todo al reiniciar
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # await async_engine.dispose() # Código de cierre (opcional)
+
+
+app = FastAPI(title="API Cuentas Medicas", description="Uso asincronico", version="0.5.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

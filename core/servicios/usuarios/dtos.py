@@ -14,7 +14,7 @@ class CrearDepartamentoDTO:
 @dataclass
 class CrearMunicipioDTO:
     nombre: str
-    departamento: CrearDepartamentoDTO | None
+    departamento: CrearDepartamentoDTO
 
 
 @dataclass
@@ -23,10 +23,10 @@ class CrearUsuarioDTO:
     nombre: str
     estado: str
     contrato: str
-    correo: str
-    telefono: str
     cargo: CrearCargoDTO
     municipio: CrearMunicipioDTO
+    correo: str | None
+    telefono: str | None
     seguridad_social: bool | None
     fecha_aprobacion_seguridad_social: datetime | None
     fecha_ultima_contratacion: datetime | None

@@ -38,9 +38,9 @@ class UsuarioORM(Base):
     fecha_ultima_contratacion: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Relaciones 1:N
-    municipio: Mapped["MunicipioORM"] = relationship(back_populates="usuarios")
-    historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="usuario")
-    cargo: Mapped["CargoORM"] = relationship(back_populates="usuarios")
-    cuentas_bancarias: Mapped[list["CuentaBancariaORM"]] = relationship(back_populates="usuario")
-    descuentos: Mapped[list["DescuentosPorPagarORM"]] = relationship(back_populates="usuario")
-    deudas: Mapped[list["DeudaORM"]] = relationship(back_populates="usuario")
+    municipio: Mapped["MunicipioORM"] = relationship(back_populates="usuarios", lazy="selectin")
+    historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="usuario", lazy="selectin")
+    cargo: Mapped["CargoORM"] = relationship(back_populates="usuarios", lazy="selectin")
+    cuentas_bancarias: Mapped[list["CuentaBancariaORM"]] = relationship(back_populates="usuario", lazy="selectin")
+    descuentos: Mapped[list["DescuentosPorPagarORM"]] = relationship(back_populates="usuario", lazy="selectin")
+    deudas: Mapped[list["DeudaORM"]] = relationship(back_populates="usuario", lazy="selectin")

@@ -40,21 +40,24 @@ class RepositorioUsuarioSqlAlchemy(
         self.db.add(usuario_nuevo)
         await self.db.flush()
         await self.db.refresh(usuario_nuevo)
-        return usuario.from_orm(usuario_nuevo)
+        return Usuario.from_orm(usuario_nuevo)
 
     async def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
-        registro_orm = await self.db.execute(
-            select(UsuarioORM)
-            .options(
-                selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
-                selectinload(UsuarioORM.cargo),
+        try:
+            registro_orm = await self.db.execute(
+                select(UsuarioORM)
+                .options(
+                    selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
+                    selectinload(UsuarioORM.cargo),
+                )
+                .where(UsuarioORM.documento == documento_usuario)
             )
-            .where(UsuarioORM.documento == documento_usuario)
-        )
-        registro_orm = registro_orm.scalar_one_or_none()
-        if registro_orm:
-            return Usuario.from_orm(registro_orm)
-        else:
+            registro_orm = registro_orm.scalar_one_or_none()
+            if registro_orm:
+                return Usuario.from_orm(registro_orm)
+            return None
+        except Exception as e:
+            print(f"Error al obtener usuario por documento: {e}")
             return None
 
     async def obtener_por_id(self, id_usuario: int) -> Usuario | None:

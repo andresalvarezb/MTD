@@ -21,6 +21,6 @@ class MunicipioORM(Base):
     )
 
     # Relaciones 1:N
-    departamento: Mapped["DepartamentoORM"] = relationship(back_populates="municipios")
+    departamento: Mapped["DepartamentoORM"] = relationship(back_populates="municipios", lazy="selectin")
     usuarios: Mapped[list["UsuarioORM"]] = relationship(back_populates="municipio")
     historial_laboral: Mapped[list["HistorialLaboralORM"]] = relationship(back_populates="municipio")

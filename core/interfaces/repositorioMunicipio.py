@@ -7,7 +7,7 @@ class CrearMunicipioProtocol(Protocol):
 
 
 class ObtenerMunicipioPorNombreProtocol(Protocol):
-    async def obtener_por_nombre(self, municipio: Municipio) -> Municipio | None: ...
+    async def obtener_por_nombre(self, municipio: str) -> Municipio | None: ...
 
 
 class ObtenerMunicipioPorIdProtocol(Protocol):

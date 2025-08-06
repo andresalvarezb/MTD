@@ -7,7 +7,7 @@ class CrearDepartamentoProtocol(Protocol):
 
 
 class ObtenerDepartamentoPorNombreProtocol(Protocol):
-    async def obtener_por_nombre(self, departamento: Departamento) -> Departamento | None: ...
+    async def obtener_por_nombre(self, departamento: str) -> Departamento | None: ...
 
 
 class ObtenerDepartamentoPorIdProtocol(Protocol):

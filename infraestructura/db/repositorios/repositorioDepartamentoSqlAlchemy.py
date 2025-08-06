@@ -22,9 +22,9 @@ class RepositorioDepartamentoSqlAlchemy(
         await self.db.refresh(nuevo_departamento)
         return Departamento.from_orm(nuevo_departamento)
 
-    async def obtener_por_nombre(self, departamento: Departamento) -> Departamento | None:
+    async def obtener_por_nombre(self, departamento: str) -> Departamento | None:
         registro_orm = await self.db.execute(
-            select(DepartamentoORM).where(DepartamentoORM.nombre == departamento.nombre)
+            select(DepartamentoORM).where(DepartamentoORM.nombre == departamento)
         )
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:

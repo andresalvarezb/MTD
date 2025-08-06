@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from core.entidades.municipio import Municipio
 from infraestructura.db.modelos.municipio import MunicipioORM
 from core.interfaces.repositorioMunicipio import (
@@ -25,8 +26,12 @@ class RepositorioMunicipioSqlAlchemy(
         await self.db.refresh(nuevo_municipio)
         return Municipio.from_orm(nuevo_municipio)
 
-    async def obtener_por_nombre(self, municipio: Municipio) -> Municipio | None:
-        registro_orm = await self.db.execute(select(MunicipioORM).where(MunicipioORM.nombre == municipio.nombre))
+    async def obtener_por_nombre(self, municipio: str) -> Municipio | None:
+        registro_orm = await self.db.execute(
+            select(MunicipioORM)
+            .options(selectinload(MunicipioORM.departamento))
+            .where(MunicipioORM.nombre == municipio)
+        )
         registro_orm = registro_orm.scalar_one_or_none()
         if registro_orm:
             return Municipio.from_orm(registro_orm)
