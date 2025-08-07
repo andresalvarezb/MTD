@@ -42,7 +42,7 @@ class RepositorioUsuarioSqlAlchemy(
         await self.db.refresh(usuario_nuevo)
         return Usuario.from_orm(usuario_nuevo)
 
-    async def obtener_por_documento(self, documento_usuario: str) -> Usuario | None:
+    async def obtener_por_documento(self, documento: str) -> Usuario | None:
         try:
             registro_orm = await self.db.execute(
                 select(UsuarioORM)
@@ -50,7 +50,7 @@ class RepositorioUsuarioSqlAlchemy(
                     selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
                     selectinload(UsuarioORM.cargo),
                 )
-                .where(UsuarioORM.documento == documento_usuario)
+                .where(UsuarioORM.documento == documento)
             )
             registro_orm = registro_orm.scalar_one_or_none()
             if registro_orm:
@@ -74,59 +74,22 @@ class RepositorioUsuarioSqlAlchemy(
             return None
         return Usuario.from_orm(registro_orm)
 
-    async def obtener_todos(self, documento: str | None = None) -> list[Usuario]:
-        if documento:
-            registro_orm = await self.db.execute(
-                select(UsuarioORM)
-                .options(
-                    selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
-                    selectinload(UsuarioORM.cargo),
-                )
-                .where(UsuarioORM.documento == documento)
+    async def obtener_todos(self) -> list[Usuario]:
+        registros_orm = await self.db.execute(
+            select(UsuarioORM).options(
+                selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
+                selectinload(UsuarioORM.cargo),
             )
-            registro_orm = registro_orm.scalar_one_or_none()
-            return [Usuario.from_orm(registro_orm)] if registro_orm else []
-        else:
-            registros_orm = await self.db.execute(
-                select(UsuarioORM).options(
-                    selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
-                    selectinload(UsuarioORM.cargo),
-                )
-            )
-            registros_orm = registros_orm.scalars().all()
-            return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]
+        )
+        registros_orm = registros_orm.scalars().all()
+        return [Usuario.from_orm(registro_orm) for registro_orm in registros_orm]
 
-    # async def actualizar(self, usuario: Usuario) -> Usuario:
-    #     registro_orm = await self.db.execute(select(UsuarioORM).where(UsuarioORM.id == usuario.id))
-    #     registro_orm = registro_orm.scalar_one_or_none()
-    #     if not registro_orm:
-    #         raise ValueError("Usuario no encontrado")
-
-    #     if not usuario.municipio.id:
-    #         raise ValueError("Municipio no asociado al usuario")
-
-    #     if not usuario.cargo.id:
-    #         raise ValueError("Cargo no asociado al usuario")
-
-    #     # Actualizar solo los campos que corresponden
-    #     registro_orm.documento = usuario.documento
-    #     registro_orm.nombre = usuario.nombre
-    #     registro_orm.estado = usuario.estado
-    #     registro_orm.contrato = usuario.contrato
-    #     registro_orm.correo = usuario.correo
-    #     registro_orm.telefono = usuario.telefono
-    #     registro_orm.seguridad_social = usuario.seguridad_social
-    #     registro_orm.fecha_aprobacion_seguridad_social = usuario.fecha_aprobacion_seguridad_social
-    #     registro_orm.fecha_ultima_contratacion = usuario.fecha_ultima_contratacion
-    #     registro_orm.id_municipio = usuario.municipio.id
-    #     registro_orm.id_cargo = usuario.cargo.id
-
-    #     # Sincronizar con la sesión (no guarda todavía)
-    #     await self.db.flush()
-    #     return Usuario.from_orm(registro_orm)
-    async def actualizar(self, info_nueva: dict, info_vieja: Usuario) -> Usuario:
+    async def actualizar(self, info_nueva: dict, usuario: Usuario) -> Usuario:
         registro_orm = await self.db.execute(
-            update(UsuarioORM).where(UsuarioORM.id == info_vieja.id).values(**info_nueva)
+            update(UsuarioORM)
+            .where(UsuarioORM.id == usuario.id)
+            .values(**info_nueva)
+            .returning(UsuarioORM)  # <<--- Esto devuelve la fila actualizada como ORM
         )
         registro_orm = registro_orm.scalar_one_or_none()
         if not registro_orm:

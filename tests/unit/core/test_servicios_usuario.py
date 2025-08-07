@@ -20,6 +20,7 @@ from core.interfaces.repositorioUsuario import (
     ActualizarUsuarioProtocol,
 )
 from core.servicios.usuarios.actualizarUsuario import ActualizarUsuario
+from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
 from utils.enums import EnumEstadoUsuario
 from core.interfaces.repositorioMunicipio import CrearMunicipioProtocol, ObtenerMunicipioPorNombreProtocol
 from core.interfaces.repositorioDepartamento import CrearDepartamentoProtocol, ObtenerDepartamentoPorNombreProtocol
@@ -345,7 +346,7 @@ async def test_unitario_crear_usuario_cargo_nuevo():
         fecha_ultima_contratacion=datetime(2024, 6, 1),
     )
 
-    repo_obtener_cargo.obtener_por_nombre.return_value = None # Cargo no existe
+    repo_obtener_cargo.obtener_por_nombre.return_value = None  # Cargo no existe
     repo_obtener_departamento.obtener_por_nombre.return_value = departamento_simulado
     repo_obtener_municipio.obtener_por_nombre.return_value = municipio_simulado
     repo_crear_cargo.crear.return_value = cargo_simulado
@@ -379,3 +380,152 @@ async def test_unitario_crear_usuario_cargo_nuevo():
     # Verificar que no se crearon municipio ni departamento
     repo_crear_departamento.crear.assert_not_awaited()
     repo_crear_municipio.crear.assert_not_awaited()
+
+
+# * TEST UNITARIO PARA OBTENER USUARIO
+@pytest.mark.asyncio
+async def test_obtener_usuario_encontrado():
+    # * Arrange / Preparar
+    # Se crean mocks de los repositorios necesarios
+    repo_mock = AsyncMock(spec=ObtenerUsuarioPorDocumentoProtocol)
+
+    cargo_simulado = Cargo(
+        # id=1,
+        nombre="DESARROLLADOR"
+    )
+    departamento_simulado = Departamento(
+        # id=1,
+        nombre="ANTIOQUIA"
+    )
+    municipio_simulado = Municipio(
+        # id=1,
+        nombre="MEDELLIN",
+        departamento=departamento_simulado,
+    )
+    usuario_simulado = Usuario(
+        # id=1,
+        nombre="TEST UNITARIO",
+        documento="987654321",
+        estado="ACTIVO",
+        contrato="NOMINA",
+        cargo=cargo_simulado,
+        municipio=municipio_simulado,
+        correo="test.unitario@example.com",
+        telefono="5554443",
+        seguridad_social=False,
+        fecha_aprobacion_seguridad_social=None,
+        fecha_ultima_contratacion=None,
+    )
+
+    # Configurar los mocks
+    repo_mock.obtener_por_documento.return_value = usuario_simulado
+
+    caso_uso = ObtenerUsuario(repo_mock)
+
+    # * Act
+    resultado = await caso_uso.ejecutar("123456789")
+
+    # Assert
+    assert resultado == usuario_simulado
+    repo_mock.obtener_por_documento.assert_awaited_once_with("123456789")
+
+
+@pytest.mark.asyncio
+async def test_obtener_usuario_no_encontrado():
+    # Arrange
+    repo_mock = AsyncMock(spec=ObtenerUsuarioPorDocumentoProtocol)
+    repo_mock.obtener_por_documento.return_value = None
+
+    caso_uso = ObtenerUsuario(repo_mock)
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="Usuario no encontrado"):
+        await caso_uso.ejecutar("000000000")
+
+    repo_mock.obtener_por_documento.assert_awaited_once_with("000000000")
+
+
+# * TEST UNITARIO PARA ACTUALIZAR UN USUARIO
+
+
+@pytest.mark.asyncio
+async def test_actualizar_usuario_exitosamente():
+    # * Arrange
+
+    # Se crean mocks de los repositorios necesarios
+    repo_actualizar = AsyncMock(spec=ActualizarUsuarioProtocol)
+    repo_obtener = AsyncMock(spec=ObtenerUsuarioPorDocumentoProtocol)
+
+    usuario_existente = Usuario(
+        documento="12345678",
+        nombre="Juan",
+        estado="ACTIVO",
+        contrato="NOMINA",
+        cargo=Cargo(nombre="DESARROLLADOR"),
+        municipio=Municipio(nombre="MEDELLIN", departamento=Departamento(nombre="ANTIOQUIA")),
+        correo="juan@example.com",
+        telefono="1234567",
+        seguridad_social=True,
+        fecha_aprobacion_seguridad_social=datetime(2024, 8, 1),
+        fecha_ultima_contratacion=datetime(2024, 6, 1),
+    )
+
+    usuario_actualizado = Usuario(
+        documento="12345678",
+        nombre="JUAN ACTUALIZADO",
+        estado="INACTIVO",
+        contrato="NOMINA",
+        cargo=Cargo(nombre="DESARROLLADOR"),
+        municipio=Municipio(nombre="MEDELLIN", departamento=Departamento(nombre="ANTIOQUIA")),
+        correo="juan.actualizado@example.com",
+        telefono="7654321",
+        seguridad_social=False,
+        fecha_aprobacion_seguridad_social=datetime(2024, 8, 1),
+        fecha_ultima_contratacion=datetime(2024, 7, 1),
+    )
+
+    # simulacion
+    repo_obtener.obtener_por_documento.return_value = usuario_existente
+    repo_actualizar.actualizar.return_value = usuario_actualizado
+
+    # Se define un DTO con los datos del usuario a actualizar
+    info_nueva = ActualizarUsuarioDTO(
+        documento="12345678", nombre="JUAN ACTUALIZADO", correo="juan.actualizado@example.com"
+    )
+
+    # * Act
+    caso_de_uso = ActualizarUsuario(repo_actualizar, repo_obtener)
+
+    resultado = await caso_de_uso.ejecutar(info_nueva)
+
+    # * Assert
+    assert resultado == usuario_actualizado
+    repo_obtener.obtener_por_documento.assert_awaited_once_with("12345678")
+    repo_actualizar.actualizar.assert_awaited_once_with(asdict(info_nueva), usuario_existente)
+
+
+@pytest.mark.asyncio
+async def test_actualizar_usuario_no_encontrado():
+    # * Arrange
+
+    # Se crean mocks de los repositorios necesarios
+    repo_actualizar = AsyncMock(spec=ActualizarUsuarioProtocol)
+    repo_obtener = AsyncMock(spec=ObtenerUsuarioPorDocumentoProtocol)
+
+    # simulacion
+    repo_obtener.obtener_por_documento.return_value = None
+
+    # Se define un DTO con los datos del usuario a actualizar
+    info_nueva = ActualizarUsuarioDTO(
+        documento="12345678", nombre="JUAN ACTUALIZADO", correo="juan.actualizado@example.com"
+    )
+
+    # * Act
+    caso_de_uso = ActualizarUsuario(repo_actualizar, repo_obtener)
+
+    # * Assert
+    with pytest.raises(ValueError, match="Usuario no encontrado. No se puede actualizar"):
+        await caso_de_uso.ejecutar(info_nueva)
+
+    repo_obtener.obtener_por_documento.assert_awaited_once_with("12345678")
+    repo_actualizar.actualizar.assert_not_awaited()

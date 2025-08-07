@@ -4,7 +4,9 @@ from .departamento import DepartamentoResponseSchema, DepartamentoUpdateSchema
 
 class MunicipioCreateSchema(BaseModel):
     nombre: str = Field(..., description="Nombre del municipio", examples=["Medellín"])
-    departamento: DepartamentoUpdateSchema = Field(..., description="Departamento al que pertenece el municipio", examples=["Antioquia"])
+    departamento: DepartamentoUpdateSchema = Field(
+        ..., description="Departamento al que pertenece el municipio", examples=["Antioquia"]
+    )
 
 
 class MunicipioResponseSchema(BaseModel):

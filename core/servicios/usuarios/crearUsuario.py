@@ -72,7 +72,8 @@ class CrearUsuario:
         usuario_nuevo = await self.repo_crear_usuario.crear(usuario)
 
         return usuario_nuevo
-    
+
+
 #     Cuando el usuario ya existe (y el caso de uso debería retornarlo sin crear nada).
 
 # Cuando el cargo existe, pero municipio/departamento no (y viceversa).

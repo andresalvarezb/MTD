@@ -5,7 +5,6 @@ class CargoCreateSchema(BaseModel):
     nombre: str = Field(..., description="Nombre del cargo o puesto", examples=["Gerente de Proyectos"])
 
 
-
 class CargoResponseSchema(BaseModel):
     id: int = Field(..., description="Identificador único del cargo o puesto")
     nombre: str = Field(..., description="Nombre del cargo o puesto")
