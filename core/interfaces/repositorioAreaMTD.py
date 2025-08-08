@@ -7,7 +7,7 @@ class CrearAreaMTDProtocol(Protocol):
 
 
 class ObtenerAreaPorNombreProtocol(Protocol):
-    async def obtener_por_nombre(self, nombre_area: str) -> AreaMTD | None: ...
+    async def obtener_por_nombre(self, nombre: str) -> AreaMTD | None: ...
 
 
 class ObtenerAreasProtocol(Protocol):

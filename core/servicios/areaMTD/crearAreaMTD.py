@@ -8,13 +8,12 @@ class CrearAreaMTD:
         self.repo_obtener = repo_obtener
 
     async def ejecutar(self, nombre: str):
-
-        area_mtd = AreaMTD(nombre=nombre)
-
         # validar existencia
-        area_existente = await self.repo_obtener.obtener_por_nombre(area_mtd.nombre)
+        area_existente = await self.repo_obtener.obtener_por_nombre(nombre)
         if area_existente:
             return area_existente
+
+        area_mtd = AreaMTD(nombre)
 
         nueva_area = await self.repo_crear.crear(area_mtd)
         return nueva_area

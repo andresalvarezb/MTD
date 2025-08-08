@@ -26,8 +26,8 @@ class RepositorioAreaMTDSqlAlchemy(
         await self.db.refresh(nueva_area)
         return AreaMTD.from_orm(nueva_area)
 
-    async def obtener_por_nombre(self, nombre_area: str) -> AreaMTD | None:
-        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.nombre == nombre_area))
+    async def obtener_por_nombre(self, nombre: str) -> AreaMTD | None:
+        resultado = await self.db.execute(select(AreaMTDORM).where(AreaMTDORM.nombre == nombre))
         registro_orm = resultado.scalar_one_or_none()
         if not registro_orm:
             return None
