@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from infraestructura.db.index import get_db
 from fastapi import APIRouter, HTTPException, Depends, Path
-from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
 from core.servicios.usuarios.crearUsuario import CrearUsuario
 from core.servicios.usuarios.obtenerUsuarios import ObtenerUsuarios
 from core.servicios.usuarios.actualizarUsuario import ActualizarUsuario
@@ -18,6 +17,13 @@ from core.servicios.usuarios.dtos import (
     ActualizarUsuarioDTO,
 )
 
+from core.servicios.cargos.crearCargo import CrearCargo
+from core.servicios.municipio.crearMunicipio import CrearMunicipio
+from core.servicios.cargos.obtenerCargo import ObtenerCargo
+from core.servicios.departamento.crearDepartamento import CrearDepartamento
+from core.servicios.municipio.ObtenerMunicipio import ObtenerMunicipio
+from core.servicios.departamento.ObtenerDepartamento import ObtenerDepartamento
+
 
 router = APIRouter()
 
@@ -29,15 +35,16 @@ async def crear_usuario(usuario: UsuarioCreateSchema, db: AsyncSession = Depends
         repo_municipio = RepositorioMunicipioSqlAlchemy(db)
         repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
         repo_cargo = RepositorioCargoSqlAlchemy(db)
+
         caso_de_uso = CrearUsuario(
-            repo_obtener_usuario=repo_usuario,
-            repo_crear_usuario=repo_usuario,
-            repo_obtener_municipio=repo_municipio,
-            repo_crear_municipio=repo_municipio,
-            repo_obtener_departamento=repo_departamento,
-            repo_crear_departamento=repo_departamento,
-            repo_obtener_cargo=repo_cargo,
-            repo_crear_cargo=repo_cargo,
+            obtener_usuario=ObtenerUsuarios(repo_usuario, repo_usuario),
+            crear_usuario_repo=repo_usuario,
+            crear_cargo=CrearCargo(repo_cargo, ObtenerCargo(repo_cargo)),
+            crear_municipio=CrearMunicipio(
+                ObtenerMunicipio(repo_municipio),
+                repo_municipio,
+                CrearDepartamento(ObtenerDepartamento(repo_departamento), repo_departamento),
+            ),
         )
         usuario_creado = await caso_de_uso.ejecutar(
             CrearUsuarioDTO(
@@ -68,7 +75,7 @@ async def obtener_usuarios(
 ):
     try:
         repo_usuario = RepositorioUsuarioSqlAlchemy(db)
-        caso_de_uso = ObtenerUsuarios(repo_usuario)
+        caso_de_uso = ObtenerUsuarios(repo_usuario, repo_usuario)
         usuarios = await caso_de_uso.ejecutar()
         return usuarios
 
@@ -88,7 +95,7 @@ async def obtener_un_usuario(
 ):
     try:
         repo_usuario = RepositorioUsuarioSqlAlchemy(db)
-        caso_de_uso = ObtenerUsuario(repo_usuario)
+        caso_de_uso = ObtenerUsuarios(repo_usuario, repo_usuario)
         usuario = await caso_de_uso.ejecutar(documento)
         return usuario
 
