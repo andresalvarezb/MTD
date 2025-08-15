@@ -1,81 +1,55 @@
-from dataclasses import asdict
 from core.entidades.usuario import Usuario
-from core.entidades.cargo import Cargo
-from core.entidades.municipio import Municipio
-from core.entidades.departamento import Departamento
 from core.servicios.usuarios.dtos import CrearUsuarioDTO
-from core.interfaces.repositorioUsuario import CrearUsuarioProtocol, ObtenerUsuarioPorDocumentoProtocol
-from core.interfaces.repositorioMunicipio import CrearMunicipioProtocol, ObtenerMunicipioPorNombreProtocol
-from core.interfaces.repositorioDepartamento import CrearDepartamentoProtocol, ObtenerDepartamentoPorNombreProtocol
-from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
+from core.interfaces.repositorioUsuario import CrearUsuarioProtocol
+from core.servicios.departamento.dtos import CrearDepartamentoDTO
+from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
+from core.servicios.cargos.crearCargo import CrearCargo
+from core.servicios.cargos.dtos import CrearCargoDTO
+from core.servicios.municipio.crearMunicipio import CrearMunicipio
+from core.servicios.municipio.dtos import CrearMunicipioDTO
+from core.servicios.utilities.exepciones import UsuarioNoExisteError
 
 
 class CrearUsuario:
     def __init__(
         self,
-        repo_obtener_usuario: ObtenerUsuarioPorDocumentoProtocol,
-        repo_crear_usuario: CrearUsuarioProtocol,
-        repo_obtener_municipio: ObtenerMunicipioPorNombreProtocol,
-        repo_crear_municipio: CrearMunicipioProtocol,
-        repo_obtener_departamento: ObtenerDepartamentoPorNombreProtocol,
-        repo_crear_departamento: CrearDepartamentoProtocol,
-        repo_obtener_cargo: ObtenerCargoPorNombreProtocol,
-        repo_crear_cargo: CrearCargoProtocol,
+        obtener_usuario: ObtenerUsuario,
+        crear_usuario_repo: CrearUsuarioProtocol,
+        crear_cargo: CrearCargo,
+        crear_municipio: CrearMunicipio,
     ):
-        self.repo_crear_usuario = repo_crear_usuario
-        self.repo_obtener_usuario = repo_obtener_usuario
-        self.repo_obtener_municipio = repo_obtener_municipio
-        self.repo_crear_municipio = repo_crear_municipio
-        self.repo_obtener_departamento = repo_obtener_departamento
-        self.repo_crear_departamento = repo_crear_departamento
-        self.repo_obtener_cargo = repo_obtener_cargo
-        self.repo_crear_cargo = repo_crear_cargo
+        self.obtener_usuario = obtener_usuario
+        self.crear_usuario_repo = crear_usuario_repo
+        self.crear_cargo = crear_cargo
+        self.crear_municipio = crear_municipio
 
     async def ejecutar(self, datos: CrearUsuarioDTO) -> Usuario:
         # Validar existencia de usuario
-        usuario_existente = await self.repo_obtener_usuario.obtener_por_documento(datos.documento)
-        if usuario_existente:
+        try:
+            usuario_existente = await self.obtener_usuario.ejecutar(datos.documento)
             return usuario_existente
+        except UsuarioNoExisteError:
+            cargo = await self.crear_cargo.ejecutar(CrearCargoDTO(nombre=datos.cargo.nombre))
 
-        cargo_existente = await self.repo_obtener_cargo.obtener_por_nombre(datos.cargo.nombre)
-        if not cargo_existente:
-            cargo_existente = await self.repo_crear_cargo.crear(Cargo(datos.cargo.nombre))
-
-        departamento_existente = await self.repo_obtener_departamento.obtener_por_nombre(
-            datos.municipio.departamento.nombre
-        )
-        if not departamento_existente:
-            departamento_existente = await self.repo_crear_departamento.crear(
-                Departamento(datos.municipio.departamento.nombre)
+            municipio = await self.crear_municipio.ejecutar(
+                CrearMunicipioDTO(
+                    nombre=datos.municipio.nombre,
+                    departamento=CrearDepartamentoDTO(nombre=datos.municipio.departamento.nombre),
+                )
             )
 
-        municipio_existente = await self.repo_obtener_municipio.obtener_por_nombre(datos.municipio.nombre)
-        if not municipio_existente:
-            municipio_existente = await self.repo_crear_municipio.crear(
-                Municipio(nombre=datos.municipio.nombre, departamento=departamento_existente)
+            usuario = Usuario(
+                documento=datos.documento,
+                nombre=datos.nombre,
+                estado=datos.estado,
+                contrato=datos.contrato,
+                cargo=cargo,
+                municipio=municipio,
+                correo=datos.correo,
+                telefono=datos.telefono,
+                seguridad_social=datos.seguridad_social,
+                fecha_aprobacion_seguridad_social=datos.fecha_aprobacion_seguridad_social,
+                fecha_ultima_contratacion=datos.fecha_ultima_contratacion,
             )
 
-        usuario = Usuario(
-            documento=datos.documento,
-            nombre=datos.nombre,
-            estado=datos.estado,
-            contrato=datos.contrato,
-            cargo=cargo_existente,
-            municipio=municipio_existente,
-            correo=datos.correo,
-            telefono=datos.telefono,
-            seguridad_social=datos.seguridad_social,
-            fecha_aprobacion_seguridad_social=datos.fecha_aprobacion_seguridad_social,
-            fecha_ultima_contratacion=datos.fecha_ultima_contratacion,
-        )
-        # print(usuario)
-        usuario_nuevo = await self.repo_crear_usuario.crear(usuario)
-
-        return usuario_nuevo
-
-
-#     Cuando el usuario ya existe (y el caso de uso debería retornarlo sin crear nada).
-
-# Cuando el cargo existe, pero municipio/departamento no (y viceversa).
-
-# Casos de error (ej. datos inválidos si tu DTO o el caso de uso los validan).
+            return await self.crear_usuario_repo.crear(usuario)

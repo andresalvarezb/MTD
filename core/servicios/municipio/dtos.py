@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from core.entidades.departamento import Departamento
+
+from core.servicios.departamento.dtos import CrearDepartamentoDTO
 
 
 @dataclass
 class CrearMunicipioDTO:
     nombre: str
-    departamento: Departamento | None = None
+    departamento: CrearDepartamentoDTO
 
 
 @dataclass
