@@ -1,5 +1,6 @@
 from core.entidades.cargo import Cargo
-from core.servicios.cargos.dtos import CrearCargoDTO
+from core.servicios.cargos.obtenerCargo import ObtenerCargo
+from core.servicios.cargos.dtos import CrearCargoDTO, ObtenerCargoDTO
 from core.interfaces.repositorioCargo import CrearCargoProtocol, ObtenerCargoPorNombreProtocol
 
 
@@ -9,13 +10,9 @@ class CrearCargo:
         self.repo_obtener = repo_obtener
 
     async def ejecutar(self, datos: CrearCargoDTO) -> Cargo:
-        # obtener cargo
-        cargo = Cargo(nombre=datos.nombre)
-        cargo_existente = await self.repo_obtener.obtener_por_nombre(cargo)
-
-        if cargo_existente:
+        try:
+            cargo_existente = await ObtenerCargo(self.repo_obtener).ejecutar(ObtenerCargoDTO(nombre=datos.nombre))
             return cargo_existente
-
-        # Crear cargo
-        cargo_nuevo = await self.repo_crear.crear(cargo)
-        return cargo_nuevo
+        except ValueError:
+            cargo_nuevo = await self.repo_crear.crear(Cargo(nombre=datos.nombre))
+            return cargo_nuevo
