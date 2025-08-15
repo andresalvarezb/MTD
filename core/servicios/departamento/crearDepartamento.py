@@ -3,23 +3,21 @@ from core.interfaces.repositorioDepartamento import (
     ObtenerDepartamentoPorNombreProtocol,
     CrearDepartamentoProtocol,
 )
-
-from .dtos import CrearDepartamentoDTO
+from core.servicios.departamento.ObtenerDepartamento import ObtenerDepartamento
+from .dtos import CrearDepartamentoDTO, ObtenerDepartamentoDTO
 
 
 class CrearDepartamento:
-    def __init__(self, repo_departamento):
-        self.repo_obtener: ObtenerDepartamentoPorNombreProtocol = repo_departamento
-        self.repo_crear: CrearDepartamentoProtocol = repo_departamento
+    def __init__(self, repo_obtener: ObtenerDepartamentoPorNombreProtocol, repo_crear: CrearDepartamentoProtocol):
+        self.repo_obtener = repo_obtener
+        self.repo_crear = repo_crear
 
     async def ejecutar(self, datos: CrearDepartamentoDTO) -> Departamento:
-        departamento = Departamento(nombre=datos.nombre)
-
-        # buscar departamento por nombre
-        existe_departamento = await self.repo_obtener.obtener_por_nombre(departamento)
-        if existe_departamento:
-            return existe_departamento
-
-        # crearlo de no existir
-        nuevo_departamento = await self.repo_crear.crear(departamento)
-        return nuevo_departamento
+        try:
+            departamento_obtenido = await ObtenerDepartamento(self.repo_obtener).ejecutar(
+                ObtenerDepartamentoDTO(nombre=datos.nombre)
+            )
+            return departamento_obtenido
+        except ValueError:
+            nuevo_departamento = await self.repo_crear.crear(Departamento(nombre=datos.nombre))
+            return nuevo_departamento
