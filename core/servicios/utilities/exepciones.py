@@ -9,3 +9,6 @@ class UsuarioNoExisteError(Exception):
 
 class CargoNoExisteError(Exception):
     pass
+
+class AreaNoExisteError(Exception):
+    pass

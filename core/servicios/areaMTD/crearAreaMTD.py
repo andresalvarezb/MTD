@@ -1,15 +1,16 @@
-from core.interfaces.repositorioAreaMTD import CrearAreaMTDProtocol, ObtenerAreaPorNombreProtocol
+from core.interfaces.repositorioAreaMTD import CrearAreaMTDProtocol
+from core.servicios.areaMTD.obtenerAreasMTD import ObtenerAreasMTD
 from core.entidades.areaMtd import AreaMTD
 
 
 class CrearAreaMTD:
-    def __init__(self, repo_crear: CrearAreaMTDProtocol, repo_obtener: ObtenerAreaPorNombreProtocol):
+    def __init__(self, repo_crear: CrearAreaMTDProtocol, repo_obtener: ObtenerAreasMTD):
         self.repo_crear = repo_crear
         self.repo_obtener = repo_obtener
 
-    async def ejecutar(self, nombre: str):
+    async def ejecutar(self, nombre: str, id_area: int | None = None):
         # validar existencia
-        area_existente = await self.repo_obtener.obtener_por_nombre(nombre)
+        area_existente = await self.repo_obtener.ejecutar(id_area)
         if area_existente:
             return area_existente
 
