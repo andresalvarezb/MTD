@@ -17,9 +17,9 @@ class CrearHistorialLaboralUsuario:
         # obtener
         historial = HistorialLaboralUsuario(
             usuario=datos.usuario,
-            contrato=datos.contrato,
-            cargo=datos.cargo,
-            municipio=datos.municipio,
+            contrato=datos.usuario.contrato,
+            cargo=datos.usuario.cargo,
+            municipio=datos.usuario.municipio,
             claveHLU=datos.claveHLU,
             fecha_contratacion=datos.fecha_contratacion,
             seguridad_social=datos.seguridad_social,

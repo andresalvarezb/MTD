@@ -35,7 +35,7 @@ class HistorialLaboralORM(Base):
     )
 
     # Relaciones 1:N
-    usuario: Mapped["UsuarioORM"] = relationship(back_populates="historial_laboral")
-    cargo: Mapped["CargoORM"] = relationship(back_populates="historial_laboral")
-    cuentas_por_pagar: Mapped[list["CuentaPorPagarORM"]] = relationship(back_populates="historial_laboral")
-    municipio: Mapped["MunicipioORM"] = relationship(back_populates="historial_laboral")
+    usuario: Mapped["UsuarioORM"] = relationship(back_populates="historial_laboral", lazy="selectin")
+    cargo: Mapped["CargoORM"] = relationship(back_populates="historial_laboral", lazy="selectin")
+    cuentas_por_pagar: Mapped[list["CuentaPorPagarORM"]] = relationship(back_populates="historial_laboral", lazy="selectin")
+    municipio: Mapped["MunicipioORM"] = relationship(back_populates="historial_laboral", lazy="selectin")

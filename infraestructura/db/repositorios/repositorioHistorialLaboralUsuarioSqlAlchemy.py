@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from core.entidades.historialLaboralUsuario import HistorialLaboralUsuario
 from infraestructura.db.modelos.historialLaboralUsuario import HistorialLaboralORM
 from core.interfaces.repositorioHistorialLaboralUsuario import (
@@ -8,7 +9,8 @@ from core.interfaces.repositorioHistorialLaboralUsuario import (
     ObtenerHistorialLaboralPorClaveProtocol,
     ActualizarHistorialLaboralUsuarioProtocol,
 )
-
+from infraestructura.db.modelos.usuario import UsuarioORM
+from infraestructura.db.modelos.municipio import MunicipioORM
 
 class RepositorioHistorialLaboralUsuarioSqlAlchemy(
     CrearHistorialLaboralUsuarioProtocol,
@@ -39,7 +41,10 @@ class RepositorioHistorialLaboralUsuarioSqlAlchemy(
 
     async def obtener(self, historialLaboral: HistorialLaboralUsuario):
         existe = await self.db.execute(
-            select(HistorialLaboralORM).where(HistorialLaboralORM.claveHLU == historialLaboral.claveHLU)
+            select(HistorialLaboralORM).options(
+                    selectinload(HistorialLaboralORM.usuario).selectinload(UsuarioORM.municipio).selectinload(MunicipioORM.departamento),
+                    
+                ).where(HistorialLaboralORM.claveHLU == historialLaboral.claveHLU)
         )
         existe = existe.scalar_one_or_none()
 

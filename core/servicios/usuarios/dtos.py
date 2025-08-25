@@ -1,23 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from core.entidades.cargo import Cargo
-from core.entidades.municipio import Municipio
+from core.servicios.municipio.dtos import CrearMunicipioDTO
+from core.servicios.cargos.dtos import CrearCargoDTO
 
-
-@dataclass
-class CrearCargoDTO:
-    nombre: str
-
-
-@dataclass
-class CrearDepartamentoDTO:
-    nombre: str
-
-
-@dataclass
-class CrearMunicipioDTO:
-    nombre: str
-    departamento: CrearDepartamentoDTO
 
 
 @dataclass

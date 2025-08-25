@@ -43,8 +43,8 @@ from infraestructura.db.repositorios.repositorioDescuentoSQLAlchemy import (
 from core.servicios.usuarios.dtos import CrearUsuarioDTO, ActualizarUsuarioDTO
 from core.servicios.cargos.dtos import CrearCargoDTO, ObtenerCargoDTO
 from core.servicios.departamento.dtos import CrearDepartamentoDTO
+from core.servicios.departamento.dtos import CrearDepartamentoDTO, ObtenerDepartamentoDTO
 from core.servicios.municipio.dtos import CrearMunicipioDTO, ObtenerMunicipioDTO
-from core.servicios.municipio.dtos import CrearMunicipioDTO
 from core.servicios.historialLaboral.dtos import CrearHistorialLaboralUsuarioDTO, ActualizarHistorialLaboralUsuarioDTO
 from core.servicios.cuentasPorPagar.dtos import CrearCuentaPorPagarDTO, ActualizarCuentaPorPagarDTO
 from core.servicios.cuentasBancarias.dtos import (
@@ -73,7 +73,9 @@ from core.entidades.cuentaPorPagar import CuentaPorPagar
 from core.entidades.banco import Banco
 from core.servicios.descuentos.dtos import FiltrarDescuentosDTO
 from core.servicios.descuentos.obtenerDescuentos import ObtenerDescuentos
-
+from core.servicios.usuarios.obtenerUsuarios import ObtenerUsuarios
+from core.servicios.departamento.crearDepartamento import CrearDepartamento
+from core.servicios.departamento.ObtenerDepartamento import ObtenerDepartamento
 
 router = APIRouter()
 
@@ -104,34 +106,33 @@ async def cargar_historial_cuentas(file: UploadFile = File(...), db: AsyncSessio
     datos = procesar_historico(file)
     for idx, registro in datos.items():
         try:
-            # crear la ubciacion del profesional (Municipio, departamento)
-            repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
-            departamento_service = CrearDepartamento(repo_departamento)
-            departamento = await departamento_service.ejecutar(CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"]))
-
-            # crear el municipio
-            repo_municipio = RepositorioMunicipioSqlAlchemy(db)
-            municipio_service = CrearMunicipio(repo_municipio)
-            municipio = await municipio_service.ejecutar(
-                CrearMunicipioDTO(nombre=registro["MUNICIPIO"], departamento=departamento)
-            )
-
             # crear cargo
             repo_cargo = RepositorioCargoSqlAlchemy(db)
-            cargo_service = CrearCargo(repo_crear=repo_cargo, repo_obtener=repo_cargo)
-            cargo = await cargo_service.ejecutar(CrearCargoDTO(nombre=registro["CARGO"]))
+            repo_municipio = RepositorioMunicipioSqlAlchemy(db)
+            repo_departamento = RepositorioDepartamentoSqlAlchemy(db)
 
             # crear usuario
             repo_usuario = RepositorioUsuarioSqlAlchemy(db)
-            usuario_service = CrearUsuario(repo_crear=repo_usuario, repo_obtener=repo_usuario)
+            usuario_service = CrearUsuario(
+                obtener_usuario=ObtenerUsuarios(repo_usuario, repo_usuario),
+                crear_usuario_repo=repo_usuario,
+                crear_cargo=CrearCargo(repo_cargo, ObtenerCargo(repo_cargo)),
+                crear_municipio=CrearMunicipio(
+                    ObtenerMunicipio(repo_municipio),
+                    repo_municipio,
+                    CrearDepartamento(ObtenerDepartamento(repo_departamento), repo_departamento),
+                ),
+            )
             usuario = await usuario_service.ejecutar(
                 CrearUsuarioDTO(
                     documento=registro["DOCUMENTO"],
                     nombre=registro["NOMBRE"],
                     estado=registro["ESTADO_USUARIO"],  # ? agregrar enum
-                    municipio=municipio,
+                    municipio=CrearMunicipioDTO(
+                        nombre=registro["MUNICIPIO"], departamento=CrearDepartamentoDTO(nombre=registro["DEPARTAMENTO"])
+                    ),
                     contrato=registro["TIPO_DE_CONTRATO"],
-                    cargo=cargo,
+                    cargo=CrearCargoDTO(nombre=registro["CARGO"]),
                     correo=registro["CORREO"],
                     telefono=registro["TELEFONO_USUARIO"],
                     seguridad_social=registro["ESTADO_SEGURIDAD_SOCIAL"] == "APROBADO",
@@ -148,9 +149,6 @@ async def cargar_historial_cuentas(file: UploadFile = File(...), db: AsyncSessio
             historialLaboralUsuario = await historialLaboralUsuario_service.ejecutar(
                 CrearHistorialLaboralUsuarioDTO(
                     usuario=usuario,
-                    cargo=cargo,
-                    municipio=municipio,
-                    contrato=registro["TIPO_DE_CONTRATO"],
                     claveHLU=(
                         str(registro["FECHA_PRESTACION_SERVICIO"].strftime("%Y%m%d"))
                         + str(registro["DOCUMENTO"])

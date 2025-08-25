@@ -2,7 +2,7 @@ from core.entidades.usuario import Usuario
 from core.servicios.usuarios.dtos import CrearUsuarioDTO
 from core.interfaces.repositorioUsuario import CrearUsuarioProtocol
 from core.servicios.departamento.dtos import CrearDepartamentoDTO
-from core.servicios.usuarios.obtenerUsuario import ObtenerUsuario
+from core.servicios.usuarios.obtenerUsuarios import ObtenerUsuarios
 from core.servicios.cargos.crearCargo import CrearCargo
 from core.servicios.cargos.dtos import CrearCargoDTO
 from core.servicios.municipio.crearMunicipio import CrearMunicipio
@@ -13,7 +13,7 @@ from core.servicios.utilities.exepciones import UsuarioNoExisteError
 class CrearUsuario:
     def __init__(
         self,
-        obtener_usuario: ObtenerUsuario,
+        obtener_usuario: ObtenerUsuarios,
         crear_usuario_repo: CrearUsuarioProtocol,
         crear_cargo: CrearCargo,
         crear_municipio: CrearMunicipio,
@@ -27,7 +27,7 @@ class CrearUsuario:
         # Validar existencia de usuario
         try:
             usuario_existente = await self.obtener_usuario.ejecutar(datos.documento)
-            return usuario_existente
+            return usuario_existente[0]
         except UsuarioNoExisteError:
             cargo = await self.crear_cargo.ejecutar(CrearCargoDTO(nombre=datos.cargo.nombre))
 

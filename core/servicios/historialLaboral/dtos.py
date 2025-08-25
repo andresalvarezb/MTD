@@ -17,10 +17,7 @@ class ActualizarSeguridadSocialDTO:
 @dataclass
 class CrearHistorialLaboralUsuarioDTO:
     usuario: Usuario
-    contrato: str
-    cargo: Cargo
     claveHLU: str
-    municipio: Municipio
     seguridad_social: bool | None
     fecha_contratacion: datetime | None
     fecha_fin_contratacion: datetime | None

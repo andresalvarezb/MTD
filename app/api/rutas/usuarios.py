@@ -13,7 +13,6 @@ from core.servicios.usuarios.dtos import (
     CrearUsuarioDTO,
     CrearCargoDTO,
     CrearMunicipioDTO,
-    CrearDepartamentoDTO,
     ActualizarUsuarioDTO,
 )
 
@@ -23,6 +22,8 @@ from core.servicios.cargos.obtenerCargo import ObtenerCargo
 from core.servicios.departamento.crearDepartamento import CrearDepartamento
 from core.servicios.municipio.ObtenerMunicipio import ObtenerMunicipio
 from core.servicios.departamento.ObtenerDepartamento import ObtenerDepartamento
+from core.servicios.cargos.dtos import CrearCargoDTO
+from core.servicios.departamento.dtos import CrearDepartamentoDTO
 
 
 router = APIRouter()
